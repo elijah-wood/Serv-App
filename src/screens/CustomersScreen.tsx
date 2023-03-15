@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { StatusBar } from 'react-native'
-import { RootStackParamList } from '../../App'
+import { AlphabetList, IData } from "react-native-section-alphabet-list";
+import { SearchBar } from '@rneui/themed';
 
-import Table, { TouchableCell, Section } from 'react-native-js-tableview';
+
+import { RootStackParamList } from '../../App'
 import { Customer } from '../types/Customer'
 import { Job } from '../types/Job'
 
@@ -15,6 +16,8 @@ type Props = {
 }
 
 const CustomersScreen: React.FC<Props> = ({ navigation }) => {
+  const [search, setSearch] = useState("")
+  const [customerIData, setCustomerIData] = useState<IData[]>([])
   const [customers, setCustomers] = useState<Customer[]>(
     [
       new Customer(0, "Milton Aaron", "m.aaron@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", [
@@ -29,72 +32,73 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
       new Customer(7, "Nick Batchelder", "n.batchelder@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", []),
     ]
   )
-  
+
+  React.useEffect(() => {
+    let filteredArray: IData[] = []
+    customers.forEach(element => filteredArray.push({ key: element.id.toString(), value: element.name}))
+    setCustomerIData(filteredArray)
+  }, [])
+
+  const updateSearch = (search) => {
+    let filteredArray: IData[] = []
+    customers.filter(customer => customer.name.toUpperCase().includes(search.toUpperCase())).forEach(element => filteredArray.push({ key: element.id.toString(), value: element.name}))
+    setCustomerIData(filteredArray)
+    setSearch(search)
+  }
+
+
+
   return (
     <ContainerView>
-      <SafeAreaView>
-          <Table accentColor='#000000' scrollable={true}>
-            <Section>
-            {customers.map(customer => {
-              return (
-                <TouchableCell
-                title={`${customer.name}`}
-                onPress={() => {
-                  navigation.navigate('CustomerDetailScreen', { customer: customer })
-                }}
-                key={`${customer.id}`}
-                />
-              )
-            })}  
-            </Section>
-          </Table>
-      </SafeAreaView>
+      <SearchBar
+        platform="ios"
+        placeholder="Search"
+        onChangeText={updateSearch}
+        value={search}
+      />
+      <AlphabetList
+      data={customerIData}
+      indexLetterStyle={{ 
+        color: 'black',
+      }}
+      renderCustomItem={(item) => (
+        <Item onPress={() => {
+          navigation.navigate("CustomerDetailScreen", { customer: new Customer(0, "Milton Aaron", "m.aaron@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", [
+            new Job(0, "Boiler Room Leak", "42 Fleetwood Dr.\nNew York, NY 11280")
+          ]) })
+        }}><ItemTitle>{item.value}</ItemTitle></Item>
+      )}
+      renderCustomSectionHeader={(section) => (
+        <SectionTitle>{section.title}</SectionTitle>
+      )}
+    />
     </ContainerView>
   )
 }
 
 const ContainerView = styled.View`
-  background-color: transparent;
   height: 100%;
   width: 100%;
+  backgroundColor: white;
+
+`
+const Item = styled.TouchableOpacity`
+  padding: 10px;
+  height: 44px;
 `
 
-const SafeAreaView = styled.SafeAreaView``
-
-const ScrollView = styled.ScrollView``
-
-const VStackContainerView = styled.View`
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-`
-// Button bottom constraint + button height + goal margin
-const GoalsVStackContainerView = styled.View`
-  margin-bottom: ${44 + 50 + 18}px;
+const ItemTitle = styled.Text`
+  fontSize: 18px;
 `
 
-const HeaderImage = styled.Image`
-  resize-mode: contain;
-  width: 300px;
-  height: 200px;
-  margin-top: ${StatusBar.currentHeight ?? 0}px;
-`
-
-const TitleText = styled.Text`
-  color: white;
-  font-size: 24px;
-  font-family: 'BeVietnam-Bold';
-  text-align: center;
-  margin-top: 18px;
-`
-
-const NextButtonContainerView = styled.View`
-  position: absolute;
-  flex: 1;
-  align-items: center;
-  left: 0px;
-  right: 0px;
-  bottom: 44px;
+const SectionTitle = styled.Text`
+  paddingTop: 2px;
+  paddingLeft: 10px;
+  paddingRight: 10px;
+  paddingBottom: 2px;
+  fontSize: 14px;
+  fontWeight: bold;
+  backgroundColor: #E5E5EA;
 `
 
 export default CustomersScreen
