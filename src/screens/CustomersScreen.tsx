@@ -46,8 +46,6 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
     setSearch(search)
   }
 
-
-
   return (
     <ContainerView>
       <SearchBar
@@ -63,9 +61,8 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
       }}
       renderCustomItem={(item) => (
         <Item onPress={() => {
-          navigation.navigate("CustomerDetailScreen", { customer: new Customer(0, "Milton Aaron", "m.aaron@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", [
-            new Job(0, "Boiler Room Leak", "42 Fleetwood Dr.\nNew York, NY 11280")
-          ]) })
+          let customer = customers[item.key]
+          navigation.navigate("CustomerDetailScreen", { customer: customer })
         }}><ItemTitle>{item.value}</ItemTitle></Item>
       )}
       renderCustomSectionHeader={(section) => (
