@@ -3,8 +3,8 @@ import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
 
-import Table, { Section, BioCell, StaticCell, KeyValueCell } from 'react-native-js-tableview';
-import {useColorScheme } from 'react-native';
+import Table, { Section, BioCell, StaticCell, KeyValueCell, TouchableCell } from 'react-native-js-tableview';
+import { useColorScheme } from 'react-native';
 import { HStack } from 'native-base'
 
 import { RootStackParamList } from '../../App'
@@ -58,6 +58,9 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <Section>
             <StaticCell title='Jobs' accessory='disclosure' onPress={() => {}} />
             <StaticCell title='Payments' accessory='disclosure' onPress={() => {}} />
+          </Section>
+          <Section>
+            <TouchableCell title='Delete'/>
           </Section>
       </Table>
     </ContainerView>

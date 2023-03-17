@@ -1,13 +1,17 @@
-import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { StatusBar } from 'expo-status-bar'
 import * as React from 'react';
-import { RootNavigator } from './src/navigation/RootNavigator';
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { NativeBaseProvider } from 'native-base'
+import { expo } from './app.json'
+import { AppRegistry } from 'react-native'
 
-import { Customer } from './src/types/Customer';
-import { NativeBaseProvider } from 'native-base';
+import { RootNavigator } from './src/navigation/RootNavigator'
+import { Customer } from './src/types/Customer'
+
+AppRegistry.registerComponent(expo.name, () => App)
 
 type Props = Record<string, never>
-
 
 type RootStackParamList = {
   Home: undefined
@@ -22,15 +26,18 @@ type RootStackParamList = {
 const App: React.FC<Props> = () => {
   React.useEffect(() => {
     // Init
+    
   }, [])
 
   return (
     <>
       <NativeBaseProvider>
         <StatusBar translucent backgroundColor="transparent" />
-        <SafeAreaProvider>
-          <RootNavigator />
-        </SafeAreaProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <SafeAreaProvider>
+            <RootNavigator />
+          </SafeAreaProvider>
+        </GestureHandlerRootView>
       </NativeBaseProvider>  
     </>
   )

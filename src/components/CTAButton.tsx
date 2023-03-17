@@ -3,7 +3,6 @@ import { TouchableOpacity, TouchableOpacityProps } from 'react-native'
 import styled from 'styled-components/native'
 import { VStack } from 'native-base'
 import Icon from 'react-native-vector-icons/Entypo'
-import { Platform } from 'react-native'
 
 type Props = TouchableOpacityProps & {
     label: string
