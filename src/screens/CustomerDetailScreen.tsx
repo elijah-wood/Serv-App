@@ -46,12 +46,12 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
               }} />
           </Section>
           <Section header='Phone' headerStyle={{ color: '#3C3C43' }}>
-              <StaticCell title={customer.phone} accessory="disclosure" onPress={() => {
+              <StaticCell title={customer.phone} titleStyle={{ color: '#0062FF' }} onPress={() => {
 
               }} />
           </Section>
           <Section header='Email' headerStyle={{ color: '#3C3C43' }}>
-              <StaticCell title={customer.email} accessory="disclosure"onPress={() => {
+              <StaticCell title={customer.email} titleStyle={{ color: '#0062FF' }} onPress={() => {
 
               }} />
           </Section>
