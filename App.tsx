@@ -4,6 +4,7 @@ import { RootNavigator } from './src/navigation/RootNavigator';
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { Customer } from './src/types/Customer';
+import { NativeBaseProvider } from 'native-base';
 
 type Props = Record<string, never>
 
@@ -25,11 +26,12 @@ const App: React.FC<Props> = () => {
 
   return (
     <>
-      <StatusBar translucent backgroundColor="transparent" />
-      <SafeAreaProvider>
-        <RootNavigator />
-      </SafeAreaProvider>
-      
+      <NativeBaseProvider>
+        <StatusBar translucent backgroundColor="transparent" />
+        <SafeAreaProvider>
+          <RootNavigator />
+        </SafeAreaProvider>
+      </NativeBaseProvider>  
     </>
   )
 }

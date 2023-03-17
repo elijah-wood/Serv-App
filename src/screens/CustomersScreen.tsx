@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { AlphabetList, IData } from "react-native-section-alphabet-list";
-import { SearchBar } from '@rneui/themed';
+import { SearchBar } from '@rneui/themed'
 
 
 import { RootStackParamList } from '../../App'
