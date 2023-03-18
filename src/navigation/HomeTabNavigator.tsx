@@ -26,7 +26,7 @@ export const InboxStackScreen: React.FC<Props> = () => {
                     title: 'Inbox',
                 }}
             />
-            <Stack.Screen name={Routes.CHAT_DETIAL} component={ChatScreen} 
+            <Stack.Screen name={Routes.CHAT_DETAIL} component={ChatScreen} 
                 options={{
                     title: 'Chat',
                 }}

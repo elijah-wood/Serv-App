@@ -20,6 +20,7 @@ type Props = Record<string, never>
 type RootStackParamList = {
   Home: undefined
   Account: undefined
+  SignInScreen: undefined
   Welcome: undefined
   HomeTabNavigator: undefined
   CustomersScreen: undefined

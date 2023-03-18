@@ -13,7 +13,7 @@ export const RootNavigator = () => {
 
   return (
     <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack.Navigator initialRouteName={Routes.HOME} screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={Routes.ACCOUNT} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={Routes.HOME} component={HomeTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name={Routes.ACCOUNT} component={AccountNavigator} options={{  headerShown: false }} />
       </Stack.Navigator>
