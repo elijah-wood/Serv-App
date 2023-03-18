@@ -6,6 +6,7 @@ export default {
     CUSTOMER_DETAIL: 'CustomerDetailScreen',
     INBOX_TAB: 'InboxTab',
     INBOX: 'Inbox',
+    CHAT_DETIAL: "ChatDetail",
     SIGN_IN: "SignIn",
     WELCOME: "Welcome",
     ACCOUNT: "Account",

@@ -1,17 +1,12 @@
 import React, { useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { SearchBar } from '@rneui/themed'
-import { StreamChat } from 'stream-chat'
-import {
-  Channel,
-  Chat,
-  MessageInput,
-  MessageList,
-  OverlayProvider as ChatOverlayProvider,
-} from 'stream-chat-expo'
+import { ChannelList } from 'stream-chat-expo'
 
+import { useChatClient } from '../stream/UseChatClient'
 import { RootStackParamList } from '../../App'
+import { chatUserId } from '../../chatConfig'
+import { useAppContext } from '../stream/AppContext'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
 
@@ -19,43 +14,35 @@ type Props = {
   navigation: OnboardingSlideGoalsNavigationProp
 }
 
-const InboxScreen: React.FC<Props> = ({ navigation }) => {
-    const [search, setSearch] = useState("")
+const filters = {
+    members: {
+      '$in': [chatUserId]
+    },
+}
 
-    const updateSearch = (search) => {
-        
-        setSearch(search)
-    }
+const InboxScreen: React.FC<Props> = ({ navigation }) => {
+    const { setChannel } = useAppContext()
+    const { clientIsReady } = useChatClient()
+
+    if (!clientIsReady) {
+      return <WarningText>Loading chat ...</WarningText>
+    } 
 
     return (
         <ContainerView>
-            <SearchBar
-                platform="ios"
-                placeholder="Search"
-                onChangeText={updateSearch}
-                value={search}
+            <ChannelList
+                onSelect={(channel) => {
+                    setChannel(channel)
+                    navigation.navigate('ChatScreen')
+                }}
+                filters={filters}
             />
-        {/* <FlatList
-            data={[
-                {key: 'Devin'},
-                {key: 'Dan'},
-                {key: 'Dominic'},
-                {key: 'Jackson'},
-                {key: 'James'},
-                {key: 'Joel'},
-                {key: 'John'},
-                {key: 'Jillian'},
-                {key: 'Jimmy'},
-                {key: 'Julie'},
-            ]}
-            renderItem={({item}) => {
-                <Text style={styles.item}>{item.key}</Text>
-            }
-        }
-        /> */}
         </ContainerView>
     )
 }
+
+const WarningText = styled.Text`
+`
 
 const ContainerView = styled.View`
   background-color: transparent;

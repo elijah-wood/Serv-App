@@ -1,13 +1,14 @@
 import React from 'react'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RootStackParamList } from '../../App'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import CustomersScreen from '../screens/CustomersScreen'
-import CustomerDetailScreen from '../screens/CustomerDetailScreen';
-import Routes from './Routes';
-import InboxScreen from '../screens/InboxScreen';
+import CustomerDetailScreen from '../screens/CustomerDetailScreen'
+import Routes from './Routes'
+import InboxScreen from '../screens/InboxScreen'
+import ChatScreen from '../screens/ChatScreen'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'HomeTabNavigator'>
 
@@ -21,11 +22,17 @@ export const InboxStackScreen: React.FC<Props> = () => {
     return (
         <Stack.Navigator initialRouteName={Routes.CUSTOMERS}>
             <Stack.Screen name={Routes.INBOX} component={InboxScreen} 
-            options={{
-                title: 'Inbox',
-                }}/>
+                options={{
+                    title: 'Inbox',
+                }}
+            />
+            <Stack.Screen name={Routes.CHAT_DETIAL} component={ChatScreen} 
+                options={{
+                    title: 'Chat',
+                }}
+            />
         </Stack.Navigator>
-    );
+    )
 }
 
 export const CustomersStackScreen: React.FC<Props> = () => {
@@ -34,15 +41,17 @@ export const CustomersStackScreen: React.FC<Props> = () => {
     return (
         <Stack.Navigator initialRouteName={Routes.CUSTOMERS}>
             <Stack.Screen name={Routes.CUSTOMERS} component={CustomersScreen} 
-            options={{
-                title: 'Customers',
-                }}/>
+                options={{
+                    title: 'Customers',
+                }}
+            />
             <Stack.Screen name={Routes.CUSTOMER_DETAIL} component={CustomerDetailScreen} 
-            options={{
-                title: 'Customer',
-                }}/>
+                options={{
+                    title: 'Customer',
+                }}
+             />
         </Stack.Navigator>
-    );
+    )
 }
 
 export const HomeTabNavigator: React.FC<Props> = () => {
@@ -51,13 +60,15 @@ export const HomeTabNavigator: React.FC<Props> = () => {
     return (
         <Tab.Navigator screenOptions={{ headerShown: false }}>
             <Tab.Screen name={Routes.INBOX_TAB} component={InboxStackScreen}
-            options={{
-                title: 'Inbox',
-                }}/>
+                options={{
+                    title: 'Inbox',
+                }}
+            />
             <Tab.Screen name={Routes.CUSTOMERS_TAB} component={CustomersStackScreen}
-            options={{
-                title: 'Customers',
-                }}/>
+                options={{
+                    title: 'Customers',
+                }}
+            />
         </Tab.Navigator>
         )
     }
