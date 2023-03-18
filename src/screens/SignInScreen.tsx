@@ -32,11 +32,15 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                 <VStack space={5} justifyContent={'center'} style={{ height: '100%', marginHorizontal: 10, marginTop: 10 }}>
                     <TitleText>Please enter your phone number.</TitleText>
                     <SubtitleText>Enter your phone number.</SubtitleText>
-                    {errors.phone && <ErrorText>This is required.</ErrorText>}
+                    {errors.phone && <ErrorText>{errors.phone.message ? errors.phone.message : 'This is required.'}</ErrorText>}
                     <Controller
                       control={control}
                       rules={{
-                      required: true,
+                        required: true,
+                        pattern: {
+                          value: /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/i,
+                          message: 'Invalid phone number.'
+                        }
                       }}
                       render={({ field: { onChange, value } }) => (
                         <PhoneInput
