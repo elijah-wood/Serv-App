@@ -21,7 +21,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
     return (
         <ContainerView>
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                <VStack space={5} justifyContent={'center'} alignItems={'left'} style={{ height: '100%', marginHorizontal: 10, marginTop: 10 }}>
+                <VStack space={5} justifyContent={'center'} style={{ height: '100%', marginHorizontal: 10, marginTop: 10 }}>
                     <TitleText>Please enter your phone number.</TitleText>
                     <SubtitleText>Enter your phone number.</SubtitleText>
                     <PhoneInput
