@@ -1,23 +1,25 @@
 import React from 'react'
-import { TouchableOpacity, TouchableOpacityProps } from 'react-native'
+import { TouchableOpacity, TouchableOpacityProps, ActivityIndicator } from 'react-native'
 import styled from 'styled-components/native'
 import { VStack } from 'native-base'
 
 type Props = TouchableOpacityProps & {
     label: string
+    loading?: boolean
 }
   
 const DefaultButton: React.FC<Props> = ({
     label,
     onPress,
+    loading,
     disabled,
     ...props
   }) => {
     return (
         <ButtonContainerView isDisabled={disabled}>
-            <TouchableOpacity onPress={onPress} disabled={disabled} >
+            <TouchableOpacity onPress={onPress} disabled={disabled || loading} {...props}>
                 <VStack alignItems={'center'} justifyContent={'center'} style={{ height: "100%" }}>
-                    <ButtonText>{label}</ButtonText>
+                    {loading ? <ActivityIndicator color={'white'}/> : <ButtonText>{label}</ButtonText>}
                 </VStack>
             </TouchableOpacity>
         </ButtonContainerView>
