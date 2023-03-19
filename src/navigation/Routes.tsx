@@ -4,6 +4,7 @@ export default {
     CUSTOMERS: 'CustomersTab',
     CUSTOMERS_TAB: 'CustomersScreen',
     CUSTOMER_DETAIL: 'CustomerDetailScreen',
+    ADD_CUSTOMER: 'AddCustomerScreen',
     INBOX_TAB: 'InboxTab',
     INBOX: 'Inbox',
     CHAT_DETAIL: "ChatDetail",

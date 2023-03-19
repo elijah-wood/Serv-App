@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { AlphabetList, IData } from "react-native-section-alphabet-list";
+import { AlphabetList, IData } from 'react-native-section-alphabet-list'
 import { SearchBar } from '@rneui/themed'
-
+import Icon from 'react-native-vector-icons/Entypo'
 
 import { RootStackParamList } from '../../App'
 import { Customer } from '../types/Customer'
 import { Job } from '../types/Job'
+import { IconButton } from 'native-base'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomersScreen'>
 
@@ -38,6 +39,17 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
     customers.forEach(element => filteredArray.push({ key: element.id.toString(), value: element.name}))
     setCustomerIData(filteredArray)
   }, [])
+
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <IconButton icon={<Icon name='plus' color={'#0062FF'} size={25}/>} onPress={() => {
+          navigation.navigate('AddCustomerScreen')
+        }}/>
+      ),
+    })
+  }, [navigation])
+
 
   const updateSearch = (search) => {
     let filteredArray: IData[] = []

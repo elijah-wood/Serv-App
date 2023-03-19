@@ -25,6 +25,7 @@ type RootStackParamList = {
   Welcome: undefined
   HomeTabNavigator: undefined
   CustomersScreen: undefined
+  AddCustomerScreen: undefined
   InboxScreen: undefined
   ChatScreen: undefined
   CustomerDetailScreen: { customer: Customer }

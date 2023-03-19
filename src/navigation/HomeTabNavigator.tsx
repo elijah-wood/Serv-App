@@ -1,4 +1,5 @@
 import React from 'react'
+import { Button } from 'react-native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RootStackParamList } from '../../App'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
@@ -9,6 +10,7 @@ import CustomerDetailScreen from '../screens/CustomerDetailScreen'
 import Routes from './Routes'
 import InboxScreen from '../screens/InboxScreen'
 import ChatScreen from '../screens/ChatScreen'
+import AddCustomerScreen from '../screens/AddCustomerScreen'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'HomeTabNavigator'>
 
@@ -43,11 +45,19 @@ export const CustomersStackScreen: React.FC<Props> = () => {
             <Stack.Screen name={Routes.CUSTOMERS} component={CustomersScreen} 
                 options={{
                     title: 'Customers',
+                    headerRight: () => (
+                       <Button title={"add"}/>
+                    )
                 }}
             />
             <Stack.Screen name={Routes.CUSTOMER_DETAIL} component={CustomerDetailScreen} 
                 options={{
                     title: 'Customer',
+                }}
+             />
+            <Stack.Screen name={Routes.ADD_CUSTOMER} component={AddCustomerScreen} 
+                options={{
+                    title: 'Add Customer',
                 }}
              />
         </Stack.Navigator>

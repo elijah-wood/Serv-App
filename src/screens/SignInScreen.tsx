@@ -10,12 +10,15 @@ import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
 import TextButton from '../components/TextButton'
 import Links from '../utils/links'
+// import ApiClient from '../api/API'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'SignInScreen'>
 
 type Props = {
   navigation: NavigationProp
 }
+
+// const apiClient = new ApiClient()
 
 const SignInScreen: React.FC<Props> = ({ navigation }) => {
     const { control, handleSubmit, formState: { errors }, getValues } = useForm({
@@ -26,7 +29,18 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
 
     const onSubmit = () => { 
       navigation.navigate('PhoneVerificationScreen', { phone: getValues('phone') })
+      // handleLogin()
     }
+
+
+    // const handleLogin = async () => {
+    //   try {
+    //     await apiClient.signin(getValues('phone'))
+    //     console.log('Login successful')
+    //   } catch (error) {
+    //     console.error('Login failed:', error.message)
+    //   }
+    // }
 
     return (
         <ContainerView>
