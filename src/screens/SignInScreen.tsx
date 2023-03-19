@@ -11,20 +11,22 @@ import DefaultButton from '../components/DefaultButton'
 import TextButton from '../components/TextButton'
 import Links from '../utils/links'
 
-type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'SignInScreen'>
+type NavigationProp = StackNavigationProp<RootStackParamList, 'SignInScreen'>
 
 type Props = {
-  navigation: OnboardingSlideGoalsNavigationProp
+  navigation: NavigationProp
 }
 
 const SignInScreen: React.FC<Props> = ({ navigation }) => {
-  const { control, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: {
-      phone: '',
-    }
-  })
+    const { control, handleSubmit, formState: { errors }, getValues } = useForm({
+      defaultValues: {
+        phone: '',
+      }
+    })
 
-  const onSubmit = data => console.log(data)
+    const onSubmit = () => { 
+      navigation.navigate('PhoneVerificationScreen', { phone: getValues('phone') })
+    }
 
     return (
         <ContainerView>
@@ -57,7 +59,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                     <HStack>
                         <TOSTextWrapper>
                             <TOSText>By tapping next, you agree to our </TOSText>
-                            <TextButton label="Terms & Conditions." onPress={onTOS} color='grey' fontSize={12}/>
+                            <TextButton label="Terms & Conditions." onPress={onTOS} color='grey' fontSize={12} underline={true}/>
                         </TOSTextWrapper>
                     </HStack>
                     <DefaultButton label='Continue' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)}/>

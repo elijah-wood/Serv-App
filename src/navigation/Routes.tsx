@@ -7,8 +7,9 @@ export default {
     INBOX_TAB: 'InboxTab',
     INBOX: 'Inbox',
     CHAT_DETAIL: "ChatDetail",
-    SIGN_IN: "SignIn",
     WELCOME: "Welcome",
     ACCOUNT: "Account",
+    SIGN_IN: "SignIn",
+    PHONE_VERIFICATION_SCREEN: "PhoneVerificationScreen"
   }
   

@@ -1,9 +1,8 @@
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import styled from 'styled-components/native'
-import { Colors } from 'react-native/Libraries/NewAppScreen'
 
 import SignInScreen from '../screens/SignInScreen'
+import PhoneVerificationScreen from '../screens/PhoneVerificationScreen'
 import Routes from '../navigation/Routes'
 
 const Stack = createNativeStackNavigator()
@@ -14,7 +13,11 @@ export const AccountNavigator: React.FC = () => {
       <Stack.Screen name={Routes.SIGN_IN} component={SignInScreen} 
           options={{
               headerShown: false,
-              title: 'Sign Up',
+          }}
+      />
+      <Stack.Screen name={Routes.PHONE_VERIFICATION_SCREEN} component={PhoneVerificationScreen} 
+          options={{
+              headerShown: false,
           }}
       />
     </Stack.Navigator>
