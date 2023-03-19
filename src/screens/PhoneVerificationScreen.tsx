@@ -45,10 +45,10 @@ const PhoneVerificationScreen: React.FC<Props> = ({ navigation }) => {
                       control={control}
                       rules={{
                         required: true,
-                        // pattern: {
-                        //   value: /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/i,
-                        //   message: 'Invalid verification code.'
-                        // }
+                        pattern: {
+                          value: /^\d{6}$/i,
+                          message: 'Invalid verification code.'
+                        }
                       }}
                       render={({ field: { onChange, value, onBlur } }) => (
                         <CodeInputWrapper>
