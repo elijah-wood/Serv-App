@@ -1,5 +1,5 @@
-import React from 'react'
-import { Platform, Linking } from 'react-native'
+import React, { useEffect } from 'react'
+import { Platform, Linking, Alert } from 'react-native'
 import { HStack, KeyboardAvoidingView, VStack } from 'native-base'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
@@ -10,7 +10,7 @@ import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
 import TextButton from '../components/TextButton'
 import Links from '../utils/links'
-import ApiClient from '../api/API'
+import UseSignIn from '../api/UseSignIn'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'SignInScreen'>
 
@@ -18,28 +18,32 @@ type Props = {
   navigation: NavigationProp
 }
 
-const apiClient = new ApiClient()
-
 const SignInScreen: React.FC<Props> = ({ navigation }) => {
+    const useSignIn = UseSignIn()
+    
     const { control, handleSubmit, formState: { errors }, getValues } = useForm({
       defaultValues: {
         phone: '',
       }
     })
 
+    useEffect(() => {
+      switch (useSignIn.status) {
+        case 'success':
+          console.log('Success')
+          //navigation.navigate('PhoneVerificationScreen', { phone: getValues('phone') })
+          break
+        case 'error':
+          Alert.alert('Error', `Something went wrong. Status: ${useSignIn.error.message}`)
+          break
+        default:
+          break
+      }
+    }, [useSignIn])
+
     const onSubmit = () => { 
       navigation.navigate('PhoneVerificationScreen', { phone: getValues('phone') })
-      // handleLogin()
-    }
-
-
-    const handleLogin = async () => {
-      try {
-        await apiClient.signin(getValues('phone'))
-        console.log('Login successful')
-      } catch (error) {
-        console.error('Login failed:', error.message)
-      }
+      // useSignIn.mutate({ phone: getValues('phone') })
     }
 
     return (
@@ -76,7 +80,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                             <TextButton label="Terms & Conditions." onPress={onTOS} color='grey' fontSize={12} underline={true}/>
                         </TOSTextWrapper>
                     </HStack>
-                    <DefaultButton label='Continue' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)}/>
+                    <DefaultButton label='Continue' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useSignIn.isLoading}/>
                 </VStack>
             </KeyboardAvoidingView>
         </ContainerView>

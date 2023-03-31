@@ -21,7 +21,7 @@ type Props = {
 const PhoneVerificationScreen: React.FC<Props> = ({ navigation }) => {
     const { control, handleSubmit, formState: { errors }, getValues } = useForm({
         defaultValues: {
-        verificationCode: '',
+          verificationCode: '',
         }
     })
 

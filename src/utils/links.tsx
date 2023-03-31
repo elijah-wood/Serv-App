@@ -1,6 +1,6 @@
 const Links = {
-    terms: '',
-    policy: '',
+    terms: 'https://google.com',
+    policy: 'https://google.com',
   }
   
   export default Links  

@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NativeBaseProvider } from 'native-base'
 import { expo } from './app.json'
 import { AppRegistry } from 'react-native'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { RootNavigator } from './src/navigation/RootNavigator'
 import { Customer } from './src/types/Customer'
@@ -33,6 +34,8 @@ type RootStackParamList = {
 
 const chatClient = StreamChat.getInstance(chatApiKey)
 
+const queryClient = new QueryClient()
+
 const App: React.FC<Props> = () => {
   React.useEffect(() => {
     // Init
@@ -43,17 +46,19 @@ const App: React.FC<Props> = () => {
     <>
       <NativeBaseProvider>
         <StatusBar translucent backgroundColor="transparent" />
-        <AppProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <SafeAreaProvider>
-              <OverlayProvider>
-                <Chat client={chatClient}>
-                  <RootNavigator />   
-                </Chat>
-              </OverlayProvider>
-            </SafeAreaProvider>
-          </GestureHandlerRootView>
-        </AppProvider>
+        <QueryClientProvider client={queryClient} contextSharing={true}>
+          <AppProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <SafeAreaProvider>
+                <OverlayProvider>
+                  <Chat client={chatClient}>
+                    <RootNavigator />   
+                  </Chat>
+                </OverlayProvider>
+              </SafeAreaProvider>
+            </GestureHandlerRootView>
+          </AppProvider>
+        </QueryClientProvider>
       </NativeBaseProvider>  
     </>
   )
