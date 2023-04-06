@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { ChannelList } from 'stream-chat-expo'
+import { SearchBar } from '@rneui/themed'
+import { FlatList } from 'react-native'
+import { Avatar, Divider, HStack, Spacer, VStack } from 'native-base'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
-import { useChatClient } from '../stream/UseChatClient'
 import { RootStackParamList } from '../../App'
-import { chatUserId } from '../../chatConfig'
-import { useAppContext } from '../stream/AppContext'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
 
@@ -14,38 +14,144 @@ type Props = {
   navigation: OnboardingSlideGoalsNavigationProp
 }
 
-const filters = {
-    members: {
-      '$in': [chatUserId]
-    },
+export class Channel {
+  id: string
+  name: string
+  time: string
+  lastMessage: string
+  isUnread: boolean
+  isOnline: boolean
+
+  constructor (id: string, name: string, time: string, lastMessage: string, isUnread: boolean, isOnline: boolean) {
+    this.id = id
+    this.name = name
+    this.time = time
+    this.lastMessage = lastMessage
+    this.isUnread = isUnread
+    this.isOnline = isOnline
+  }
 }
 
 const InboxScreen: React.FC<Props> = ({ navigation }) => {
-    const { setChannel } = useAppContext()
-    const { clientIsReady } = useChatClient()
+  const [search, setSearch] = useState("")
+  const [channels, setChannels] = useState<Channel[]>([
+    new Channel("0", "Nicole Benevo", "9:37pm", "I will be available from 3-5pm", true, false),
+    new Channel("1", "Maria Seere", "9:02pm", "Spoke to customer. Will be there soon. I will be available from 3-5pm", false, true)
+  ])
+  const [channelsToDisplay, setChannelsToDisplay] = useState<Channel[]>([])
 
-    if (!clientIsReady) {
-      return <WarningText>Loading chat ...</WarningText>
-    } 
+  React.useEffect(() => {
+    let filteredArray: Channel[] = []
+    channels.forEach(element => filteredArray.push(element))
+    setChannelsToDisplay(filteredArray)
+  }, [])
 
-    return (
-        <ContainerView>
-            <ChannelList
-                onSelect={(channel) => {
-                    setChannel(channel)
-                    navigation.navigate('ChatScreen')
-                }}
-                filters={filters}
-            />
-        </ContainerView>
-    )
+  // if (!clientIsReady) {
+  //   return <WarningText>Loading chat ...</WarningText>
+  // } 
+
+  const updateSearch = (search) => {
+    let filteredArray: Channel[] = []
+    channels.filter(channel => channel.name.toUpperCase().includes(search.toUpperCase())).forEach(element => filteredArray.push(element))
+    setChannelsToDisplay(filteredArray)
+    setSearch(search)
+  }
+
+  return (
+    <ContainerView>
+      <SearchBar
+        platform="ios"
+        placeholder="Search"
+        onChangeText={updateSearch}
+        value={search}
+      />
+      <FlatList
+        data={channelsToDisplay}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <Thread channel={item} onPress={() => {
+            navigation.navigate('ChatDetail', { customer: item })
+          }}/>
+        )}
+      />
+    </ContainerView>
+  )
 }
+
+type ThreadProps = {
+  channel: Channel
+  onPress: () => void
+}
+
+const Thread: React.FC<ThreadProps> = ({
+  ...props
+}) => {
+  const getInitials = (word: string): string => {
+    const bits = word.trim().split(' ')
+    return bits
+      .map((bit) => bit.charAt(0))
+      .join('')
+      .toUpperCase()
+  }
+
+  return (
+      <ThreadContainerView>
+        <TouchableOpacity onPress={props.onPress}>
+          <VStack space={5}>
+            <HStack space={2}>
+              <Avatar>
+                {getInitials(props.channel.name)}
+                {props.channel.isUnread && <Avatar.Badge bg="green.500" />}
+              </Avatar>
+              <ThreadFlexFillWidth>
+                <HStack alignItems={"center"}>
+                  <ThreadTitle>{props.channel.name}</ThreadTitle>
+                  <Spacer/>
+                  <ThreadTime>{props.channel.time}</ThreadTime>
+                </HStack>
+                <Spacer/>
+                <ThreadLastMessage numberOfLines={1}>{props.channel.lastMessage}</ThreadLastMessage>
+              </ThreadFlexFillWidth>
+            </HStack>
+            <Divider/>
+          </VStack>
+        </TouchableOpacity>
+      </ThreadContainerView>
+  )
+}
+
+const ThreadFlexFillWidth = styled.View`
+  flex: 1;
+  width: 100%;
+`
+
+const ThreadContainerView = styled.View`
+  width: 100%;
+  padding-horizontal: 15px;
+  padding-top: 15px;
+`
+
+const ThreadTitle = styled.Text`
+  font-size: 17px;
+  font-weight: bold;
+  text-align: left;
+`
+
+const ThreadTime = styled.Text`
+  font-size: 15px;
+  color: gray;
+  text-align: right;
+`
+
+const ThreadLastMessage = styled.Text`
+  font-size: 15px;
+`
 
 const WarningText = styled.Text`
 `
 
 const ContainerView = styled.View`
-  background-color: transparent;
+  background-color: white;
   height: 100%;
   width: 100%;
 `

@@ -4,11 +4,11 @@ import { StackNavigationProp } from '@react-navigation/stack'
 import { AlphabetList, IData } from 'react-native-section-alphabet-list'
 import { SearchBar } from '@rneui/themed'
 import Icon from 'react-native-vector-icons/Entypo'
+import { IconButton } from 'native-base'
 
 import { RootStackParamList } from '../../App'
 import { Customer } from '../types/Customer'
 import { Job } from '../types/Job'
-import { IconButton } from 'native-base'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomersScreen'>
 
@@ -88,8 +88,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
 const ContainerView = styled.View`
   height: 100%;
   width: 100%;
-  backgroundColor: white;
-
+  background-color: white;
 `
 const Item = styled.TouchableOpacity`
   padding: 10px;

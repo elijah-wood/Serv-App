@@ -9,10 +9,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { RootNavigator } from './src/navigation/RootNavigator'
 import { Customer } from './src/types/Customer'
-import { AppProvider } from './src/stream/AppContext'
-import { Chat, OverlayProvider } from 'stream-chat-expo'
-import { StreamChat } from 'stream-chat'
-import { chatApiKey } from './chatConfig'
+import { Channel } from './src/screens/InboxScreen'
 
 AppRegistry.registerComponent(expo.name, () => App)
 
@@ -28,11 +25,9 @@ type RootStackParamList = {
   CustomersScreen: undefined
   AddCustomerScreen: undefined
   InboxScreen: undefined
-  ChatScreen: undefined
+  ChatScreen: { customer: Channel }
   CustomerDetailScreen: { customer: Customer }
 }
-
-const chatClient = StreamChat.getInstance(chatApiKey)
 
 const queryClient = new QueryClient()
 
@@ -47,17 +42,11 @@ const App: React.FC<Props> = () => {
       <NativeBaseProvider>
         <StatusBar translucent backgroundColor="transparent" />
         <QueryClientProvider client={queryClient} contextSharing={true}>
-          <AppProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <SafeAreaProvider>
-                <OverlayProvider>
-                  <Chat client={chatClient}>
-                    <RootNavigator />   
-                  </Chat>
-                </OverlayProvider>
-              </SafeAreaProvider>
-            </GestureHandlerRootView>
-          </AppProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <SafeAreaProvider>
+              <RootNavigator />   
+            </SafeAreaProvider>
+          </GestureHandlerRootView>
         </QueryClientProvider>
       </NativeBaseProvider>  
     </>

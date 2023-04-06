@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button } from 'react-native'
+import { Button, Image } from 'react-native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RootStackParamList } from '../../App'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
@@ -9,7 +9,7 @@ import CustomersScreen from '../screens/CustomersScreen'
 import CustomerDetailScreen from '../screens/CustomerDetailScreen'
 import Routes from './Routes'
 import InboxScreen from '../screens/InboxScreen'
-import ChatScreen from '../screens/ChatScreen'
+import ChatDetail from '../screens/ChatDetail'
 import AddCustomerScreen from '../screens/AddCustomerScreen'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'HomeTabNavigator'>
@@ -28,7 +28,7 @@ export const InboxStackScreen: React.FC<Props> = () => {
                     title: 'Inbox',
                 }}
             />
-            <Stack.Screen name={Routes.CHAT_DETAIL} component={ChatScreen} 
+            <Stack.Screen name={Routes.CHAT_DETAIL} component={ChatDetail} 
                 options={{
                     title: 'Chat',
                 }}
@@ -45,9 +45,6 @@ export const CustomersStackScreen: React.FC<Props> = () => {
             <Stack.Screen name={Routes.CUSTOMERS} component={CustomersScreen} 
                 options={{
                     title: 'Customers',
-                    headerRight: () => (
-                       <Button title={"add"}/>
-                    )
                 }}
             />
             <Stack.Screen name={Routes.CUSTOMER_DETAIL} component={CustomerDetailScreen} 
@@ -68,15 +65,27 @@ export const HomeTabNavigator: React.FC<Props> = () => {
     const Tab = createBottomTabNavigator()
 
     return (
-        <Tab.Navigator screenOptions={{ headerShown: false }}>
+        <Tab.Navigator screenOptions={{ headerShown: false }} >
             <Tab.Screen name={Routes.INBOX_TAB} component={InboxStackScreen}
                 options={{
                     title: 'Inbox',
+                    tabBarIcon: ({ color }) => (
+                        <Image
+                        source={require('../assets/Inbox.png')}
+                        style={{ width: 20, height: 20, tintColor: color }}
+                        />
+                    )
                 }}
             />
             <Tab.Screen name={Routes.CUSTOMERS_TAB} component={CustomersStackScreen}
                 options={{
                     title: 'Customers',
+                    tabBarIcon: ({ color }) => (
+                        <Image
+                        source={require('../assets/Customers.png')}
+                        style={{ width: 14, height: 18, tintColor: color }}
+                        />
+                    )
                 }}
             />
         </Tab.Navigator>
