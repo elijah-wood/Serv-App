@@ -19,72 +19,67 @@ type Props = {
 }
 
 const SignInScreen: React.FC<Props> = ({ navigation }) => {
-    const useSignIn = UseSignIn()
-    
-    const { control, handleSubmit, formState: { errors }, getValues } = useForm({
-      defaultValues: {
-        phone: '',
-      }
-    })
-
-    useEffect(() => {
-      switch (useSignIn.status) {
-        case 'success':
-          console.log('Success')
-          //navigation.navigate('PhoneVerificationScreen', { phone: getValues('phone') })
-          break
-        case 'error':
-          Alert.alert('Error', `Something went wrong. Status: ${useSignIn.error.message}`)
-          break
-        default:
-          break
-      }
-    }, [useSignIn])
-
-    const onSubmit = () => { 
-      navigation.navigate('PhoneVerificationScreen', { phone: getValues('phone') })
-      // useSignIn.mutate({ phone: getValues('phone') })
+  const useSignIn = UseSignIn()
+  
+  const { control, handleSubmit, formState: { errors }, getValues } = useForm({
+    defaultValues: {
+      phone: '',
     }
+  })
 
-    return (
-        <ContainerView>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                <VStack space={5} justifyContent={'center'} style={{ height: '100%', marginHorizontal: 10, marginTop: 10 }}>
-                    <TitleText>Please enter your phone number.</TitleText>
-                    <SubtitleText>Enter your phone number.</SubtitleText>
-                    {errors.phone && <ErrorText>{errors.phone.message ? errors.phone.message : 'This is required.'}</ErrorText>}
-                    <Controller
-                      control={control}
-                      rules={{
-                        required: true,
-                        pattern: {
-                          value: /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/i,
-                          message: 'Invalid phone number.'
-                        }
-                      }}
-                      render={({ field: { onChange, value } }) => (
-                        <PhoneInput
-                          containerStyle={{ width: '100%' }}
-                          value={value}
-                          onChangeText={onChange}
-                          defaultCode="US"
-                          layout="second"
-                          autoFocus
-                        />
-                      )}
-                      name="phone"
-                    />
-                    <HStack>
-                        <TOSTextWrapper>
-                            <TOSText>By tapping next, you agree to our </TOSText>
-                            <TextButton label="Terms & Conditions." onPress={onTOS} color='grey' fontSize={12} underline={true}/>
-                        </TOSTextWrapper>
-                    </HStack>
-                    <DefaultButton label='Continue' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useSignIn.isLoading}/>
-                </VStack>
-            </KeyboardAvoidingView>
-        </ContainerView>
-    )
+  useEffect(() => {
+    switch (useSignIn.status) {
+      case 'success':
+        navigation.navigate('PhoneVerificationScreen', { phone: getValues('phone') })
+        break
+      default:
+        break
+    }
+  }, [useSignIn])
+
+  const onSubmit = () => { 
+    useSignIn.mutate({ phone: getValues('phone') })
+  }
+
+  return (
+      <ContainerView>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+              <VStack space={5} justifyContent={'center'} style={{ height: '100%', marginHorizontal: 10, marginTop: 10 }}>
+                  <TitleText>Please enter your phone number.</TitleText>
+                  <SubtitleText>Enter your phone number.</SubtitleText>
+                  {errors.phone && <ErrorText>{errors.phone.message ? errors.phone.message : 'This is required.'}</ErrorText>}
+                  <Controller
+                    control={control}
+                    rules={{
+                      required: true,
+                      pattern: {
+                        value: /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/i,
+                        message: 'Invalid phone number.'
+                      }
+                    }}
+                    render={({ field: { onChange, value } }) => (
+                      <PhoneInput
+                        containerStyle={{ width: '100%' }}
+                        value={value}
+                        onChangeText={onChange}
+                        defaultCode="US"
+                        layout="second"
+                        autoFocus
+                      />
+                    )}
+                    name="phone"
+                  />
+                  <HStack>
+                      <TOSTextWrapper>
+                          <TOSText>By tapping next, you agree to our </TOSText>
+                          <TextButton label="Terms & Conditions." onPress={onTOS} color='grey' fontSize={12} underline={true}/>
+                      </TOSTextWrapper>
+                  </HStack>
+                  <DefaultButton label='Continue' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useSignIn.isLoading}/>
+              </VStack>
+          </KeyboardAvoidingView>
+      </ContainerView>
+  )
 }
 
 const onTOS = async () => {

@@ -1,15 +1,16 @@
 import { UseMutationResult, useMutation } from 'react-query'
+
 import { API } from './API'
-import { SCResponse } from './SCResponse'
+import { UserResponse } from './UserResponse'
 
 type SignInInput = {
   phone: string
 }
 
-const UseSignIn = (): UseMutationResult<SCResponse, Error, SignInInput> => {
-    return useMutation<SCResponse, Error, SignInInput>(values=> {
-        return API.login(values)
-    })
+const UseSignIn = (): UseMutationResult<UserResponse, Error, SignInInput> => {
+  return useMutation<UserResponse, Error, SignInInput>(async values => {
+    return API.login(values)
+  })
 }
 
 export default UseSignIn

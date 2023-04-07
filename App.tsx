@@ -8,8 +8,8 @@ import { AppRegistry } from 'react-native'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { RootNavigator } from './src/navigation/RootNavigator'
-import { Customer } from './src/types/Customer'
 import { Channel } from './src/screens/InboxScreen'
+import TokenIntercepter from './src/api/TokenIntercepter'
 
 AppRegistry.registerComponent(expo.name, () => App)
 
@@ -25,8 +25,8 @@ type RootStackParamList = {
   CustomersScreen: undefined
   AddCustomerScreen: undefined
   InboxScreen: undefined
-  ChatScreen: { customer: Channel }
-  CustomerDetailScreen: { customer: Customer }
+  ChatDetail: { customer: Channel }
+  CustomerDetailScreen: { customerId: string }
 }
 
 const queryClient = new QueryClient()
@@ -34,7 +34,12 @@ const queryClient = new QueryClient()
 const App: React.FC<Props> = () => {
   React.useEffect(() => {
     // Init
-    
+    // Adding interceptors for request token, refresh token and response error handling
+    TokenIntercepter.addRequestInterceptor()
+    TokenIntercepter.addResponseInterceptor()
+
+    // TODO: Refresh token call to be updated
+    // TokenInterceptor.addRefreshTokenInterceptor()
   }, [])
 
   return (

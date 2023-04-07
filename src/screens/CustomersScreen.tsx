@@ -7,8 +7,8 @@ import Icon from 'react-native-vector-icons/Entypo'
 import { IconButton } from 'native-base'
 
 import { RootStackParamList } from '../../App'
-import { Customer } from '../types/Customer'
-import { Job } from '../types/Job'
+import UseCustomers, { Customer } from '../api/UseCustomers'
+import { ActivityIndicator, RefreshControl } from 'react-native'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomersScreen'>
 
@@ -17,30 +17,20 @@ type Props = {
 }
 
 const CustomersScreen: React.FC<Props> = ({ navigation }) => {
+  const useCustomers = UseCustomers()
   const [search, setSearch] = useState("")
   const [customerIData, setCustomerIData] = useState<IData[]>([])
-  const [customers, setCustomers] = useState<Customer[]>(
-    [
-      new Customer(0, "Milton Aaron", "m.aaron@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", [
-        new Job(0, "Boiler Room Leak", "42 Fleetwood Dr.\nNew York, NY 11280")
-      ]),
-      new Customer(1, "Reid Alex", "r.alex@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", []),
-      new Customer(2, "Will Baarda", "w.baarda@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", []),
-      new Customer(3, "Bruce Ballard", "b.ballard@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", []),
-      new Customer(4, "Pauline Banister", "p.banister@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", []),
-      new Customer(5, "Michael Barlow", "m.barlow@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", []),
-      new Customer(6, "Alex Bartley", "a.bartley@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", []),
-      new Customer(7, "Nick Batchelder", "n.batchelder@gmail.com", "+1 (234) 567-8900", "42 Fleetwood Dr.\nNew York, NY 11280", []),
-    ]
-  )
+  const [customers, setCustomers] = useState<Customer[]>([])
 
-  React.useEffect(() => {
+  useEffect(() => {
     let filteredArray: IData[] = []
-    customers.forEach(element => filteredArray.push({ key: element.id.toString(), value: element.name}))
+    customers.forEach(element => filteredArray.push({ key: element.id.toString(), value: element.full_name}))
     setCustomerIData(filteredArray)
+
+    useCustomers.mutate()
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <IconButton icon={<Icon name='plus' color={'#0062FF'} size={25}/>} onPress={() => {
@@ -50,12 +40,29 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
     })
   }, [navigation])
 
+  useEffect(() => {
+    switch (useCustomers.status) {
+      case 'success':
+        if (useCustomers.data) {
+          setCustomers(useCustomers.data)
+        }
+        break
+      default:
+        break
+    }
+  }, [useCustomers])
 
   const updateSearch = (search) => {
     let filteredArray: IData[] = []
-    customers.filter(customer => customer.name.toUpperCase().includes(search.toUpperCase())).forEach(element => filteredArray.push({ key: element.id.toString(), value: element.name}))
+    customers.filter(customer => customer.full_name.toUpperCase().includes(search.toUpperCase())).forEach(element => filteredArray.push({ key: element.id.toString(), value: element.full_name}))
     setCustomerIData(filteredArray)
     setSearch(search)
+  }
+
+  if (useCustomers.isLoading) {
+    return (
+      <ActivityIndicator/>
+    )
   }
 
   return (
@@ -67,6 +74,11 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
         value={search}
       />
       <AlphabetList
+      refreshControl={
+        <RefreshControl refreshing={useCustomers.isLoading} onRefresh={() => {
+          useCustomers.mutate()
+        }}/>
+      }
       data={customerIData}
       indexLetterStyle={{ 
         color: 'black',
@@ -74,7 +86,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
       renderCustomItem={(item) => (
         <Item onPress={() => {
           let customer = customers[item.key]
-          navigation.navigate("CustomerDetailScreen", { customer: customer })
+          navigation.navigate("CustomerDetailScreen", { customerId: customer.id })
         }}><ItemTitle>{item.value}</ItemTitle></Item>
       )}
       renderCustomSectionHeader={(section) => (

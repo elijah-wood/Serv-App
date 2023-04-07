@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { SearchBar } from '@rneui/themed'
 import { FlatList } from 'react-native'
-import { Avatar, Divider, HStack, Spacer, VStack } from 'native-base'
+import { Avatar, Divider, HStack, Icon, IconButton, Spacer, VStack } from 'native-base'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 
 import { RootStackParamList } from '../../App'
+import { TwilioService } from '../twilio/TwilioService'
+import { getUserSession } from '../api/Session'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
 
@@ -56,6 +58,62 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
     setChannelsToDisplay(filteredArray)
     setSearch(search)
   }
+
+  // TWILIO
+  const channelPaginator = useRef()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <IconButton icon={<Icon name='plus' color={'#0062FF'} size={25}/>} onPress={() => {
+          navigation.navigate('AddCustomerScreen')
+        }}/>
+      ),
+    })
+  }, [navigation])
+
+  const setChannelEvents = useCallback(
+    (client) => {
+      client.on('messageAdded', (message) => {
+        setChannels((prevChannels) =>
+          prevChannels.map((channel) =>
+            channel.id === message.channel.sid ? { ...channel, lastMessageTime: message.dateCreated } : channel,
+          ),
+        )
+      })
+      return client
+    },
+    [setChannels],
+  )
+
+  const getSubscribedChannels = useCallback(
+    (client) =>
+      client.getSubscribedChannels().then((paginator) => {
+        channelPaginator.current = paginator
+        const newChannels = TwilioService.getInstance().parseChannels(channelPaginator.current.items)
+        setChannels(newChannels)
+      }),
+    [setChannels],
+  )
+
+  useEffect(() => {
+    const getSession = async () => {
+      const session = await getUserSession()
+      setLoading(true)
+      TwilioService.getInstance().getChatClient(session.user.twilio_token)
+        .then(() => TwilioService.getInstance().addTokenListener(getToken))
+        .then(setChannelEvents)
+        .then(getSubscribedChannels)
+        .catch((err) => showMessage({ message: err.message, type: 'danger' }))
+        .finally(() => setLoading(false))
+  
+      return () => TwilioService.getInstance().clientShutdown()  
+    }
+
+    getSession()
+
+  }, [setChannelEvents, getSubscribedChannels])
+  //
 
   return (
     <ContainerView>
@@ -157,3 +215,7 @@ const ContainerView = styled.View`
 `
 
 export default InboxScreen
+function useApp(): { channels: any; updateChannels: any } {
+  throw new Error('Function not implemented.')
+}
+

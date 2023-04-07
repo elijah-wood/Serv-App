@@ -1,14 +1,16 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
 
 import Table, { Section, BioCell, StaticCell, KeyValueCell, TouchableCell } from 'react-native-js-tableview';
-import { useColorScheme } from 'react-native';
+import { ActivityIndicator, useColorScheme } from 'react-native';
 import { HStack } from 'native-base'
 
 import { RootStackParamList } from '../../App'
 import { CTAButton } from '../components/CTAButton';
+import UseGetCustomer from '../api/UseGetCustomer';
+import { Customer } from '../api/UseCustomers';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
 type CustomerRouteProp = RouteProp<RootStackParamList, 'CustomerDetailScreen'>
@@ -19,8 +21,26 @@ type Props = {
 }
 
 const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { customer } = route.params
-  const scheme = useColorScheme()
+  const useGetCustomer = UseGetCustomer(route.params.customerId)
+  const [customer, setCustomer] = useState<Customer>()
+
+  useEffect(() => {
+    switch (useGetCustomer.status) {
+      case 'success':
+        if (useGetCustomer.data) {
+          setCustomer(useGetCustomer.data)
+        }
+        break
+      default:
+        break
+    }
+  }, [useGetCustomer])
+  
+  if (useGetCustomer.isLoading) {
+    return (
+      <ActivityIndicator/>
+    )
+  }
 
   return (
     <ContainerView>
@@ -30,7 +50,7 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           mode={'inset-grouped'}
           scrollable={true}>
           <Section>
-              <BioCell title={customer.name} subtitle='Customer' />
+              <BioCell title={customer.full_name} subtitle='Customer' />
           </Section>       
           <HStack space={4} justifyContent={'center'} style={{ marginTop: 16, marginHorizontal: 16}}>
             <CTAButton label='message' icon='message' onPress={() => {
@@ -41,7 +61,7 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
             }}/>
           </HStack>
           <Section header='Address' headerStyle={{ color: '#3C3C43' }}>
-              <KeyValueCell title={customer.address} accessory="disclosure" onPress={() => {
+              <KeyValueCell title={JSON.parse(customer.address)} accessory="disclosure" onPress={() => {
 
               }} />
           </Section>

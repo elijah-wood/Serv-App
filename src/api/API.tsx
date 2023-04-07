@@ -1,21 +1,55 @@
-import { Customer } from "../types/Customer"
 import APIClient from "./APIClient"
-import { SCResponse } from "./SCResponse"
+import { AuthenticatedHeaders } from "./AuthenticatedHeaders"
+import { getUserSession } from "./Session"
 import { CompleteSignInInput } from "./UseCompleteSignIn"
-import { UserResponse } from "./UserResponse"
+import { CreateCustomerInput } from "./UseCreateCustomer"
 import { SignInInput } from "./UseSignIn"
-
-let client = new APIClient()
 
 export const API = {
     login: async (values: SignInInput) => {
-        return await client.post<SignInInput, SCResponse>('/login', values)
+        const response = await APIClient.post('/login', values)
+        return response.data
     },
     completeLogin: async (values: CompleteSignInInput) => {
-        return await client.post<CompleteSignInInput, UserResponse>('/complete-login', values)
+        const response = await APIClient.post('/complete-login', values)
+        return response.data
+    },
+    refreshToken: async () => {
+        const session = await getUserSession()
+        const response = await APIClient.post('/refresh-token', {
+          token: session?.user.jwt, // the parameter would be the refresh token
+        })
+        return response.data
     },
     getCustomers: async () => {
-        return await client.getWithToken<Customer[]>('/customers')
+        const response = await APIClient.get('/customers', {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },
+    getCustomer: async (id: string) => {
+        const response = await APIClient.get(`/customers/${id}`, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },
+    createCustomer: async (values: CreateCustomerInput) => {
+        const response = await APIClient.post('/customers', values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.status
+    },
+    getJobs: async () => {
+        const response = await APIClient.get('/jobs', {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },
+    generateTwilioAccessToken: async () => {
+        const response = await APIClient.post('/generate-twilio-access-token', [], {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
     },
   }
   

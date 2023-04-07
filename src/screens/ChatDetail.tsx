@@ -1,13 +1,14 @@
 import { StackNavigationProp } from '@react-navigation/stack'
 import { GiftedChat } from 'react-native-gifted-chat'
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import styled from 'styled-components/native'
 import { RouteProp } from '@react-navigation/native'
 
 import { RootStackParamList } from '../../App'
+import { TwilioService } from '../twilio/TwilioService'
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'ChatScreen'>
-type ChatDetailRouteProp = RouteProp<RootStackParamList, 'ChatScreen'>
+type NavigationProp = StackNavigationProp<RootStackParamList, 'ChatDetail'>
+type ChatDetailRouteProp = RouteProp<RootStackParamList, 'ChatDetail'>
 
 type Props = {
   navigation: NavigationProp
@@ -18,30 +19,51 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
   const { customer } = route.params
   const [messages, setMessages] = useState([])
 
-  useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: customer.lastMessage,
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: customer.name,
-          avatar: '',
-        },
-      },
-    ])
+  const chatClientChannel = useRef()
+  const chatMessagesPaginator = useRef()
 
-    navigation.setOptions({ title: customer.name })
+  const setChannelEvents = useCallback((channel) => {
+    chatClientChannel.current = channel
+    chatClientChannel.current.on('messageAdded', (message) => {
+      const newMessage = TwilioService.getInstance().parseMessage(message)
+      const { giftedId } = message.attributes
+      if (giftedId) {
+        setMessages((prevMessages) => prevMessages.map((m) => (m._id === giftedId ? newMessage : m)))
+      } else {
+        setMessages((prevMessages) => [newMessage, ...prevMessages])
+      }
+    })
+    return chatClientChannel.current
   }, [])
 
-  const onSend = useCallback((messages = []) => {
-    setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
+  useEffect(() => {
+    TwilioService.getInstance()
+      .getChatClient()
+      .then((client) => client.getChannelBySid(channelId))
+      .then((channel) => setChannelEvents(channel))
+      .then((currentChannel) => currentChannel.getMessages())
+      .then((paginator) => {
+        chatMessagesPaginator.current = paginator
+        const newMessages = TwilioService.getInstance().parseMessages(paginator.items)
+        setMessages(newMessages)
+      })
+      .catch((err) => showMessage({ message: err.message, type: 'danger' }))
+  }, [channelId, setChannelEvents])
+
+  const onSend = useCallback((newMessages = []) => {
+    const attributes = { giftedId: newMessages[0]._id }
+    setMessages((prevMessages) => GiftedChat.append(prevMessages, newMessages))
+    chatClientChannel.current?.sendMessage(newMessages[0].text, attributes)
+  }, [])
+
+  useEffect(() => {
+    navigation.setOptions({ title: customer.name })
   }, [])
 
   return (
     <Container>
       <GiftedChat
+        renderAvatarOnTop
         messages={messages}
         onSend={messages => onSend(messages)}
         user={{
