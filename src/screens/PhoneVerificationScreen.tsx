@@ -20,7 +20,8 @@ type Props = {
   route: PhoneVerificationRouteProp
 }
 
-const PhoneVerificationScreen: React.FC<Props> = ({ navigation }) => {
+const PhoneVerificationScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { phone } = route.params
   const useCompleteSignIn = UseCompleteSignIn()
 
   const { control, handleSubmit, formState: { errors }, getValues } = useForm({
@@ -30,21 +31,16 @@ const PhoneVerificationScreen: React.FC<Props> = ({ navigation }) => {
   })
 
   const onSubmit = () => { 
-    useCompleteSignIn.mutate({ verification_token: getValues('verificationCode') })
+    useCompleteSignIn.mutate({ phone: phone, verification_code: getValues('verificationCode') })
   }
 
   useEffect(() => {
     switch (useCompleteSignIn.status) {
       case 'success':
         if (useCompleteSignIn.data) {
+          console.log(`success, ${useCompleteSignIn.data}`)
           setUserSession(useCompleteSignIn.data)
-          navigation.dispatch(
-            // Reset stack for Android
-            CommonActions.reset({
-                index: 1,
-                routes: [{ name: 'Home' }],
-            })
-          )
+          navigation.replace('Home')
         }
         break
       default:

@@ -3,11 +3,13 @@ import { API } from './API'
 import { UserResponse } from './UserResponse'
 
 type CompleteSignInInput = {
-    verification_token: string
+    phone: string
+    verification_code: string
 }
 
 const UseCompleteSignIn = (): UseMutationResult<UserResponse, Error, CompleteSignInInput> => {
     return useMutation<UserResponse, Error, CompleteSignInInput>(values => {
+        console.log(values)
         return API.completeLogin(values)
     })
 }

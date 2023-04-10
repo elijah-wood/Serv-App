@@ -8,7 +8,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 
 import { RootStackParamList } from '../../App'
 import { TwilioService } from '../twilio/TwilioService'
-import { getUserSession } from '../api/Session'
+import { getUserSession, removeUserSession } from '../api/Session'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
 

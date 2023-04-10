@@ -61,7 +61,7 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                       <PhoneInput
                         containerStyle={{ width: '100%' }}
                         value={value}
-                        onChangeText={onChange}
+                        onChangeFormattedText={onChange}
                         defaultCode="US"
                         layout="second"
                         autoFocus
