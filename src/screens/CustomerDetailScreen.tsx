@@ -3,14 +3,14 @@ import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
 
-import Table, { Section, BioCell, StaticCell, KeyValueCell, TouchableCell } from 'react-native-js-tableview';
-import { ActivityIndicator, useColorScheme } from 'react-native';
+import Table, { Section, BioCell, StaticCell, KeyValueCell, TouchableCell } from 'react-native-js-tableview'
+import { ActivityIndicator, useColorScheme } from 'react-native'
 import { HStack } from 'native-base'
 
 import { RootStackParamList } from '../../App'
-import { CTAButton } from '../components/CTAButton';
-import UseGetCustomer from '../api/UseGetCustomer';
-import { Customer } from '../api/UseCustomers';
+import { CTAButton } from '../components/CTAButton'
+import UseGetCustomer from '../api/UseGetCustomer'
+import { Customer } from '../api/UseCustomers'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
 type CustomerRouteProp = RouteProp<RootStackParamList, 'CustomerDetailScreen'>

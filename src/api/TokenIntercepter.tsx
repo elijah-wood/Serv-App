@@ -11,7 +11,7 @@ const addRequestInterceptor = (): void => {
     async (config: InternalAxiosRequestConfig) => {
       const session = await getUserSession()
       if (session && config.headers) {
-        config.headers.Authorization = `Bearer ${session.user.jwt}`
+        config.headers.Authorization = `Bearer ${session.token}`
       }
       return config
     },
@@ -29,7 +29,7 @@ const addResponseInterceptor = (): void => {
 const refreshTokenCall = async (failedRequest: any) => {
   const data = await API.refreshToken()
   data && setUserSession(data)
-  failedRequest.response.config.headers.Authorization = 'Bearer ' + data.jwt
+  failedRequest.response.config.headers.Authorization = 'Bearer ' + data.token
   return Promise.resolve()
 }
 

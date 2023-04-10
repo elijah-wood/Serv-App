@@ -9,7 +9,7 @@ import { HomeTabNavigator } from './HomeTabNavigator'
 import { getUserSession } from '../api/Session'
 
 export const RootNavigator = () => {
-  const [isLoggedIn, setLoggedIn] = useState<boolean | null>(null)
+  const [isLoggedIn, setLoggedIn] = useState<boolean>(true)
   
   const Stack = createNativeStackNavigator()
   const scheme = useColorScheme()
@@ -25,16 +25,9 @@ export const RootNavigator = () => {
 
   return (
     <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack.Navigator initialRouteName={Routes.ACCOUNT} screenOptions={{ headerShown: false }}>
-        {isLoggedIn ? (
-          <>
-            <Stack.Screen name={Routes.HOME} component={HomeTabNavigator} options={{ headerShown: false }} />
-          </>
-        ) : ( 
-          <>
-            <Stack.Screen name={Routes.ACCOUNT} component={AccountNavigator} options={{  headerShown: false }} />
-          </>
-        )}
+      <Stack.Navigator initialRouteName={isLoggedIn ? Routes.HOME : Routes.ACCOUNT} screenOptions={{ headerShown: false }}>
+        <Stack.Screen name={Routes.HOME} component={HomeTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name={Routes.ACCOUNT} component={AccountNavigator} options={{  headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   )

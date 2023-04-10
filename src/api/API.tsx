@@ -17,7 +17,7 @@ export const API = {
     refreshToken: async () => {
         const session = await getUserSession()
         const response = await APIClient.post('/refresh-token', {
-          token: session?.user.jwt, // the parameter would be the refresh token
+          token: session?.token, // the parameter would be the refresh token
         })
         return response.data
     },

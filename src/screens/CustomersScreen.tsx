@@ -4,7 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack'
 import { AlphabetList, IData } from 'react-native-section-alphabet-list'
 import { SearchBar } from '@rneui/themed'
 import Icon from 'react-native-vector-icons/Entypo'
-import { IconButton } from 'native-base'
+import { Box, Center, IconButton } from 'native-base'
 
 import { RootStackParamList } from '../../App'
 import UseCustomers, { Customer } from '../api/UseCustomers'
@@ -61,7 +61,9 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
 
   if (useCustomers.isLoading) {
     return (
-      <ActivityIndicator/>
+      <ContainerView>
+          <PaddedActivityIndicator/>
+      </ContainerView>
     )
   }
 
@@ -96,6 +98,10 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
     </ContainerView>
   )
 }
+
+const PaddedActivityIndicator = styled.ActivityIndicator`
+  padding: 12px;
+`
 
 const ContainerView = styled.View`
   height: 100%;

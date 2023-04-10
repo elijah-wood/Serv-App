@@ -1,15 +1,14 @@
 import { UseMutationResult, useMutation } from 'react-query'
 import { API } from './API'
-import { UserResponse } from './UserResponse'
+import { TokenResponse } from './TokenResponse'
 
 type CompleteSignInInput = {
     phone: string
     verification_code: string
 }
 
-const UseCompleteSignIn = (): UseMutationResult<UserResponse, Error, CompleteSignInInput> => {
-    return useMutation<UserResponse, Error, CompleteSignInInput>(values => {
-        console.log(values)
+const UseCompleteSignIn = (): UseMutationResult<TokenResponse, Error, CompleteSignInInput> => {
+    return useMutation<TokenResponse, Error, CompleteSignInInput>(values => {
         return API.completeLogin(values)
     })
 }

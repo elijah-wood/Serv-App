@@ -8,11 +8,9 @@ declare module 'axios' {
 }
 
 export const errorResponseHandler = (error: AxiosError): Promise<never> => {
-  // Check for errorHandlerEnabled config
-  if (error?.config.hasOwnProperty('errorHandlerEnabled') && error?.config.errorHandlerEnabled === true) {
+    // Check for errorHandlerEnabled config
     const message = error.message //error?.response?.data?.errors?.length > 0 ? error?.response?.data.errors[0].message : error.message
     Alert.alert('Error', message)
-  }
 
-  return Promise.reject(error)
+    return Promise.reject(error)
 }

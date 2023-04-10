@@ -1,17 +1,16 @@
 import * as SecureStore from 'expo-secure-store'
-
-import { UserResponse } from './UserResponse'
+import { TokenResponse } from './TokenResponse'
 
 type Session = {
-  user: UserResponse
+  token: string
 }
 
-const setUserSession = async (user: UserResponse): Promise<void> => {
+const setUserSession = async (token: string): Promise<void> => {
   try {
     await SecureStore.setItemAsync(
       'user_session',
       JSON.stringify({
-        user,
+        token: token,
       }),
     )
   } catch (error) {

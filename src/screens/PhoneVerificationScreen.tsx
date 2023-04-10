@@ -38,9 +38,14 @@ const PhoneVerificationScreen: React.FC<Props> = ({ navigation, route }) => {
     switch (useCompleteSignIn.status) {
       case 'success':
         if (useCompleteSignIn.data) {
-          console.log(`success, ${useCompleteSignIn.data}`)
-          setUserSession(useCompleteSignIn.data)
-          navigation.replace('Home')
+          setUserSession(useCompleteSignIn.data.token)
+          navigation.dispatch(
+            // Reset stack for Android
+            CommonActions.reset({
+                index: 1,
+                routes: [{ name: 'Home' }],
+            })
+          )
         }
         break
       default:

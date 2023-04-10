@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { SearchBar } from '@rneui/themed'
-import { FlatList } from 'react-native'
+import { Alert, FlatList } from 'react-native'
 import { Avatar, Divider, HStack, Icon, IconButton, Spacer, VStack } from 'native-base'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 
@@ -36,6 +36,7 @@ export class Channel {
 
 const InboxScreen: React.FC<Props> = ({ navigation }) => {
   const [search, setSearch] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const [channels, setChannels] = useState<Channel[]>([
     new Channel("0", "Nicole Benevo", "9:37pm", "I will be available from 3-5pm", true, false),
     new Channel("1", "Maria Seere", "9:02pm", "Spoke to customer. Will be there soon. I will be available from 3-5pm", false, true)
@@ -99,13 +100,13 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     const getSession = async () => {
       const session = await getUserSession()
-      setLoading(true)
+      setIsLoading(true)
       TwilioService.getInstance().getChatClient(session.user.twilio_token)
         .then(() => TwilioService.getInstance().addTokenListener(getToken))
         .then(setChannelEvents)
         .then(getSubscribedChannels)
-        .catch((err) => showMessage({ message: err.message, type: 'danger' }))
-        .finally(() => setLoading(false))
+        .catch((err) => Alert.alert('error', err.message))
+        .finally(() => setIsLoading(false))
   
       return () => TwilioService.getInstance().clientShutdown()  
     }
