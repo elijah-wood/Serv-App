@@ -11,6 +11,11 @@ import Routes from './Routes'
 import InboxScreen from '../screens/InboxScreen'
 import ChatDetail from '../screens/ChatDetail'
 import AddCustomerScreen from '../screens/AddCustomerScreen'
+import JobsScreen from '../screens/JobsScreen'
+import JobDetailScreen from '../screens/JobsDetailScreen'
+import AnalyticsScreen from '../screens/AnalyticsScreen'
+import TeamScreen from '../screens/TeamScreen'
+import AddJobScreen from '../screens/AddJobScreen'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'HomeTabNavigator'>
 
@@ -61,6 +66,58 @@ export const CustomersStackScreen: React.FC<Props> = () => {
     )
 }
 
+export const JobsStackScreen: React.FC<Props> = () => {
+    const Stack = createNativeStackNavigator()
+
+    return (
+        <Stack.Navigator initialRouteName={Routes.JOBS}>
+            <Stack.Screen name={Routes.JOBS} component={JobsScreen} 
+                options={{
+                    title: 'Jobs',
+                }}
+            />
+            <Stack.Screen name={Routes.JOB_DETAIL} component={JobDetailScreen} 
+                options={{
+                    title: 'Job',
+                }}
+             />
+            <Stack.Screen name={Routes.ADD_JOB} component={AddJobScreen} 
+                options={{
+                    title: 'Create Job',
+                }}
+             />
+        </Stack.Navigator>
+    )
+}
+
+export const AnalyticsStackScreen: React.FC<Props> = () => {
+    const Stack = createNativeStackNavigator()
+
+    return (
+        <Stack.Navigator initialRouteName={Routes.ANALYTICS}>
+            <Stack.Screen name={Routes.ANALYTICS} component={AnalyticsScreen} 
+                options={{
+                    title: 'Analytics',
+                }}
+            />
+        </Stack.Navigator>
+    )
+}
+
+export const TeamStackScreen: React.FC<Props> = () => {
+    const Stack = createNativeStackNavigator()
+
+    return (
+        <Stack.Navigator initialRouteName={Routes.TEAM}>
+            <Stack.Screen name={Routes.TEAM} component={TeamScreen} 
+                options={{
+                    title: 'Team',
+                }}
+            />
+        </Stack.Navigator>
+    )
+}
+
 export const HomeTabNavigator: React.FC<Props> = () => {
     const Tab = createBottomTabNavigator()
 
@@ -84,6 +141,39 @@ export const HomeTabNavigator: React.FC<Props> = () => {
                         <Image
                         source={require('../assets/Customers.png')}
                         style={{ width: 14, height: 18, tintColor: color }}
+                        />
+                    )
+                }}
+            />
+            <Tab.Screen name={Routes.JOBS_TAB} component={JobsStackScreen}
+                options={{
+                    title: 'Jobs',
+                    tabBarIcon: ({ color }) => (
+                        <Image
+                        source={require('../assets/Jobs.png')}
+                        style={{ width: 20, height: 18, tintColor: color }}
+                        />
+                    )
+                }}
+            />
+            <Tab.Screen name={Routes.ANALYTICS_TAB} component={AnalyticsStackScreen}
+                options={{
+                    title: 'Analytics',
+                    tabBarIcon: ({ color }) => (
+                        <Image
+                        source={require('../assets/Analytics.png')}
+                        style={{ width: 16, height: 17, tintColor: color }}
+                        />
+                    )
+                }}
+            />
+            <Tab.Screen name={Routes.TEAM_TAB} component={TeamStackScreen}
+                options={{
+                    title: 'Team',
+                    tabBarIcon: ({ color }) => (
+                        <Image
+                        source={require('../assets/Team.png')}
+                        style={{ width: 20, height: 20, tintColor: color }}
                         />
                     )
                 }}

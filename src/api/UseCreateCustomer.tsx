@@ -1,5 +1,6 @@
 import { UseMutationResult, useMutation } from 'react-query'
 import { API } from './API'
+import { Address } from './UseCustomers'
 
 type CreateCustomerInput = {
     phone: string
@@ -7,7 +8,7 @@ type CreateCustomerInput = {
     first_name: string
     last_name: string
     profile_image_url: string
-    address: JSON
+    address: Address
 }
 
 const UseCreateCustomer = (): UseMutationResult<number, Error, CreateCustomerInput> => {

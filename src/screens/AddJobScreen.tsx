@@ -2,30 +2,33 @@ import React, { useEffect } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 
-import { KeyboardAvoidingView, Platform, useColorScheme } from 'react-native';
-import { HStack, VStack } from 'native-base'
+import { KeyboardAvoidingView, Platform } from 'react-native';
+import { VStack } from 'native-base'
 import { Controller, useForm } from 'react-hook-form'
 
 import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
-import UseCreateCustomer from '../api/UseCreateCustomer'
 import { Address } from '../api/UseCustomers'
+import UseCreateJob from '../api/UseCreateJob';
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'AddCustomerScreen'>
+type NavigationProp = StackNavigationProp<RootStackParamList, 'AddJobScreen'>
 
 type Props = {
   navigation: NavigationProp
 }
 
-const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
-  const useCreateCustomer = UseCreateCustomer()
+const AddJobScreen: React.FC<Props> = ({ navigation }) => {
+  const useCreateJob = UseCreateJob()
   
   const { control, handleSubmit, formState: { errors }, getValues } = useForm({
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      phone: '',
-      email: '',
+      name: '',
+      customer_id: '',
+      description: '',
+      type: '',
+      home_size: '',
+      bedrooms: '',
+      bathrooms: '',
       address1: '',
       address2: '',
       city: '',
@@ -35,22 +38,24 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
   })
 
   useEffect(() => {
-    switch (useCreateCustomer.status) {
+    switch (useCreateJob.status) {
       case 'success':
-        navigation.navigate('PhoneVerificationScreen', { phone: getValues('phone') })
+        navigation.goBack()
         break
       default:
         break
     }
-  }, [useCreateCustomer])
+  }, [useCreateJob])
 
   const onSubmit = () => { 
-    useCreateCustomer.mutate({
-      phone: getValues('phone'),
-      email: getValues('email'),
-      first_name: getValues('firstName'),
-      last_name: getValues('lastName'),
-      profile_image_url: '',
+    useCreateJob.mutate({
+      name: getValues('name'),
+      customer_id: getValues('customer_id'),
+      description: getValues('description'),
+      type: getValues('type'),
+      home_size: getValues('home_size'),
+      bedrooms: getValues('bedrooms'),
+      bathrooms: getValues('bathrooms'),
       address: { 
         line1: getValues('address1'),
         line2: getValues('address2'),
@@ -79,12 +84,11 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       autoFocus={true}
                       value={value}
                       onBlur={onBlur}
-                      placeholder="First name"
-                      textContentType="givenName"
+                      placeholder="Name"                
                   />
                 </TextInputWrapper>
               )}
-              name="firstName"
+              name="name"
             />
             <Controller
               control={control}
@@ -97,12 +101,11 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       onChangeText={onChange}
                       value={value}
                       onBlur={onBlur}
-                      placeholder="Last name"
-                      textContentType="familyName"
+                      placeholder="Customer"
                   />
                 </TextInputWrapper>
               )}
-              name="lastName"
+              name="customer_id"
             />
             <Controller
               control={control}
@@ -119,12 +122,12 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       onChangeText={onChange}
                       value={value}
                       onBlur={onBlur}
-                      placeholder="Phone"
-                      textContentType="telephoneNumber"
+                      placeholder="Description"
+
                   />
                 </TextInputWrapper>
               )}
-              name="phone"
+              name="description"
             />
             <Controller
               control={control}
@@ -137,12 +140,11 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       onChangeText={onChange}
                       value={value}
                       onBlur={onBlur}
-                      placeholder="Email"
-                      textContentType="emailAddress"
+                      placeholder="Type"
                   />
                 </TextInputWrapper>
               )}
-              name="email"
+              name="type"
             />
           </VStack>
           { /*Address */ }
@@ -238,7 +240,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
               name="zip"
             />
           </VStack>
-          <DefaultButton label='Add new customer' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useCreateCustomer.isLoading}/>
+          <DefaultButton label='Create new job' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useCreateJob.isLoading}/>
         </VStack>
       </KeyboardAvoidingView>
 
@@ -269,4 +271,4 @@ const ErrorText = styled.Text`
   color: red;
 `
 
-export default AddCustomerScreen
+export default AddJobScreen

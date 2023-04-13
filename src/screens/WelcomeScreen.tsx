@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { StatusBar } from 'react-native'
 import { RootStackParamList } from '../../App'
 
 import Table, { Section, BioCell, StaticCell, TouchableCell } from 'react-native-js-tableview';
 
-type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
+type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
 
 type Props = {
-  navigation: OnboardingSlideGoalsNavigationProp
+  navigation: NavigationProp
 }
 
 const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
@@ -45,24 +44,5 @@ const ContainerView = styled.View`
 const ScrollViewWrapper = styled.SafeAreaView``
 
 const ScrollView = styled.ScrollView``
-
-const VStackContainerView = styled.View`
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-`
-// Button bottom constraint + button height + goal margin
-const GoalsVStackContainerView = styled.View`
-  margin-bottom: ${44 + 50 + 18}px;
-`
-
-
-const TitleText = styled.Text`
-  color: white;
-  font-size: 24px;
-  font-family: 'BeVietnam-Bold';
-  text-align: center;
-  margin-top: 18px;
-`
 
 export default WelcomeScreen

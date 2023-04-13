@@ -2,13 +2,14 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { SearchBar } from '@rneui/themed'
-import { Alert, FlatList } from 'react-native'
+import { ActivityIndicator, Alert, FlatList } from 'react-native'
 import { Avatar, Divider, HStack, Icon, IconButton, Spacer, VStack } from 'native-base'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 
 import { RootStackParamList } from '../../App'
 import { TwilioService } from '../twilio/TwilioService'
 import { getUserSession, removeUserSession } from '../api/Session'
+import { API } from '../api/API'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
 
@@ -23,14 +24,16 @@ export class Channel {
   lastMessage: string
   isUnread: boolean
   isOnline: boolean
+  twilio_sid: string
 
-  constructor (id: string, name: string, time: string, lastMessage: string, isUnread: boolean, isOnline: boolean) {
+  constructor (id: string, name: string, time: string, lastMessage: string, isUnread: boolean, isOnline: boolean, twilio_sid: string) {
     this.id = id
     this.name = name
     this.time = time
     this.lastMessage = lastMessage
     this.isUnread = isUnread
     this.isOnline = isOnline
+    this.twilio_sid = twilio_sid
   }
 }
 
@@ -38,8 +41,8 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
   const [search, setSearch] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [channels, setChannels] = useState<Channel[]>([
-    new Channel("0", "Nicole Benevo", "9:37pm", "I will be available from 3-5pm", true, false),
-    new Channel("1", "Maria Seere", "9:02pm", "Spoke to customer. Will be there soon. I will be available from 3-5pm", false, true)
+    new Channel("0", "Nicole Benevo", "9:37pm", "I will be available from 3-5pm", true, false, ''),
+    new Channel("1", "Maria Seere", "9:02pm", "Spoke to customer. Will be there soon. I will be available from 3-5pm", false, true, '')
   ])
   const [channelsToDisplay, setChannelsToDisplay] = useState<Channel[]>([])
 
@@ -48,10 +51,6 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
     channels.forEach(element => filteredArray.push(element))
     setChannelsToDisplay(filteredArray)
   }, [])
-
-  // if (!clientIsReady) {
-  //   return <WarningText>Loading chat ...</WarningText>
-  // } 
 
   const updateSearch = (search) => {
     let filteredArray: Channel[] = []
@@ -91,30 +90,37 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
     (client) =>
       client.getSubscribedChannels().then((paginator) => {
         channelPaginator.current = paginator
-        const newChannels = TwilioService.getInstance().parseChannels(channelPaginator.current.items)
-        setChannels(newChannels)
+        if (channelPaginator.current) {
+          const newChannels = TwilioService.getInstance().parseChannels(channelPaginator.current)
+          setChannels(newChannels)
+        }
       }),
     [setChannels],
   )
 
   useEffect(() => {
-    const getSession = async () => {
-      const session = await getUserSession()
-      setIsLoading(true)
-      TwilioService.getInstance().getChatClient(session.user.twilio_token)
-        .then(() => TwilioService.getInstance().addTokenListener(getToken))
-        .then(setChannelEvents)
-        .then(getSubscribedChannels)
-        .catch((err) => Alert.alert('error', err.message))
-        .finally(() => setIsLoading(false))
+    setIsLoading(true)
+    API.createTwilioAccessToken()
+      .then((token) => {
+        console.log(token)
+        TwilioService.getInstance().getChatClient(token)
+      })
+      .then(() => TwilioService.getInstance().addTokenListener(API.createTwilioAccessToken()))
+      .then(setChannelEvents)
+      .then(getSubscribedChannels)
+      .catch((err) => {
+        // do something
+        console.log(err)
+      })
+      .finally(() => setIsLoading(false))
   
-      return () => TwilioService.getInstance().clientShutdown()  
-    }
-
-    getSession()
-
   }, [setChannelEvents, getSubscribedChannels])
-  //
+
+  if (isLoading) {
+    return(
+      <ActivityIndicator/>
+    )
+  }
 
   return (
     <ContainerView>
@@ -216,7 +222,4 @@ const ContainerView = styled.View`
 `
 
 export default InboxScreen
-function useApp(): { channels: any; updateChannels: any } {
-  throw new Error('Function not implemented.')
-}
 

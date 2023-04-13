@@ -1,6 +1,6 @@
 import { UseMutationResult, useMutation } from 'react-query'
 import { API } from './API'
-import { Customer } from './UseCustomers'
+import { Address, Customer } from './UseCustomers'
 import { UserResponse } from './UserResponse'
 
 type Job = {
@@ -13,6 +13,8 @@ type Job = {
     bedrooms?: string
     bathrooms?: string
     team_id: string
+    address?: Address
+    type?: string
     Customer: Customer
     Invoice: Invoice[]
     Photo: Photo[]

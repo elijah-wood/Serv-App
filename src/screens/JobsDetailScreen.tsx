@@ -4,39 +4,39 @@ import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
 
 import Table, { Section, BioCell, StaticCell, KeyValueCell, TouchableCell } from 'react-native-js-tableview'
-import { ActivityIndicator, useColorScheme } from 'react-native'
+import { ActivityIndicator } from 'react-native'
 import { HStack } from 'native-base'
 
 import { RootStackParamList } from '../../App'
 import { CTAButton } from '../components/CTAButton'
-import UseGetCustomer from '../api/UseGetCustomer'
-import { Customer } from '../api/UseCustomers'
+import UseGetJob from '../api/UseGetJob'
+import { Job } from '../api/UseJobs'
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
-type CustomerRouteProp = RouteProp<RootStackParamList, 'CustomerDetailScreen'>
+type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
+type CustomerRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
 
 type Props = {
   route: CustomerRouteProp
   navigation: NavigationProp
 }
 
-const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
-  const useGetCustomer = UseGetCustomer(route.params.customerId)
-  const [customer, setCustomer] = useState<Customer>()
+const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
+  const useGetJob = UseGetJob(route.params.jobId)
+  const [job, setJob] = useState<Job>()
 
   useEffect(() => {
-    switch (useGetCustomer.status) {
+    switch (useGetJob.status) {
       case 'success':
-        if (useGetCustomer.data) {
-          setCustomer(useGetCustomer.data)
+        if (useGetJob.data) {
+          setJob(useGetJob.data)
         }
         break
       default:
         break
     }
-  }, [useGetCustomer])
+  }, [useGetJob])
   
-  if (useGetCustomer.isLoading) {
+  if (useGetJob.isLoading) {
     return (
       <PaddedActivityIndicator/>
     )
@@ -44,13 +44,13 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <ContainerView>
-      <Table
+      {/* <Table
           accentColor='#0062FF'
           blendAccent={false}
           mode={'inset-grouped'}
           scrollable={true}>
           <Section>
-              <BioCell title={customer.first_name + ' ' + customer.last_name} subtitle='Customer' />
+              <BioCell title={job.Customer.first_name + ' ' + job.Customer.last_name} subtitle='Customer' />
           </Section>       
           <HStack space={4} justifyContent={'center'} style={{ marginTop: 16, marginHorizontal: 16}}>
             <CTAButton label='message' icon='message' onPress={() => {
@@ -61,17 +61,7 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
             }}/>
           </HStack>
           <Section header='Address' headerStyle={{ color: '#3C3C43' }}>
-              <KeyValueCell title={customer.address.line1} accessory="disclosure" onPress={() => {
-
-              }} />
-          </Section>
-          <Section header='Phone' headerStyle={{ color: '#3C3C43' }}>
-              <StaticCell title={customer.phone} titleStyle={{ color: '#0062FF' }} onPress={() => {
-
-              }} />
-          </Section>
-          <Section header='Email' headerStyle={{ color: '#3C3C43' }}>
-              <StaticCell title={customer.email} titleStyle={{ color: '#0062FF' }} onPress={() => {
+              <KeyValueCell title={job.Customer.address.line1} accessory="disclosure" onPress={() => {
 
               }} />
           </Section>
@@ -79,10 +69,7 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
             <StaticCell title='Jobs' accessory='disclosure' onPress={() => {}} />
             <StaticCell title='Payments' accessory='disclosure' onPress={() => {}} />
           </Section>
-          <Section>
-            <TouchableCell title='Delete'/>
-          </Section>
-      </Table>
+      </Table> */}
     </ContainerView>
   )
 }
@@ -97,4 +84,4 @@ const ContainerView = styled.View`
   width: 100%;
 `
 
-export default CustomerDetailScreen
+export default JobDetailScreen

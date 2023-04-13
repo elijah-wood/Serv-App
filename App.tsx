@@ -23,10 +23,15 @@ type RootStackParamList = {
   Welcome: undefined
   HomeTabNavigator: undefined
   CustomersScreen: undefined
+  CustomerDetailScreen: { customerId: string }
   AddCustomerScreen: undefined
+  JobsScreen: undefined
+  JobDetailScreen: { jobId: string }
+  AddJobScreen: undefined
   InboxScreen: undefined
   ChatDetail: { customer: Channel }
-  CustomerDetailScreen: { customerId: string }
+  TeamScreen: undefined
+  AnalyticsScreen: undefined
 }
 
 const queryClient = new QueryClient()

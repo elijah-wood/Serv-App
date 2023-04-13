@@ -4,11 +4,11 @@ import { StackNavigationProp } from '@react-navigation/stack'
 import { AlphabetList, IData } from 'react-native-section-alphabet-list'
 import { SearchBar } from '@rneui/themed'
 import Icon from 'react-native-vector-icons/Entypo'
-import { Box, Center, IconButton } from 'native-base'
+import { IconButton } from 'native-base'
 
 import { RootStackParamList } from '../../App'
 import UseCustomers, { Customer } from '../api/UseCustomers'
-import { ActivityIndicator, RefreshControl } from 'react-native'
+import { RefreshControl } from 'react-native'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomersScreen'>
 
@@ -24,7 +24,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
 
   useEffect(() => {
     let filteredArray: IData[] = []
-    customers.forEach(element => filteredArray.push({ key: element.id.toString(), value: element.full_name}))
+    customers.forEach(element => filteredArray.push({ key: element.id.toString(), value: element.first_name + ' ' + element.last_name}))
     setCustomerIData(filteredArray)
 
     useCustomers.mutate()
@@ -54,7 +54,9 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
 
   const updateSearch = (search) => {
     let filteredArray: IData[] = []
-    customers.filter(customer => customer.full_name.toUpperCase().includes(search.toUpperCase())).forEach(element => filteredArray.push({ key: element.id.toString(), value: element.full_name}))
+    customers.filter(customer => {
+      (customer.first_name + ' ' + customer.last_name).toUpperCase().includes(search.toUpperCase())
+    }).forEach(element => filteredArray.push({ key: element.id.toString(), value: element.first_name + ' ' + element.last_name}))
     setCustomerIData(filteredArray)
     setSearch(search)
   }

@@ -3,6 +3,7 @@ import { AuthenticatedHeaders } from "./AuthenticatedHeaders"
 import { getUserSession } from "./Session"
 import { CompleteSignInInput } from "./UseCompleteSignIn"
 import { CreateCustomerInput } from "./UseCreateCustomer"
+import { CreateJobInput } from "./UseCreateJob"
 import { SignInInput } from "./UseSignIn"
 
 export const API = {
@@ -45,8 +46,20 @@ export const API = {
         })
         return response.data
     },
-    generateTwilioAccessToken: async () => {
-        const response = await APIClient.post('/generate-twilio-access-token', [], {
+    getJob: async (id: string) => {
+        const response = await APIClient.get(`/jobs/${id}`, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },
+    createJob: async (values: CreateJobInput) => {
+        const response = await APIClient.post('/jobs', values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.status
+    },
+    createTwilioAccessToken: async () => {
+        const response = await APIClient.post('/twilio/access-token', [], {
             headers: await AuthenticatedHeaders(),
         })
         return response.data
