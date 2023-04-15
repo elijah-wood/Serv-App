@@ -1,4 +1,4 @@
-import { UseMutationResult, useMutation } from 'react-query'
+import { useQuery, UseQueryResult } from 'react-query'
 import { API } from './API'
 import { Job } from './UseJobs'
 
@@ -23,11 +23,16 @@ type Address = {
     state?: string
 }
 
-const UseCustomers = (): UseMutationResult<Customer[], Error, void> => {
-    return useMutation<Customer[], Error, void>(async () => {
+type UseCustomersResult = {
+    ok: boolean
+    result: Customer[]
+}
+
+const UseCustomers = (): UseQueryResult<UseCustomersResult, Error> => {
+    return useQuery<UseCustomersResult, Error>('Customers', async () => {
         return API.getCustomers()
     })
 }
 
 export default UseCustomers
-export type { Customer, Address }
+export type { Customer, Address, UseCustomersResult }

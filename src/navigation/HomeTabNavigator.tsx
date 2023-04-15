@@ -30,7 +30,7 @@ export const InboxStackScreen: React.FC<Props> = () => {
         <Stack.Navigator initialRouteName={Routes.CUSTOMERS}>
             <Stack.Screen name={Routes.INBOX} component={InboxScreen} 
                 options={{
-                    title: 'Inbox',
+                    title: 'Messages',
                 }}
             />
             <Stack.Screen name={Routes.CHAT_DETAIL} component={ChatDetail} 

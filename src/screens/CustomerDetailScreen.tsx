@@ -27,14 +27,14 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   useEffect(() => {
     switch (useGetCustomer.status) {
       case 'success':
-        if (useGetCustomer.data) {
-          setCustomer(useGetCustomer.data)
+        if (useGetCustomer.data.result) {
+          setCustomer(useGetCustomer.data.result)
         }
         break
       default:
         break
     }
-  }, [useGetCustomer])
+  }, [useGetCustomer.isLoading])
   
   if (useGetCustomer.isLoading) {
     return (
@@ -50,7 +50,7 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           mode={'inset-grouped'}
           scrollable={true}>
           <Section>
-              <BioCell title={customer.first_name + ' ' + customer.last_name} subtitle='Customer' />
+              <BioCell title={customer?.first_name + ' ' + customer?.last_name} subtitle='Customer' />
           </Section>       
           <HStack space={4} justifyContent={'center'} style={{ marginTop: 16, marginHorizontal: 16}}>
             <CTAButton label='message' icon='message' onPress={() => {
@@ -61,17 +61,17 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
             }}/>
           </HStack>
           <Section header='Address' headerStyle={{ color: '#3C3C43' }}>
-              <KeyValueCell title={customer.address.line1} accessory="disclosure" onPress={() => {
+              <KeyValueCell title={customer?.address?.line1 ?? 'None provided'} accessory="disclosure" onPress={() => {
 
               }} />
           </Section>
           <Section header='Phone' headerStyle={{ color: '#3C3C43' }}>
-              <StaticCell title={customer.phone} titleStyle={{ color: '#0062FF' }} onPress={() => {
+              <StaticCell title={customer?.phone} titleStyle={{ color: '#0062FF' }} onPress={() => {
 
               }} />
           </Section>
           <Section header='Email' headerStyle={{ color: '#3C3C43' }}>
-              <StaticCell title={customer.email} titleStyle={{ color: '#0062FF' }} onPress={() => {
+              <StaticCell title={customer?.email} titleStyle={{ color: '#0062FF' }} onPress={() => {
 
               }} />
           </Section>

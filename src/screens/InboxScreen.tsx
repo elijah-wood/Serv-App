@@ -2,14 +2,14 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { SearchBar } from '@rneui/themed'
-import { ActivityIndicator, Alert, FlatList } from 'react-native'
+import { FlatList } from 'react-native'
 import { Avatar, Divider, HStack, Icon, IconButton, Spacer, VStack } from 'native-base'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 
 import { RootStackParamList } from '../../App'
 import { TwilioService } from '../twilio/TwilioService'
-import { getUserSession, removeUserSession } from '../api/Session'
 import { API } from '../api/API'
+import { Client, Conversation, Paginator, Message } from '@twilio/conversations'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
 
@@ -17,51 +17,28 @@ type Props = {
   navigation: OnboardingSlideGoalsNavigationProp
 }
 
-export class Channel {
-  id: string
-  name: string
-  time: string
-  lastMessage: string
-  isUnread: boolean
-  isOnline: boolean
-  twilio_sid: string
-
-  constructor (id: string, name: string, time: string, lastMessage: string, isUnread: boolean, isOnline: boolean, twilio_sid: string) {
-    this.id = id
-    this.name = name
-    this.time = time
-    this.lastMessage = lastMessage
-    this.isUnread = isUnread
-    this.isOnline = isOnline
-    this.twilio_sid = twilio_sid
-  }
-}
-
 const InboxScreen: React.FC<Props> = ({ navigation }) => {
   const [search, setSearch] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [channels, setChannels] = useState<Channel[]>([
-    new Channel("0", "Nicole Benevo", "9:37pm", "I will be available from 3-5pm", true, false, ''),
-    new Channel("1", "Maria Seere", "9:02pm", "Spoke to customer. Will be there soon. I will be available from 3-5pm", false, true, '')
-  ])
-  const [channelsToDisplay, setChannelsToDisplay] = useState<Channel[]>([])
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  // const [channelsToDisplay, setChannelsToDisplay] = useState<Conversation[]>([])
 
-  React.useEffect(() => {
-    let filteredArray: Channel[] = []
-    channels.forEach(element => filteredArray.push(element))
-    setChannelsToDisplay(filteredArray)
-  }, [])
+  const conversationPaginator = useRef<Paginator<Conversation>>()
 
-  const updateSearch = (search) => {
-    let filteredArray: Channel[] = []
-    channels.filter(channel => channel.name.toUpperCase().includes(search.toUpperCase())).forEach(element => filteredArray.push(element))
-    setChannelsToDisplay(filteredArray)
-    setSearch(search)
-  }
+  // React.useEffect(() => {
+  //   let filteredArray: Channel[] = []
+  //   channels.forEach(element => filteredArray.push(element))
+  //   setChannelsToDisplay(filteredArray)
+  // }, [channels])
+
+  // const updateSearch = (search) => {
+  //   let filteredArray: Channel[] = []
+  //   channels.filter(channel => channel.name.toUpperCase().includes(search.toUpperCase())).forEach(element => filteredArray.push(element))
+  //   setChannelsToDisplay(filteredArray)
+  //   setSearch(search)
+  // }
 
   // TWILIO
-  const channelPaginator = useRef()
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -74,68 +51,74 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
 
   const setChannelEvents = useCallback(
     (client) => {
-      client.on('messageAdded', (message) => {
-        setChannels((prevChannels) =>
-          prevChannels.map((channel) =>
-            channel.id === message.channel.sid ? { ...channel, lastMessageTime: message.dateCreated } : channel,
-          ),
-        )
+      client.on('messageAdded', (message: Message) => {
+        console.log("message addded: " + message.body)
+        // setConversations((prevConversations) =>
+        //   prevConversations.map((channel) =>
+        //     channel.sidd === message.conversation.sid ? { ...channel, lastMessageTime: message.dateCreated } : channel,
+        //   ),
+        // )
+      })
+      client.on('conversationAdded', (conversation: Conversation) => {
+        console.log("conversation addded: " + conversation._participants)
+        let updatedConversations = conversations
+        updatedConversations.push(conversation)
+        setConversations(updatedConversations)
       })
       return client
     },
-    [setChannels],
+    [setConversations],
   )
 
-  const getSubscribedChannels = useCallback(
-    (client) =>
-      client.getSubscribedChannels().then((paginator) => {
-        channelPaginator.current = paginator
-        if (channelPaginator.current) {
-          const newChannels = TwilioService.getInstance().parseChannels(channelPaginator.current)
-          setChannels(newChannels)
-        }
-      }),
-    [setChannels],
+  const getSubscribedConversations = useCallback(
+    async (client: Client) => {
+      client.on('stateChanged', async (state) => {
+        if (state === 'initialized') {
+          const conversations = await client.getSubscribedConversations()
+          conversationPaginator.current = conversations
+          setConversations(conversations.items)
+          setIsLoading(false)
+        } 
+      })
+    },
+    [setConversations],
   )
 
   useEffect(() => {
     setIsLoading(true)
     API.createTwilioAccessToken()
-      .then((token) => {
-        console.log(token)
-        TwilioService.getInstance().getChatClient(token)
-      })
+      .then((response) => TwilioService.getInstance().getChatClient(response.result))
       .then(() => TwilioService.getInstance().addTokenListener(API.createTwilioAccessToken()))
       .then(setChannelEvents)
-      .then(getSubscribedChannels)
+      .then(getSubscribedConversations)
       .catch((err) => {
         // do something
         console.log(err)
+        setIsLoading(false)
       })
-      .finally(() => setIsLoading(false))
   
-  }, [setChannelEvents, getSubscribedChannels])
+  }, [setChannelEvents, getSubscribedConversations])
 
   if (isLoading) {
     return(
-      <ActivityIndicator/>
+      <PaddedActivityIndicator/>
     )
   }
 
   return (
     <ContainerView>
-      <SearchBar
+      {/* <SearchBar
         platform="ios"
         placeholder="Search"
         onChangeText={updateSearch}
         value={search}
-      />
+      /> */}
       <FlatList
-        data={channelsToDisplay}
-        keyExtractor={(item) => item.id}
+        data={conversations}
+        keyExtractor={(item) => item.sid}
         renderItem={({ item }) => (
-          <Thread channel={item} onPress={() => {
-            navigation.navigate('ChatDetail', { customer: item })
+          <Thread conversation={item} onPress={() => {
+            navigation.navigate('ChatDetail', { conversationSid: item.sid })
           }}/>
         )}
       />
@@ -144,7 +127,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
 }
 
 type ThreadProps = {
-  channel: Channel
+  conversation: Conversation
   onPress: () => void
 }
 
@@ -159,24 +142,28 @@ const Thread: React.FC<ThreadProps> = ({
       .toUpperCase()
   }
 
+  useEffect(() => {
+    console.log(props.conversation.attributes)
+  }, [])
+
   return (
       <ThreadContainerView>
         <TouchableOpacity onPress={props.onPress}>
           <VStack space={5}>
             <HStack space={2}>
               <Avatar>
-                {getInitials(props.channel.name)}
-                {props.channel.isUnread && <Avatar.Badge bg="green.500" />}
+                {/* {getInitials(props.conversation.attributes['name'])}
+                {props.channel.isUnread && <Avatar.Badge bg="green.500" />} */}
               </Avatar>
-              <ThreadFlexFillWidth>
+              {/* <ThreadFlexFillWidth>
                 <HStack alignItems={"center"}>
-                  <ThreadTitle>{props.channel.name}</ThreadTitle>
+                  <ThreadTitle>{props.conversation.dateUpdated.toISOString}</ThreadTitle>
                   <Spacer/>
-                  <ThreadTime>{props.channel.time}</ThreadTime>
+                  <ThreadTime>{props.conversation.dateUpdated.toISOString}</ThreadTime>
                 </HStack>
                 <Spacer/>
-                <ThreadLastMessage numberOfLines={1}>{props.channel.lastMessage}</ThreadLastMessage>
-              </ThreadFlexFillWidth>
+                <ThreadLastMessage numberOfLines={1}>{props.conversation.lastMessage}</ThreadLastMessage>
+              </ThreadFlexFillWidth> */}
             </HStack>
             <Divider/>
           </VStack>
@@ -212,7 +199,8 @@ const ThreadLastMessage = styled.Text`
   font-size: 15px;
 `
 
-const WarningText = styled.Text`
+const PaddedActivityIndicator = styled.ActivityIndicator`
+  padding: 12px;
 `
 
 const ContainerView = styled.View`

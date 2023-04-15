@@ -8,8 +8,8 @@ import { AppRegistry } from 'react-native'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { RootNavigator } from './src/navigation/RootNavigator'
-import { Channel } from './src/screens/InboxScreen'
 import TokenIntercepter from './src/api/TokenIntercepter'
+import { Conversation } from '@twilio/conversations'
 
 AppRegistry.registerComponent(expo.name, () => App)
 
@@ -29,7 +29,7 @@ type RootStackParamList = {
   JobDetailScreen: { jobId: string }
   AddJobScreen: undefined
   InboxScreen: undefined
-  ChatDetail: { customer: Channel }
+  ChatDetail: { conversationSid: string }
   TeamScreen: undefined
   AnalyticsScreen: undefined
 }

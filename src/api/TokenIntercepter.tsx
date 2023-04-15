@@ -11,7 +11,7 @@ const addRequestInterceptor = (): void => {
     async (config: InternalAxiosRequestConfig) => {
       const session = await getUserSession()
       if (session && config.headers) {
-        config.headers.Authorization = `Bearer ${session.token}`
+        config.headers.Authorization = `Bearer ${session?.token}`
       }
       return config
     },

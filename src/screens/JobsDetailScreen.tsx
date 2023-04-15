@@ -27,8 +27,8 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   useEffect(() => {
     switch (useGetJob.status) {
       case 'success':
-        if (useGetJob.data) {
-          setJob(useGetJob.data)
+        if (useGetJob.data.result) {
+          setJob(useGetJob.data.result)
         }
         break
       default:

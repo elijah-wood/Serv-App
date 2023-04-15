@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { AlphabetList, IData } from 'react-native-section-alphabet-list'
@@ -23,14 +23,6 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
   const [customers, setCustomers] = useState<Customer[]>([])
 
   useEffect(() => {
-    let filteredArray: IData[] = []
-    customers.forEach(element => filteredArray.push({ key: element.id.toString(), value: element.first_name + ' ' + element.last_name}))
-    setCustomerIData(filteredArray)
-
-    useCustomers.mutate()
-  }, [])
-
-  useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <IconButton icon={<Icon name='plus' color={'#0062FF'} size={25}/>} onPress={() => {
@@ -41,22 +33,43 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
   }, [navigation])
 
   useEffect(() => {
+    const updateCustomers = async (customers: Customer[]) => {
+      setCustomers(customers)
+
+      const customerDataArray: IData[] = []
+      customers.forEach(customer => {
+        customerDataArray.push({
+          key: customer.id.toString(),
+          value: `${customer.first_name} ${customer.last_name}`
+        })
+      })
+      setCustomerIData(customerDataArray)
+    }
+
     switch (useCustomers.status) {
       case 'success':
-        if (useCustomers.data) {
-          setCustomers(useCustomers.data)
+        if (useCustomers.data.result) {
+          updateCustomers(useCustomers.data.result)
         }
         break
       default:
         break
     }
-  }, [useCustomers])
+  }, [useCustomers.isLoading])
 
   const updateSearch = (search) => {
     let filteredArray: IData[] = []
     customers.filter(customer => {
-      (customer.first_name + ' ' + customer.last_name).toUpperCase().includes(search.toUpperCase())
+      let fullName = ''
+      if (customer.first_name && customer.last_name) {
+        fullName = customer.first_name + ' ' + customer.last_name
+      }
+      
+      return fullName.toUpperCase().includes(search.toUpperCase())
     }).forEach(element => filteredArray.push({ key: element.id.toString(), value: element.first_name + ' ' + element.last_name}))
+
+    console.log(filteredArray)
+    console.log(search)
     setCustomerIData(filteredArray)
     setSearch(search)
   }
@@ -78,9 +91,11 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
         value={search}
       />
       <AlphabetList
+      style={{height: '100%'}}
+      refreshing={useCustomers.isLoading}
       refreshControl={
         <RefreshControl refreshing={useCustomers.isLoading} onRefresh={() => {
-          useCustomers.mutate()
+          useCustomers.refetch()
         }}/>
       }
       data={customerIData}
@@ -89,8 +104,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
       }}
       renderCustomItem={(item) => (
         <Item onPress={() => {
-          let customer = customers[item.key]
-          navigation.navigate("CustomerDetailScreen", { customerId: customer.id })
+          navigation.navigate("CustomerDetailScreen", { customerId: item.key })
         }}><ItemTitle>{item.value}</ItemTitle></Item>
       )}
       renderCustomSectionHeader={(section) => (

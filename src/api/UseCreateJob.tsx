@@ -6,15 +6,20 @@ type CreateJobInput = {
     name: string
     customer_id: string
     description: string
-    type: string
     home_size: string
     bedrooms: string
     bathrooms: string
     address: Address
+    type: string
+    status: string
 }
 
-const UseCreateJob = (): UseMutationResult<number, Error, CreateJobInput> => {
-    return useMutation<number, Error, CreateJobInput>(async values => {
+type CreateJobResponse = {
+    ok: boolean
+}
+
+const UseCreateJob = (): UseMutationResult<CreateJobResponse, Error, CreateJobInput> => {
+    return useMutation<CreateJobResponse, Error, CreateJobInput>(async values => {
         return API.createJob(values)
     })
 }

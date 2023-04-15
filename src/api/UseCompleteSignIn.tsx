@@ -4,7 +4,7 @@ import { TokenResponse } from './TokenResponse'
 
 type CompleteSignInInput = {
     phone: string
-    verification_code: string
+    code: string
 }
 
 const UseCompleteSignIn = (): UseMutationResult<TokenResponse, Error, CompleteSignInInput> => {

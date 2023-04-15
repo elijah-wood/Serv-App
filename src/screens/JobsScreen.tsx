@@ -7,7 +7,7 @@ import { Avatar, Divider, HStack, IconButton, Spacer, VStack } from 'native-base
 
 import { RootStackParamList } from '../../App'
 import UseJobs, { Job } from '../api/UseJobs'
-import { FlatList, TouchableOpacity } from 'react-native'
+import { FlatList, RefreshControl, TouchableOpacity } from 'react-native'
 import { Address, Customer } from '../api/UseCustomers'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobsScreen'>
@@ -20,17 +20,12 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
   const useJobs = UseJobs()
   const [search, setSearch] = useState("")
   const [jobsToDisplay, setJobsToDisplay] = useState<Job[]>([])
-  const [jobs, setJobs] = useState<Job[]>([
-    { id: '0', name: 'Boiler Room Leak', status: 'Estimated', Customer: { first_name: 'Mark', last_name: 'Guthas' } as Customer } as Job,
-    { id: '1', name: 'Boiler Room Leak', status: 'Estimated', Customer: { first_name: 'Mark', last_name: 'Guthas' } as Customer } as Job,
-  ])
+  const [jobs, setJobs] = useState<Job[]>([])
 
   useEffect(() => {
     let filteredArray: Job[] = []
     jobs.forEach(element => filteredArray.push(element))
     setJobsToDisplay(filteredArray)
-
-    useJobs.mutate()
   }, [])
 
   useEffect(() => {
@@ -46,14 +41,15 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     switch (useJobs.status) {
       case 'success':
-        if (useJobs.data) {
-          setJobs(useJobs.data)
+        if (useJobs.data.result) {
+          setJobs(useJobs.data.result)
+          setJobsToDisplay(useJobs.data.result)
         }
         break
       default:
         break
     }
-  }, [setJobs])
+  }, [useJobs.isLoading])
 
   const updateSearch = (search) => {
     let filteredArray: Job[] = []
@@ -79,6 +75,12 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
         value={search}
       />
       <FlatList
+        refreshing={useJobs.isLoading}
+        refreshControl={
+          <RefreshControl refreshing={useJobs.isLoading} onRefresh={() => {
+            useJobs.refetch()
+          }}/>
+        }
         data={jobsToDisplay}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
@@ -107,8 +109,8 @@ return (
             <HStack space={2}>
                 <JobFlexFillWidth>
                     <JobTitle>{props.job.name}</JobTitle>            
-                    <JobSubtitle>{props.job.Customer.first_name + ' ' + props.job.Customer.last_name}</JobSubtitle>
-                    <JobSubtitle>{props.job.address}</JobSubtitle>
+                    <JobSubtitle>{props.job.Customer?.first_name + ' ' + props.job.Customer?.last_name}</JobSubtitle>
+                    <JobSubtitle>{props.job.address.line1}</JobSubtitle>
                     <JobBoldSubtitle>{props.job.status + ' • ' + 'You & Maria'}</JobBoldSubtitle>
                 </JobFlexFillWidth>
                 <Avatar>

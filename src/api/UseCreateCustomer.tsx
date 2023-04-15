@@ -11,8 +11,12 @@ type CreateCustomerInput = {
     address: Address
 }
 
-const UseCreateCustomer = (): UseMutationResult<number, Error, CreateCustomerInput> => {
-    return useMutation<number, Error, CreateCustomerInput>(async values => {
+type CreateCustomerResponse = {
+    ok: boolean
+}
+
+const UseCreateCustomer = (): UseMutationResult<CreateCustomerResponse, Error, CreateCustomerInput> => {
+    return useMutation<CreateCustomerResponse, Error, CreateCustomerInput>(async values => {
         return API.createCustomer(values)
     })
 }

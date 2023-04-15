@@ -7,9 +7,18 @@ declare module 'axios' {
   }
 }
 
+type ErrorResponse = {
+    ok: boolean
+    error: string
+}
+
 export const errorResponseHandler = (error: AxiosError): Promise<never> => {
-    // Check for errorHandlerEnabled config
-    const message = error.message //error?.response?.data?.errors?.length > 0 ? error?.response?.data.errors[0].message : error.message
+    // Check for errorHandlerEnabled config)
+    let response = error?.response?.data as ErrorResponse
+    let message = "Unknown error."
+    if (response) {
+        message = response.error
+    }
     Alert.alert('Error', message)
 
     return Promise.reject(error)

@@ -31,7 +31,7 @@ const PhoneVerificationScreen: React.FC<Props> = ({ navigation, route }) => {
   })
 
   const onSubmit = () => { 
-    useCompleteSignIn.mutate({ phone: phone, verification_code: getValues('verificationCode') })
+    useCompleteSignIn.mutate({ phone: phone, code: getValues('verificationCode') })
   }
 
   useEffect(() => {

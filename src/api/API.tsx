@@ -35,10 +35,11 @@ export const API = {
         return response.data
     },
     createCustomer: async (values: CreateCustomerInput) => {
+        console.log(values)
         const response = await APIClient.post('/customers', values, {
             headers: await AuthenticatedHeaders(),
         })
-        return response.status
+        return response.data
     },
     getJobs: async () => {
         const response = await APIClient.get('/jobs', {
@@ -56,7 +57,7 @@ export const API = {
         const response = await APIClient.post('/jobs', values, {
             headers: await AuthenticatedHeaders(),
         })
-        return response.status
+        return response.data
     },
     createTwilioAccessToken: async () => {
         const response = await APIClient.post('/twilio/access-token', [], {

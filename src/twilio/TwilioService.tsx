@@ -1,11 +1,11 @@
 import { Client } from '@twilio/conversations'
 
 export class TwilioService {
-  static serviceInstance
-  static chatClient
+  static serviceInstance: TwilioService
+  static chatClient: Client
 
   // Create a single service instance
-  static getInstance() {
+  static getInstance(): TwilioService {
     if (!TwilioService.serviceInstance) {
       TwilioService.serviceInstance = new TwilioService()
     }
@@ -13,7 +13,7 @@ export class TwilioService {
   }
 
   // Use chat client if don't have instance, create a new chat client
-  async getChatClient(twilioToken) {
+  async getChatClient(twilioToken): Promise<Client> {
     if (!TwilioService.chatClient && !twilioToken) {
       throw new Error('Twilio token is null or undefined')
     }
@@ -25,7 +25,7 @@ export class TwilioService {
   }
 
   // Manage our token expiration
-  addTokenListener(getToken) {
+  addTokenListener(getToken): Client {
     if (!TwilioService.chatClient) {
       throw new Error('Twilio client is null or undefined')
     }
