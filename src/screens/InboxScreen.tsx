@@ -52,7 +52,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
   const setChannelEvents = useCallback(
     (client) => {
       client.on('messageAdded', (message: Message) => {
-        console.log("message addded: " + message.body)
+        console.log("message addded inbox: " + message.body)
         // setConversations((prevConversations) =>
         //   prevConversations.map((channel) =>
         //     channel.sidd === message.conversation.sid ? { ...channel, lastMessageTime: message.dateCreated } : channel,
@@ -155,15 +155,15 @@ const Thread: React.FC<ThreadProps> = ({
                 {/* {getInitials(props.conversation.attributes['name'])}
                 {props.channel.isUnread && <Avatar.Badge bg="green.500" />} */}
               </Avatar>
-              {/* <ThreadFlexFillWidth>
+              <ThreadFlexFillWidth>
                 <HStack alignItems={"center"}>
-                  <ThreadTitle>{props.conversation.dateUpdated.toISOString}</ThreadTitle>
+                  {/* <ThreadTitle>{props.conversation.dateUpdated}</ThreadTitle>
                   <Spacer/>
-                  <ThreadTime>{props.conversation.dateUpdated.toISOString}</ThreadTime>
+                  <ThreadTime>{props.conversation.dateUpdated}</ThreadTime> */}
                 </HStack>
                 <Spacer/>
-                <ThreadLastMessage numberOfLines={1}>{props.conversation.lastMessage}</ThreadLastMessage>
-              </ThreadFlexFillWidth> */}
+                <ThreadLastMessage numberOfLines={1}>{props.conversation.lastMessage.index}</ThreadLastMessage>
+              </ThreadFlexFillWidth>
             </HStack>
             <Divider/>
           </VStack>
