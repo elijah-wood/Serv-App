@@ -20,6 +20,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
   const { conversationSid } = route.params
   const [messages, setMessages] = useState<IMessage[]>([])
   const [participantSid, setParticipantSid] = useState<string>('MB298bd975cbed4e59a1beec3430859b17')
+  const [isLoading, setIsLoading] = useState(true)
   
   const chatClientConversation = useRef<Conversation>()
   const chatMessagesPaginator = useRef<Paginator<Message>>()
@@ -58,6 +59,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
           },
         }
       }))
+      setIsLoading(false)
     },
     [setMessages],
   )
@@ -75,13 +77,21 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
 
   const onSend = useCallback((newMessages = []) => {
     const attributes = { giftedId: newMessages[0]._id }
-    setMessages((prevMessages) => [newMessages[0], ...prevMessages])
+    setMessages((prevMessages) => GiftedChat.append(prevMessages, newMessages))
     chatClientConversation.current?.sendMessage(newMessages[0].text, attributes)
-  }, [setMessages])
+  }, [])
 
   useEffect(() => {
     navigation.setOptions({ title: "Chat" })
   }, [])
+
+  if (isLoading) {
+    return(
+      <Container> 
+        <PaddedActivityIndicator/>
+      </Container>
+    )
+  }
 
   return (
     <Container> 
@@ -97,6 +107,10 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
   
   )
 }
+
+const PaddedActivityIndicator = styled.ActivityIndicator`
+  padding: 12px;
+`
 
 const Container = styled.View`
   width: 100%;
