@@ -38,7 +38,6 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
   //   setSearch(search)
   // }
 
-  // TWILIO
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -52,22 +51,24 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
   const setChannelEvents = useCallback(
     (client) => {
       client.on('messageAdded', (message: Message) => {
-        console.log("message addded inbox: " + message.body)
-        // setConversations((prevConversations) =>
-        //   prevConversations.map((channel) =>
-        //     channel.sidd === message.conversation.sid ? { ...channel, lastMessageTime: message.dateCreated } : channel,
-        //   ),
-        // )
+        setConversations((prevConversations) =>
+          prevConversations.map((conversation) => {
+            if (conversation.sid === message.conversation.sid) {
+              let updatedConvo = conversation
+              updatedConvo.lastMessage.dateCreated = message.dateCreated
+              return updatedConvo
+            } else {
+              return conversation
+            }
+          })
+        )
       })
       client.on('conversationAdded', (conversation: Conversation) => {
-        console.log("conversation addded: " + conversation._participants)
-        let updatedConversations = conversations
-        updatedConversations.push(conversation)
-        setConversations(updatedConversations)
+        setConversations([conversation, ...conversations])
       })
       return client
     },
-    [setConversations],
+    [],
   )
 
   const getSubscribedConversations = useCallback(
@@ -76,12 +77,12 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
         if (state === 'initialized') {
           const conversations = await client.getSubscribedConversations()
           conversationPaginator.current = conversations
-          setConversations(conversations.items)
+          setConversations(conversations.items.reverse())
           setIsLoading(false)
         } 
       })
     },
-    [setConversations],
+    [],
   )
 
   useEffect(() => {
@@ -96,8 +97,10 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
         console.log(err)
         setIsLoading(false)
       })
-  
-  }, [setChannelEvents, getSubscribedConversations])
+      return () => {
+        TwilioService.serviceInstance.clientShutdown()
+      }
+  }, [])
 
   if (isLoading) {
     return(
@@ -134,6 +137,8 @@ type ThreadProps = {
 const Thread: React.FC<ThreadProps> = ({
   ...props
 }) => {
+  const [unreadMessages, setUnreadMessages] = useState(0)
+
   const getInitials = (word: string): string => {
     const bits = word.trim().split(' ')
     return bits
@@ -146,6 +151,26 @@ const Thread: React.FC<ThreadProps> = ({
     console.log(props.conversation.attributes)
   }, [])
 
+  function formatDate(date: Date): string {
+    const now = new Date();
+    
+    const dateStr = date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: '2-digit' });
+    
+    // Check if the date is today
+    if (date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
+      return date.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric', hour12: true })
+    }
+    
+    // Check if the date is yesterday
+    now.setDate(now.getDate() - 1)
+    if (date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
+      return 'Yesterday'
+    }
+    
+    // If the date is not today or yesterday, display the date in mm/dd/yyyy format
+    return dateStr
+  }
+
   return (
       <ThreadContainerView>
         <TouchableOpacity onPress={props.onPress}>
@@ -157,12 +182,12 @@ const Thread: React.FC<ThreadProps> = ({
               </Avatar>
               <ThreadFlexFillWidth>
                 <HStack alignItems={"center"}>
-                  {/* <ThreadTitle>{props.conversation.dateUpdated}</ThreadTitle>
+                  <ThreadTitle>{props.conversation.friendlyName.slice(9)}</ThreadTitle>
                   <Spacer/>
-                  <ThreadTime>{props.conversation.dateUpdated}</ThreadTime> */}
+                  <ThreadTime>{formatDate(props.conversation.lastMessage.dateCreated)}</ThreadTime>
                 </HStack>
                 <Spacer/>
-                <ThreadLastMessage numberOfLines={1}>{props.conversation.lastMessage.index}</ThreadLastMessage>
+                {/* <ThreadLastMessage numberOfLines={1}>{unreadMessages > 0 ? 'Unread messages' : ''}</ThreadLastMessage> */}
               </ThreadFlexFillWidth>
             </HStack>
             <Divider/>

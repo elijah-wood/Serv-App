@@ -5,7 +5,7 @@ import { RouteProp } from '@react-navigation/native'
 
 import Table, { Section, BioCell, StaticCell, KeyValueCell, TouchableCell } from 'react-native-js-tableview'
 import { ActivityIndicator } from 'react-native'
-import { HStack } from 'native-base'
+import { VStack } from 'native-base'
 
 import { RootStackParamList } from '../../App'
 import { CTAButton } from '../components/CTAButton'
@@ -44,38 +44,56 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <ContainerView>
-      {/* <Table
+      <VStack> 
+        <TitleText>{job?.name}</TitleText>
+        <Table
           accentColor='#0062FF'
           blendAccent={false}
           mode={'inset-grouped'}
-          scrollable={true}>
-          <Section>
-              <BioCell title={job.Customer.first_name + ' ' + job.Customer.last_name} subtitle='Customer' />
-          </Section>       
-          <HStack space={4} justifyContent={'center'} style={{ marginTop: 16, marginHorizontal: 16}}>
-            <CTAButton label='message' icon='message' onPress={() => {
-              
-            }}/>
-            <CTAButton label='call' icon='phone' onPress={() => {
-              
-            }}/>
-          </HStack>
+          scrollable={true}>  
+          <Section header='Description' headerStyle={{ color: '#3C3C43' }}>
+              <KeyValueCell title={job?.description ?? ''} />
+          </Section>
+          <Section header='Status' headerStyle={{ color: '#3C3C43' }} >
+              <KeyValueCell title={job?.status ?? ''} accessory="disclosure" onPress={() => {
+
+              }} />
+          </Section>
+          <Section header='Customer' headerStyle={{ color: '#3C3C43' }}>
+              <KeyValueCell title={(job?.Customer?.first_name ?? '') + ' ' + (job?.Customer?.last_name ?? '')} />
+          </Section>
           <Section header='Address' headerStyle={{ color: '#3C3C43' }}>
-              <KeyValueCell title={job.Customer.address.line1} accessory="disclosure" onPress={() => {
+              <KeyValueCell title={job?.address?.line1 ?? 'Not provided'} accessory="disclosure" onPress={() => {
 
               }} />
           </Section>
           <Section>
-            <StaticCell title='Jobs' accessory='disclosure' onPress={() => {}} />
-            <StaticCell title='Payments' accessory='disclosure' onPress={() => {}} />
+            <StaticCell title='Invoices' accessory='disclosure' onPress={() => {}} />
           </Section>
-      </Table> */}
+          <Section>
+            <StaticCell title='Photos' accessory='disclosure' onPress={() => {}} />
+          </Section>
+          <Section>
+            <StaticCell title='Collaborators' accessory='disclosure' onPress={() => {}} />
+          </Section>
+          <Section>
+            <TouchableCell title='Delete'/>
+          </Section>
+        </Table>
+      </VStack>
     </ContainerView>
   )
 }
 
 const PaddedActivityIndicator = styled.ActivityIndicator`
   padding: 12px;
+`
+
+const TitleText = styled.Text`
+  font-size: 21px;
+  font-weight: bold;
+  padding-left: 16px;
+  padding-top: 16px;
 `
 
 const ContainerView = styled.View`

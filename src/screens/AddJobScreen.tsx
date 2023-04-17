@@ -2,14 +2,14 @@ import React, { useEffect } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 
-import { KeyboardAvoidingView, Platform } from 'react-native';
+import { KeyboardAvoidingView, Platform } from 'react-native'
 import { VStack } from 'native-base'
 import { Controller, useForm } from 'react-hook-form'
 
 import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
 import { Address } from '../api/UseCustomers'
-import UseCreateJob from '../api/UseCreateJob';
+import UseCreateJob from '../api/UseCreateJob'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'AddJobScreen'>
 

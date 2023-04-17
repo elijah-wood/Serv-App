@@ -49,7 +49,7 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
       default:
         break
     }
-  }, [useJobs.isLoading])
+  }, [useJobs])
 
   const updateSearch = (search) => {
     let filteredArray: Job[] = []

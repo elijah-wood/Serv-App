@@ -28,6 +28,7 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
     switch (useGetCustomer.status) {
       case 'success':
         if (useGetCustomer.data.result) {
+          console.log(route.params.customerId)
           setCustomer(useGetCustomer.data.result)
         }
         break
@@ -66,12 +67,12 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
               }} />
           </Section>
           <Section header='Phone' headerStyle={{ color: '#3C3C43' }}>
-              <StaticCell title={customer?.phone} titleStyle={{ color: '#0062FF' }} onPress={() => {
+              <StaticCell title={customer?.phone ?? ''} titleStyle={{ color: '#0062FF' }} onPress={() => {
 
               }} />
           </Section>
           <Section header='Email' headerStyle={{ color: '#3C3C43' }}>
-              <StaticCell title={customer?.email} titleStyle={{ color: '#0062FF' }} onPress={() => {
+              <StaticCell title={customer?.email ?? ''} titleStyle={{ color: '#0062FF' }} onPress={() => {
 
               }} />
           </Section>
