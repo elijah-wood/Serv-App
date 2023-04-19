@@ -121,7 +121,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
         keyExtractor={(item) => item.sid}
         renderItem={({ item }) => (
           <Thread conversation={item} onPress={() => {
-            navigation.navigate('ChatDetail', { conversationSid: item.sid })
+            navigation.navigate('ChatDetail', { conversationSid: item.sid, name: ''})
           }}/>
         )}
       />
@@ -138,6 +138,7 @@ const Thread: React.FC<ThreadProps> = ({
   ...props
 }) => {
   const [unreadMessages, setUnreadMessages] = useState(0)
+  const [name, setName] = useState('Unknown')
 
   const getInitials = (word: string): string => {
     const bits = word.trim().split(' ')
@@ -149,6 +150,15 @@ const Thread: React.FC<ThreadProps> = ({
 
   useEffect(() => {
     console.log(props.conversation.attributes)
+    
+    props.conversation._participants.forEach((participant) => {
+      let fn = participant.attributes['first_name'] as string
+      let ln = participant.attributes['last_name'] as string
+      
+      if (fn && ln) {
+        setName(fn + ' ' + ln)
+      } 
+    })
   }, [])
 
   function formatDate(date: Date): string {
@@ -177,17 +187,17 @@ const Thread: React.FC<ThreadProps> = ({
           <VStack space={5}>
             <HStack space={2}>
               <Avatar>
-                {/* {getInitials(props.conversation.attributes['name'])}
-                {props.channel.isUnread && <Avatar.Badge bg="green.500" />} */}
+                {getInitials(name)}
+                {/* {props.channel.isUnread && <Avatar.Badge bg="green.500" />} */}
               </Avatar>
               <ThreadFlexFillWidth>
                 <HStack alignItems={"center"}>
-                  <ThreadTitle>{props.conversation.friendlyName.slice(9)}</ThreadTitle>
+                  <ThreadTitle>{name}</ThreadTitle>
                   <Spacer/>
                   <ThreadTime>{formatDate(props.conversation.lastMessage.dateCreated)}</ThreadTime>
                 </HStack>
                 <Spacer/>
-                {/* <ThreadLastMessage numberOfLines={1}>{unreadMessages > 0 ? 'Unread messages' : ''}</ThreadLastMessage> */}
+                <ThreadLastMessage numberOfLines={1}>{'Customer'}</ThreadLastMessage>
               </ThreadFlexFillWidth>
             </HStack>
             <Divider/>

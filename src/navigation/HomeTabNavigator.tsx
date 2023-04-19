@@ -122,7 +122,7 @@ export const HomeTabNavigator: React.FC<Props> = () => {
     const Tab = createBottomTabNavigator()
 
     return (
-        <Tab.Navigator screenOptions={{ headerShown: false }} >
+        <Tab.Navigator screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true }} >
             <Tab.Screen name={Routes.INBOX_TAB} component={InboxStackScreen}
                 options={{
                     title: 'Inbox',

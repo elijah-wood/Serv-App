@@ -29,7 +29,7 @@ type RootStackParamList = {
   JobDetailScreen: { jobId: string }
   AddJobScreen: undefined
   InboxScreen: undefined
-  ChatDetail: { conversationSid: string }
+  ChatDetail: { conversationSid: string, name: string }
   TeamScreen: undefined
   AnalyticsScreen: undefined
 }
