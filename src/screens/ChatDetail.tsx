@@ -47,7 +47,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
       navigation.setOptions({ title: name })
   }, [])
 
-  const addNewMessages = (newPage: boolean) => {
+  const addNewMessages = (includePreviousMessages: boolean) => {
     let newMessages = chatMessagesPaginator.current.items.map(item => {
       return {
         id: item.sid,
@@ -60,7 +60,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
         type: 'text'
       } as MessageType.Any
     })
-    if (newPage) {
+    if (includePreviousMessages) {
       setMessages([...messages, ...newMessages.reverse()])
     } else {
       setMessages(newMessages.reverse())
