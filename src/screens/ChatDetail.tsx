@@ -1,11 +1,9 @@
 import { StackNavigationProp } from '@react-navigation/stack'
-// import { GiftedChat, IMessage } from 'react-native-gifted-chat'
 import { Chat, MessageType, defaultTheme } from '@flyerhq/react-native-chat-ui'
 import { useCallback, useEffect, useRef, useState } from "react"
 import styled from 'styled-components/native'
 import { RouteProp } from '@react-navigation/native'
 import { Client, Conversation, Message, Paginator } from '@twilio/conversations'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { RootStackParamList } from '../../App'
 import { TwilioService } from '../twilio/TwilioService'
@@ -128,7 +126,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
         onSendPress={messages => onSend(messages)}
         theme={{
           ...defaultTheme,
-          colors: { ...defaultTheme.colors, inputBackground: '#0062FF' }
+          colors: { ...defaultTheme.colors, inputBackground: '#0062FF' },
         }}
         user={{
           id: participantSid,
@@ -148,9 +146,8 @@ const PaddedActivityIndicator = styled.ActivityIndicator`
   padding: 12px;
 `
 
-const Container = styled.SafeAreaView`
+const Container = styled.View`
   width: 100%;
-  flex: 1;
   height: 100%;
   background-color: white;
 `

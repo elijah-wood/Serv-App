@@ -1,10 +1,11 @@
 import React from 'react'
-import { Button, Image } from 'react-native'
+import { Image } from 'react-native'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { RootStackParamList } from '../../App'
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
+import { RootStackParamList } from '../../App'
 import CustomersScreen from '../screens/CustomersScreen'
 import CustomerDetailScreen from '../screens/CustomerDetailScreen'
 import Routes from './Routes'
@@ -22,6 +23,77 @@ type NavigationProp = StackNavigationProp<RootStackParamList, 'HomeTabNavigator'
 type Props = {
   navigation: NavigationProp
 }
+
+export const HomeTabNavigator: React.FC<Props> = () => {
+    const Tab = createBottomTabNavigator()
+
+    return (
+        <Tab.Navigator screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true}} >
+            <Tab.Screen name={Routes.INBOX_TAB} component={InboxStackScreen}
+                options={({ route }) => ({
+                    title: 'Inbox',
+                    tabBarIcon: ({ color }) => (
+                        <Image
+                        source={require('../assets/Inbox.png')}
+                        style={{ width: 20, height: 20, tintColor: color }}
+                        />
+                    ),
+                    tabBarStyle: ((route) => {
+                      const routeName = getFocusedRouteNameFromRoute(route) ?? ""
+                      if (routeName === 'ChatDetail') {
+                        return { display: "none" }
+                      }
+                      return
+                    })(route),
+                  })}
+            />
+            <Tab.Screen name={Routes.CUSTOMERS_TAB} component={CustomersStackScreen}
+                options={{
+                    title: 'Customers',
+                    tabBarIcon: ({ color }) => (
+                        <Image
+                        source={require('../assets/Customers.png')}
+                        style={{ width: 14, height: 18, tintColor: color }}
+                        />
+                    )
+                }}
+            />
+            <Tab.Screen name={Routes.JOBS_TAB} component={JobsStackScreen}
+                options={{
+                    title: 'Jobs',
+                    tabBarIcon: ({ color }) => (
+                        <Image
+                        source={require('../assets/Jobs.png')}
+                        style={{ width: 20, height: 18, tintColor: color }}
+                        />
+                    )
+                }}
+            />
+            <Tab.Screen name={Routes.ANALYTICS_TAB} component={AnalyticsStackScreen}
+                options={{
+                    title: 'Analytics',
+                    tabBarIcon: ({ color }) => (
+                        <Image
+                        source={require('../assets/Analytics.png')}
+                        style={{ width: 16, height: 17, tintColor: color }}
+                        />
+                    )
+                }}
+            />
+            <Tab.Screen name={Routes.TEAM_TAB} component={TeamStackScreen}
+                options={{
+                    title: 'Team',
+                    tabBarIcon: ({ color }) => (
+                        <Image
+                        source={require('../assets/Team.png')}
+                        style={{ width: 20, height: 20, tintColor: color }}
+                        />
+                    )
+                }}
+            />
+        </Tab.Navigator>
+        )
+    }
 
 export const InboxStackScreen: React.FC<Props> = () => {
     const Stack = createNativeStackNavigator()
@@ -117,67 +189,3 @@ export const TeamStackScreen: React.FC<Props> = () => {
         </Stack.Navigator>
     )
 }
-
-export const HomeTabNavigator: React.FC<Props> = () => {
-    const Tab = createBottomTabNavigator()
-
-    return (
-        <Tab.Navigator screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true }} >
-            <Tab.Screen name={Routes.INBOX_TAB} component={InboxStackScreen}
-                options={{
-                    title: 'Inbox',
-                    tabBarIcon: ({ color }) => (
-                        <Image
-                        source={require('../assets/Inbox.png')}
-                        style={{ width: 20, height: 20, tintColor: color }}
-                        />
-                    )
-                }}
-            />
-            <Tab.Screen name={Routes.CUSTOMERS_TAB} component={CustomersStackScreen}
-                options={{
-                    title: 'Customers',
-                    tabBarIcon: ({ color }) => (
-                        <Image
-                        source={require('../assets/Customers.png')}
-                        style={{ width: 14, height: 18, tintColor: color }}
-                        />
-                    )
-                }}
-            />
-            <Tab.Screen name={Routes.JOBS_TAB} component={JobsStackScreen}
-                options={{
-                    title: 'Jobs',
-                    tabBarIcon: ({ color }) => (
-                        <Image
-                        source={require('../assets/Jobs.png')}
-                        style={{ width: 20, height: 18, tintColor: color }}
-                        />
-                    )
-                }}
-            />
-            <Tab.Screen name={Routes.ANALYTICS_TAB} component={AnalyticsStackScreen}
-                options={{
-                    title: 'Analytics',
-                    tabBarIcon: ({ color }) => (
-                        <Image
-                        source={require('../assets/Analytics.png')}
-                        style={{ width: 16, height: 17, tintColor: color }}
-                        />
-                    )
-                }}
-            />
-            <Tab.Screen name={Routes.TEAM_TAB} component={TeamStackScreen}
-                options={{
-                    title: 'Team',
-                    tabBarIcon: ({ color }) => (
-                        <Image
-                        source={require('../assets/Team.png')}
-                        style={{ width: 20, height: 20, tintColor: color }}
-                        />
-                    )
-                }}
-            />
-        </Tab.Navigator>
-        )
-    }
