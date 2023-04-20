@@ -126,7 +126,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
         onSendPress={messages => onSend(messages)}
         theme={{
           ...defaultTheme,
-          colors: { ...defaultTheme.colors, inputBackground: '#0062FF' },
+          colors: { ...defaultTheme.colors, inputBackground: '#0062FF', primary: '#0062FF' },
         }}
         user={{
           id: participantSid,
