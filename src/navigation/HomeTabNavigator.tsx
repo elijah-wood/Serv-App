@@ -134,6 +134,16 @@ export const CustomersStackScreen: React.FC<Props> = () => {
                     title: 'Add Customer',
                 }}
              />
+             <Stack.Screen name={Routes.JOB_DETAIL} component={JobDetailScreen} 
+                options={{
+                    title: 'Job',
+                }}
+             />
+            <Stack.Screen name={Routes.CHAT_DETAIL} component={ChatDetail} 
+                options={{
+                    title: 'Chat',
+                }}
+            />
         </Stack.Navigator>
     )
 }
@@ -156,6 +166,11 @@ export const JobsStackScreen: React.FC<Props> = () => {
             <Stack.Screen name={Routes.ADD_JOB} component={AddJobScreen} 
                 options={{
                     title: 'Create Job',
+                }}
+             />
+            <Stack.Screen name={Routes.CUSTOMER_DETAIL} component={CustomerDetailScreen} 
+                options={{
+                    title: 'Customer',
                 }}
              />
         </Stack.Navigator>

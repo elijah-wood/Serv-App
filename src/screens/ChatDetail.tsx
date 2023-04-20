@@ -1,6 +1,6 @@
 import { StackNavigationProp } from '@react-navigation/stack'
 import { Chat, MessageType, defaultTheme } from '@flyerhq/react-native-chat-ui'
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import styled from 'styled-components/native'
 import { RouteProp } from '@react-navigation/native'
 import { Client, Conversation, Message, Paginator } from '@twilio/conversations'
@@ -126,7 +126,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
         onSendPress={messages => onSend(messages)}
         theme={{
           ...defaultTheme,
-          colors: { ...defaultTheme.colors, inputBackground: '#0062FF', primary: '#0062FF' },
+          colors: { ...defaultTheme.colors, inputBackground: '#0062FF', primary: '#0062FF', userAvatarNameColors: ['#363636'] },
         }}
         user={{
           id: participantSid,

@@ -10,6 +10,7 @@ import { RootStackParamList } from '../../App'
 import { TwilioService } from '../twilio/TwilioService'
 import { API } from '../api/API'
 import { Client, Conversation, Paginator, Message } from '@twilio/conversations'
+import { getInitials } from '../utils/GetStringInitials'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
 
@@ -120,8 +121,8 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
         data={conversations}
         keyExtractor={(item) => item.sid}
         renderItem={({ item }) => (
-          <Thread conversation={item} onPress={() => {
-            navigation.navigate('ChatDetail', { conversationSid: item.sid, name: ''})
+          <Thread conversation={item} onPress={(name: string) => {
+            navigation.navigate('ChatDetail', { conversationSid: item.sid, name: name})
           }}/>
         )}
       />
@@ -131,7 +132,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
 
 type ThreadProps = {
   conversation: Conversation
-  onPress: () => void
+  onPress: (name: string) => void
 }
 
 const Thread: React.FC<ThreadProps> = ({
@@ -139,14 +140,6 @@ const Thread: React.FC<ThreadProps> = ({
 }) => {
   const [unreadMessages, setUnreadMessages] = useState(0)
   const [name, setName] = useState('Unknown')
-
-  const getInitials = (word: string): string => {
-    const bits = word.trim().split(' ')
-    return bits
-      .map((bit) => bit.charAt(0))
-      .join('')
-      .toUpperCase()
-  }
 
   useEffect(() => {
     console.log(props.conversation.attributes)
@@ -183,12 +176,13 @@ const Thread: React.FC<ThreadProps> = ({
 
   return (
       <ThreadContainerView>
-        <TouchableOpacity onPress={props.onPress}>
+        <TouchableOpacity onPress={() => { 
+            props.onPress(name)
+          }}>
           <VStack space={5}>
             <HStack space={2}>
               <Avatar>
                 {getInitials(name)}
-                {/* {props.channel.isUnread && <Avatar.Badge bg="green.500" />} */}
               </Avatar>
               <ThreadFlexFillWidth>
                 <HStack alignItems={"center"}>

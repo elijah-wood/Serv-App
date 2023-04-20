@@ -3,12 +3,12 @@ import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { SearchBar } from '@rneui/themed'
 import Icon from 'react-native-vector-icons/Entypo'
-import { Avatar, Divider, HStack, IconButton, Spacer, VStack } from 'native-base'
+import { IconButton } from 'native-base'
 
 import { RootStackParamList } from '../../App'
 import UseJobs, { Job } from '../api/UseJobs'
-import { FlatList, RefreshControl, TouchableOpacity } from 'react-native'
-import { Address, Customer } from '../api/UseCustomers'
+import { FlatList, RefreshControl } from 'react-native'
+import { JobRow } from '../components/JobRow'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobsScreen'>
 
@@ -68,12 +68,12 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <ContainerView>
-      <SearchBar
+      {/* <SearchBar
         platform="ios"
         placeholder="Search"
         onChangeText={updateSearch}
         value={search}
-      />
+      /> */}
       <FlatList
         refreshing={useJobs.isLoading}
         refreshControl={
@@ -84,7 +84,7 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
         data={jobsToDisplay}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <JobRow job={item} onPress={() => {
+          <JobRow showBorder={false} job={item} customer={item.Customer} onPress={() => {
             navigation.navigate('JobDetailScreen', { jobId: item.id })
           }}/>
         )}
@@ -92,65 +92,6 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
     </ContainerView>
   )
 }
-
-type JobProps = {
-    job: Job
-    onPress: () => void
-}
-
-const JobRow: React.FC<JobProps> = ({
-...props
-}) => {
-
-return (
-    <JobContainerView>
-        <TouchableOpacity onPress={props.onPress}>
-        <VStack space={5}>
-            <HStack space={2}>
-                <JobFlexFillWidth>
-                    <JobTitle>{props.job.name}</JobTitle>            
-                    <JobSubtitle>{props.job.Customer?.first_name + ' ' + props.job.Customer?.last_name}</JobSubtitle>
-                    <JobSubtitle>{props.job.address.line1}</JobSubtitle>
-                    <JobBoldSubtitle>{props.job.status + ' • ' + 'You & Maria'}</JobBoldSubtitle>
-                </JobFlexFillWidth>
-                <Avatar>
-                    {}
-                </Avatar>
-            </HStack>
-            <Divider/>
-        </VStack>
-        </TouchableOpacity>
-    </JobContainerView>
-)
-}
-
-const JobFlexFillWidth = styled.View`
-  flex: 1;
-  width: 100%;
-`
-
-const JobContainerView = styled.View`
-  width: 100%;
-  padding-horizontal: 15px;
-  padding-top: 15px;
-`
-
-const JobTitle = styled.Text`
-  font-size: 17px;
-  font-weight: bold;
-  text-align: left;
-`
-
-const JobSubtitle = styled.Text`
-  font-size: 15px;
-  text-align: left;
-`
-
-const JobBoldSubtitle = styled.Text`
-  font-size: 15px;
-  text-align: left;
-  font-weight: bold;
-`
 
 const PaddedActivityIndicator = styled.ActivityIndicator`
   padding: 12px;

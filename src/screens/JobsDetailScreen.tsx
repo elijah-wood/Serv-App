@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
-
-import Table, { Section, BioCell, StaticCell, KeyValueCell, TouchableCell } from 'react-native-js-tableview'
-import { ActivityIndicator } from 'react-native'
-import { VStack } from 'native-base'
+import { FlatList, HStack, Spacer, VStack, View } from 'native-base'
+import { ScrollView } from 'react-native-virtualized-view'
 
 import { RootStackParamList } from '../../App'
-import { CTAButton } from '../components/CTAButton'
 import UseGetJob from '../api/UseGetJob'
 import { Job } from '../api/UseJobs'
+import { renderAddress } from '../utils/RenderAddress'
+import { openMap } from '../utils/OpenMap'
+import { DetailSection, SectionContainer, SectionTitle } from '../components/DetailSection'
+import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
+import DefaultButton from '../components/DefaultButton'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type CustomerRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -44,46 +46,61 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <ContainerView>
-      <VStack> 
-        <TitleText>{job?.name}</TitleText>
-        <Table
-          accentColor='#0062FF'
-          blendAccent={false}
-          mode={'inset-grouped'}
-          scrollable={true}>  
-          <Section header='Description' headerStyle={{ color: '#3C3C43' }}>
-              <KeyValueCell title={job?.description ?? ''} />
-          </Section>
-          <Section header='Status' headerStyle={{ color: '#3C3C43' }} >
-              <KeyValueCell title={job?.status ?? ''} accessory="disclosure" onPress={() => {
-
-              }} />
-          </Section>
-          <Section header='Customer' headerStyle={{ color: '#3C3C43' }}>
-              <KeyValueCell title={(job?.Customer?.first_name ?? '') + ' ' + (job?.Customer?.last_name ?? '')} />
-          </Section>
-          <Section header='Address' headerStyle={{ color: '#3C3C43' }}>
-              <KeyValueCell title={job?.address?.line1 ?? 'Not provided'} accessory="disclosure" onPress={() => {
-
-              }} />
-          </Section>
-          <Section>
-            <StaticCell title='Invoices' accessory='disclosure' onPress={() => {}} />
-          </Section>
-          <Section>
-            <StaticCell title='Photos' accessory='disclosure' onPress={() => {}} />
-          </Section>
-          <Section>
-            <StaticCell title='Collaborators' accessory='disclosure' onPress={() => {}} />
-          </Section>
-          <Section>
-            <TouchableCell title='Delete'/>
-          </Section>
-        </Table>
-      </VStack>
+      <ScrollView>
+        <VStack space={4}>
+          <TitleText>{job?.name}</TitleText>
+          <DetailSection title='Description' value={job?.description ?? ''} onPress={() => {
+            
+          }}/>
+          <DetailSection title='Status' value={job?.status ?? ''} showDisclosure={true} onPress={() => {
+            
+          }}/>
+          <DetailSection title='Customer' value={renderCustomerFullName(job?.Customer)} color={'#0062FF'} onPress={() => {
+            navigation.navigate('CustomerDetailScreen', { customerId: job?.customer_id })
+          }}/>
+          {/* Invoices */}
+          <SectionContainer>
+            <SectionTitle>Invoices</SectionTitle>
+            <InvoiceListContainer>
+              <FlatList
+                  data={job?.Invoice}
+                  keyExtractor={(item) => item.id}
+                  ItemSeparatorComponent={() => <View style={{height: 16}}/>}
+                  renderItem={({ item }) => (
+                    <TitleText>{item.id}</TitleText>
+                  )}
+                />
+                <DefaultButton label='+ New Estimate / Invoice'/>
+            </InvoiceListContainer>
+          </SectionContainer>
+          <DetailSection title='Address' value={renderAddress(job?.address)} onPress={() => {
+            openMap(job?.address)
+          }}/>
+          {/* Collaborators */}
+          <SectionContainer>
+            <SectionTitle>Collaborators</SectionTitle>
+            <InvoiceListContainer>
+              {/* <FlatList
+                  data={job?.Team.User}
+                  keyExtractor={(item) => item.id}
+                  ItemSeparatorComponent={() => <View style={{height: 16}}/>}
+                  renderItem={({ item }) => (
+                    <TitleText>{item.id}</TitleText>
+                  )}
+                /> */}
+                <DefaultButton label='Add Member'/>
+            </InvoiceListContainer>
+          </SectionContainer>
+          <Spacer/>
+        </VStack>
+      </ScrollView>
     </ContainerView>
   )
 }
+
+const InvoiceListContainer = styled.View`
+  padding: 16px;
+`
 
 const PaddedActivityIndicator = styled.ActivityIndicator`
   padding: 12px;

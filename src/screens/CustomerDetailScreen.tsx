@@ -2,15 +2,22 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
-
-import Table, { Section, BioCell, StaticCell, KeyValueCell, TouchableCell } from 'react-native-js-tableview'
-import { ActivityIndicator, useColorScheme } from 'react-native'
-import { HStack } from 'native-base'
+import { Avatar, Center, HStack, Spacer, VStack, View } from 'native-base'
+import { ScrollView } from 'react-native-virtualized-view'
 
 import { RootStackParamList } from '../../App'
 import { CTAButton } from '../components/CTAButton'
 import UseGetCustomer from '../api/UseGetCustomer'
 import { Customer } from '../api/UseCustomers'
+import { openMap } from '../utils/OpenMap'
+import { renderAddress } from '../utils/RenderAddress'
+import { FlatList } from 'react-native'
+import { makeCall } from '../utils/MakeCall'
+import { composeEmail } from '../utils/ComposeEmail'
+import { JobRow } from '../components/JobRow'
+import { DetailSection, SectionContainer, SectionTitle } from '../components/DetailSection'
+import { getInitials } from '../utils/GetStringInitials'
+import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
 type CustomerRouteProp = RouteProp<RootStackParamList, 'CustomerDetailScreen'>
@@ -28,7 +35,6 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
     switch (useGetCustomer.status) {
       case 'success':
         if (useGetCustomer.data.result) {
-          console.log(route.params.customerId)
           setCustomer(useGetCustomer.data.result)
         }
         break
@@ -43,50 +49,70 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
     )
   }
 
+
+
   return (
     <ContainerView>
-      <Table
-          accentColor='#0062FF'
-          blendAccent={false}
-          mode={'inset-grouped'}
-          scrollable={true}>
-          <Section>
-              <BioCell title={customer?.first_name + ' ' + customer?.last_name} subtitle='Customer' />
-          </Section>       
+      <ScrollView>
+        <VStack space={4}>
+          <Center>
+            <AvatarContainer>
+              <Avatar size={'xl'}>{getInitials(renderCustomerFullName(customer))}</Avatar>
+            </AvatarContainer>
+            <CustomerName>{renderCustomerFullName(customer)}</CustomerName>
+          </Center>
           <HStack space={4} justifyContent={'center'} style={{ marginTop: 16, marginHorizontal: 16}}>
-            <CTAButton label='message' icon='message' onPress={() => {
-              
-            }}/>
-            <CTAButton label='call' icon='phone' onPress={() => {
-              
-            }}/>
+              <CTAButton label='call' icon='phone' onPress={() => {
+                makeCall(customer?.phone)
+              }}/>
+              <CTAButton label='message' icon='message' onPress={() => {
+                navigation.navigate('ChatDetail', { conversationSid: customer?.twilio_conversation_sid, name: renderCustomerFullName(customer)})
+              }}/>
           </HStack>
-          <Section header='Address' headerStyle={{ color: '#3C3C43' }}>
-              <KeyValueCell title={customer?.address?.line1 ?? 'None provided'} accessory="disclosure" onPress={() => {
-
-              }} />
-          </Section>
-          <Section header='Phone' headerStyle={{ color: '#3C3C43' }}>
-              <StaticCell title={customer?.phone ?? ''} titleStyle={{ color: '#0062FF' }} onPress={() => {
-
-              }} />
-          </Section>
-          <Section header='Email' headerStyle={{ color: '#3C3C43' }}>
-              <StaticCell title={customer?.email ?? ''} titleStyle={{ color: '#0062FF' }} onPress={() => {
-
-              }} />
-          </Section>
-          <Section>
-            <StaticCell title='Jobs' accessory='disclosure' onPress={() => {}} />
-            <StaticCell title='Payments' accessory='disclosure' onPress={() => {}} />
-          </Section>
-          <Section>
-            <TouchableCell title='Delete'/>
-          </Section>
-      </Table>
+          <DetailSection title='Address' value={renderAddress(customer?.address)} onPress={() => {
+            openMap(customer?.address)
+          }}/>
+          <DetailSection title='Phone' value={customer?.phone ?? ''} color={'#0062FF'} onPress={() => {
+            makeCall(customer?.phone)
+          }}/>
+          <DetailSection title='Email' value={customer?.email ?? ''} color={'#0062FF'} onPress={() => {
+            composeEmail(customer?.email)
+          }}/>
+          {/* Jobs */}
+          <SectionContainer>
+            <SectionTitle>Jobs</SectionTitle>
+            <JobsListContainer>
+              <FlatList
+                  data={customer?.Job}
+                  keyExtractor={(item) => item.id}
+                  ItemSeparatorComponent={() => <View style={{height: 16}}/>}
+                  renderItem={({ item }) => (
+                    <JobRow showBorder={true} job={item} customer={customer} onPress={() => {
+                      navigation.navigate('JobDetailScreen', { jobId: item.id })
+                    }}/>
+                  )}
+                />
+            </JobsListContainer>
+          </SectionContainer>
+          <Spacer/>
+        </VStack>
+      </ScrollView>
     </ContainerView>
   )
 }
+
+const JobsListContainer = styled.View`
+  padding: 16px;
+`
+
+const AvatarContainer = styled.View`
+  padding: 16px;
+`
+
+const CustomerName = styled.Text`
+  font-weight: bold;
+  font-size: 28px;
+`
 
 const PaddedActivityIndicator = styled.ActivityIndicator`
   padding: 12px;

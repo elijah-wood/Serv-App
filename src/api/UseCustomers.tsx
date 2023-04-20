@@ -10,7 +10,7 @@ type Customer = {
     last_name?: string
     profile_image_url?: string
     address?: Address
-    twilio_conversations_sid: string
+    twilio_conversation_sid: string
     Job: Job[]
 }  
 
