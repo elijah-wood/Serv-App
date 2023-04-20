@@ -19,7 +19,7 @@ type Props = {
 }
 
 const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
-  const { conversationSid } = route.params
+  const { conversationSid, name } = route.params
   const [messages, setMessages] = useState<MessageType.Any[]>([])
   const [participantSid, setParticipantSid] = useState<string>('MB298bd975cbed4e59a1beec3430859b17')
   const [isLoading, setIsLoading] = useState(true)
@@ -38,30 +38,34 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
       })
       .then((paginator: Paginator<Message>) => {
         chatMessagesPaginator.current = paginator
-        let newMessages = paginator.items.map(item => {
-          if (item.attachedMedia.length > 0) {
-            const url = item.attachedMedia[0].filename
-            console.log(url)
-          }
-          return {
-            id: item.sid,
-            text: item.body,
-            createdAt: item.dateCreated.getTime(),
-            author: {
-              id: item.participantSid,
-              firstName: item.author,
-            },
-            type: 'text'
-          } as MessageType.Any
-        })
-        setMessages(newMessages.reverse())
+        addNewMessages(false)
         setIsLoading(false)
       })
       .catch((err) => { 
         console.log(err)
       })
-      navigation.setOptions({ title: "Chat" })
+      navigation.setOptions({ title: name })
   }, [])
+
+  const addNewMessages = (newPage: boolean) => {
+    let newMessages = chatMessagesPaginator.current.items.map(item => {
+      return {
+        id: item.sid,
+        text: item.body,
+        createdAt: item.dateCreated.getTime(),
+        author: {
+          id: item.participantSid,
+          firstName: item.author,
+        },
+        type: 'text'
+      } as MessageType.Any
+    })
+    if (newPage) {
+      setMessages([...messages, ...newMessages.reverse()])
+    } else {
+      setMessages(newMessages.reverse())
+    }
+  }
 
   const setChannelEvents = useCallback(
     async (client) => {
@@ -124,10 +128,16 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
         onSendPress={messages => onSend(messages)}
         theme={{
           ...defaultTheme,
-          colors: { ...defaultTheme.colors, inputBackground: 'blue' },
+          colors: { ...defaultTheme.colors, inputBackground: '#0062FF' }
         }}
         user={{
           id: participantSid,
+        }}
+        onEndReached={async () => {
+          if (chatMessagesPaginator.current.hasPrevPage) {
+            chatMessagesPaginator.current = await chatMessagesPaginator.current.prevPage()
+            addNewMessages(true)
+          }
         }}
         />
     </Container>
@@ -138,8 +148,9 @@ const PaddedActivityIndicator = styled.ActivityIndicator`
   padding: 12px;
 `
 
-const Container = styled.View`
+const Container = styled.SafeAreaView`
   width: 100%;
+  flex: 1;
   height: 100%;
   background-color: white;
 `
