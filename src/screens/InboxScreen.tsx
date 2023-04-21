@@ -1,16 +1,14 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { SearchBar } from '@rneui/themed'
 import { FlatList } from 'react-native'
-import { Avatar, Divider, HStack, Icon, IconButton, Spacer, VStack } from 'native-base'
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import { Icon, IconButton } from 'native-base'
 
 import { RootStackParamList } from '../../App'
 import { TwilioService } from '../twilio/TwilioService'
 import { API } from '../api/API'
 import { Client, Conversation, Paginator, Message } from '@twilio/conversations'
-import { getInitials } from '../utils/GetStringInitials'
+import { Thread } from '../components/ConversationThread'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
 
@@ -129,104 +127,6 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
     </ContainerView>
   )
 }
-
-type ThreadProps = {
-  conversation: Conversation
-  onPress: (name: string) => void
-}
-
-const Thread: React.FC<ThreadProps> = ({
-  ...props
-}) => {
-  const [unreadMessages, setUnreadMessages] = useState(0)
-  const [name, setName] = useState('Unknown')
-
-  useEffect(() => {
-    console.log(props.conversation.attributes)
-    
-    props.conversation._participants.forEach((participant) => {
-      let fn = participant.attributes['first_name'] as string
-      let ln = participant.attributes['last_name'] as string
-      
-      if (fn && ln) {
-        setName(fn + ' ' + ln)
-      } 
-    })
-  }, [])
-
-  function formatDate(date: Date): string {
-    const now = new Date();
-    
-    const dateStr = date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: '2-digit' });
-    
-    // Check if the date is today
-    if (date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
-      return date.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric', hour12: true })
-    }
-    
-    // Check if the date is yesterday
-    now.setDate(now.getDate() - 1)
-    if (date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
-      return 'Yesterday'
-    }
-    
-    // If the date is not today or yesterday, display the date in mm/dd/yyyy format
-    return dateStr
-  }
-
-  return (
-      <ThreadContainerView>
-        <TouchableOpacity onPress={() => { 
-            props.onPress(name)
-          }}>
-          <VStack space={5}>
-            <HStack space={2}>
-              <Avatar>
-                {getInitials(name)}
-              </Avatar>
-              <ThreadFlexFillWidth>
-                <HStack alignItems={"center"}>
-                  <ThreadTitle>{name}</ThreadTitle>
-                  <Spacer/>
-                  <ThreadTime>{formatDate(props.conversation.lastMessage.dateCreated)}</ThreadTime>
-                </HStack>
-                <Spacer/>
-                <ThreadLastMessage numberOfLines={1}>{'Customer'}</ThreadLastMessage>
-              </ThreadFlexFillWidth>
-            </HStack>
-            <Divider/>
-          </VStack>
-        </TouchableOpacity>
-      </ThreadContainerView>
-  )
-}
-
-const ThreadFlexFillWidth = styled.View`
-  flex: 1;
-  width: 100%;
-`
-
-const ThreadContainerView = styled.View`
-  width: 100%;
-  padding-horizontal: 15px;
-  padding-top: 15px;
-`
-
-const ThreadTitle = styled.Text`
-  font-size: 17px;
-  font-weight: bold;
-  text-align: left;
-`
-
-const ThreadTime = styled.Text`
-  font-size: 15px;
-  color: gray;
-  text-align: right;
-`
-
-const ThreadLastMessage = styled.Text`
-  font-size: 15px;
-`
 
 const PaddedActivityIndicator = styled.ActivityIndicator`
   padding: 12px;

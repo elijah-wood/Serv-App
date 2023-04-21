@@ -8,6 +8,7 @@ type Props = TouchableOpacityProps & {
     value: string
     color?: ColorValue
     showDisclosure?: boolean
+    customRightComponent?: React.ReactNode
 }
   
 export const DetailSection: React.FC<Props> = ({
@@ -25,7 +26,17 @@ export const DetailSection: React.FC<Props> = ({
                     {(props.showDisclosure == true) && 
                     <>
                         <Spacer/>
-                        <ChevronWrapper><ChevronRightIcon /></ChevronWrapper>
+                        <RightComponentContainer>
+                            <ChevronRightIcon />
+                        </RightComponentContainer>
+                    </>
+                    }
+                    {(props.customRightComponent) && 
+                    <>
+                        <Spacer/>
+                        <RightComponentContainer>
+                            {props.customRightComponent}
+                        </RightComponentContainer>
                     </>
                     }
                 </HStack>
@@ -34,8 +45,9 @@ export const DetailSection: React.FC<Props> = ({
     )
 }
 
-const ChevronWrapper = styled.View`
-    padding-right: 16px;
+const RightComponentContainer = styled.View`
+  padding-vertical: 16px;
+  padding-right: 16px;
 `
 
 const SectionContainer = styled.View`
@@ -56,4 +68,4 @@ const SectionValue = styled.Text<{ color?: ColorValue }>`
   padding: 16px;
 `
 
-export { SectionContainer, SectionTitle }
+export { SectionContainer, SectionTitle, SectionValue }

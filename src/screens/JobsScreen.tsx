@@ -68,12 +68,12 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <ContainerView>
-      {/* <SearchBar
+      <SearchBar
         platform="ios"
         placeholder="Search"
         onChangeText={updateSearch}
         value={search}
-      /> */}
+      />
       <FlatList
         refreshing={useJobs.isLoading}
         refreshControl={

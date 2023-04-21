@@ -15,9 +15,10 @@ import { FlatList } from 'react-native'
 import { makeCall } from '../utils/MakeCall'
 import { composeEmail } from '../utils/ComposeEmail'
 import { JobRow } from '../components/JobRow'
-import { DetailSection, SectionContainer, SectionTitle } from '../components/DetailSection'
+import { DetailSection, SectionContainer, SectionTitle, SectionValue } from '../components/DetailSection'
 import { getInitials } from '../utils/GetStringInitials'
 import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
+import { MapButton } from '../components/MapButton'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
 type CustomerRouteProp = RouteProp<RootStackParamList, 'CustomerDetailScreen'>
@@ -69,7 +70,9 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                 navigation.navigate('ChatDetail', { conversationSid: customer?.twilio_conversation_sid, name: renderCustomerFullName(customer)})
               }}/>
           </HStack>
-          <DetailSection title='Address' value={renderAddress(customer?.address)} onPress={() => {
+          <DetailSection title='Address' value={renderAddress(customer?.address)} customRightComponent={
+              <MapButton/>
+          } onPress={() => {
             openMap(customer?.address)
           }}/>
           <DetailSection title='Phone' value={customer?.phone ?? ''} color={'#0062FF'} onPress={() => {

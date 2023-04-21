@@ -31,6 +31,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
       .then(setChannelEvents)
       .then((client: Client) => client.getConversationBySid(conversationSid))
       .then((conversation: Conversation) => {
+        conversation.updateLastReadMessageIndex(conversation.lastMessage.index)
         chatClientConversation.current = conversation
         return conversation.getMessages()
       })

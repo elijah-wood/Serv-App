@@ -13,6 +13,7 @@ import { openMap } from '../utils/OpenMap'
 import { DetailSection, SectionContainer, SectionTitle } from '../components/DetailSection'
 import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import DefaultButton from '../components/DefaultButton'
+import { MapButton } from '../components/MapButton'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type CustomerRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -73,7 +74,9 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                 <DefaultButton label='+ New Estimate / Invoice'/>
             </InvoiceListContainer>
           </SectionContainer>
-          <DetailSection title='Address' value={renderAddress(job?.address)} onPress={() => {
+          <DetailSection title='Address' value={renderAddress(job?.address)} customRightComponent={
+              <MapButton/>
+          } onPress={() => {
             openMap(job?.address)
           }}/>
           {/* Collaborators */}

@@ -39,7 +39,7 @@ export const CTAButton: React.FC<Props> = ({
   }
 
 const ButtonContainerView = styled.View`
-  background-color: white;
+  background: white;
   border-radius: 9px;
   height: 67px;
   flex: 1;
