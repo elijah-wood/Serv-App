@@ -37,6 +37,24 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
   //   setSearch(search)
   // }
 
+  useEffect(() => {
+    setIsLoading(true)
+    API.createTwilioAccessToken()
+      .then((response) => TwilioService.getInstance().getChatClient(response.result))
+      .then(() => TwilioService.getInstance().addTokenListener(API.createTwilioAccessToken()))
+      .then(setChannelEvents)
+      .then(getSubscribedConversations)
+      .catch((err) => {
+        // do something
+        console.log(err)
+        setIsLoading(false)
+      })
+    navigation.setOptions({headerShown: true})
+    return () => {
+      TwilioService.serviceInstance.clientShutdown()
+    }
+  }, [])
+  
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -83,23 +101,6 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
     },
     [],
   )
-
-  useEffect(() => {
-    setIsLoading(true)
-    API.createTwilioAccessToken()
-      .then((response) => TwilioService.getInstance().getChatClient(response.result))
-      .then(() => TwilioService.getInstance().addTokenListener(API.createTwilioAccessToken()))
-      .then(setChannelEvents)
-      .then(getSubscribedConversations)
-      .catch((err) => {
-        // do something
-        console.log(err)
-        setIsLoading(false)
-      })
-      return () => {
-        TwilioService.serviceInstance.clientShutdown()
-      }
-  }, [])
 
   if (isLoading) {
     return(

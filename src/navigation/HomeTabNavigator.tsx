@@ -18,19 +18,40 @@ import AnalyticsScreen from '../screens/AnalyticsScreen'
 import TeamScreen from '../screens/TeamScreen'
 import AddJobScreen from '../screens/AddJobScreen'
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'HomeTabNavigator'>
+type NavigationProp = StackNavigationProp<RootStackParamList, 'HomeNavigator'>
 
 type Props = {
   navigation: NavigationProp
 }
 
-export const HomeTabNavigator: React.FC<Props> = () => {
+export const HomeNavigator: React.FC<Props> = () => {
+    const Stack = createNativeStackNavigator()
+
+    return (
+        <Stack.Navigator initialRouteName={Routes.INBOX_TAB}>
+            <Stack.Screen name={Routes.INBOX_TAB} component={HomeTabs} 
+                options={{
+                    title: 'Messages',
+                    headerShown: false,
+                }}
+            />
+            {/* Do not show tab bar on this screen: */}
+            <Stack.Screen name={Routes.CHAT_DETAIL} component={ChatDetail} 
+                options={{
+                    title: 'Chat',
+                }}
+            />
+        </Stack.Navigator>
+        )
+    }
+
+export const HomeTabs: React.FC<Props> = () => {
     const Tab = createBottomTabNavigator()
 
     return (
         <Tab.Navigator screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true}} >
-            <Tab.Screen name={Routes.INBOX_TAB} component={InboxStackScreen}
-                options={({ route }) => ({
+            <Tab.Screen name={Routes.INBOX} component={InboxScreen}
+                options={({
                     title: 'Inbox',
                     tabBarIcon: ({ color }) => (
                         <Image
@@ -38,13 +59,6 @@ export const HomeTabNavigator: React.FC<Props> = () => {
                         style={{ width: 20, height: 20, tintColor: color }}
                         />
                     ),
-                    tabBarStyle: ((route) => {
-                      const routeName = getFocusedRouteNameFromRoute(route) ?? ""
-                      if (routeName === 'ChatDetail') {
-                        return { display: "none" }
-                      }
-                      return
-                    })(route),
                   })}
             />
             <Tab.Screen name={Routes.CUSTOMERS_TAB} component={CustomersStackScreen}
@@ -92,25 +106,6 @@ export const HomeTabNavigator: React.FC<Props> = () => {
                 }}
             />
         </Tab.Navigator>
-        )
-    }
-
-export const InboxStackScreen: React.FC<Props> = () => {
-    const Stack = createNativeStackNavigator()
-
-    return (
-        <Stack.Navigator initialRouteName={Routes.CUSTOMERS}>
-            <Stack.Screen name={Routes.INBOX} component={InboxScreen} 
-                options={{
-                    title: 'Messages',
-                }}
-            />
-            <Stack.Screen name={Routes.CHAT_DETAIL} component={ChatDetail} 
-                options={{
-                    title: 'Chat',
-                }}
-            />
-        </Stack.Navigator>
     )
 }
 

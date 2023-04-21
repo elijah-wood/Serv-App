@@ -21,7 +21,7 @@ type RootStackParamList = {
   SignInScreen: undefined
   PhoneVerificationScreen: { phone: string }
   Welcome: undefined
-  HomeTabNavigator: undefined
+  HomeNavigator: undefined
   CustomersScreen: undefined
   CustomerDetailScreen: { customerId: string }
   AddCustomerScreen: undefined

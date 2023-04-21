@@ -5,7 +5,7 @@ import { ActivityIndicator, useColorScheme, View } from 'react-native'
 
 import Routes from './Routes'
 import { AccountNavigator } from './AccountNavigator'
-import { HomeTabNavigator } from './HomeTabNavigator'
+import { HomeNavigator } from './HomeTabNavigator'
 import { getUserSession } from '../api/Session'
 
 function SplashScreen() {
@@ -41,7 +41,7 @@ export const RootNavigator = () => {
   return (
     <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack.Navigator initialRouteName={isLoggedIn ? Routes.HOME : Routes.ACCOUNT} screenOptions={{ headerShown: false }}>
-        <Stack.Screen name={Routes.HOME} component={HomeTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name={Routes.HOME} component={HomeNavigator} options={{ headerShown: false }} />
         <Stack.Screen name={Routes.ACCOUNT} component={AccountNavigator} options={{  headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -69,7 +69,10 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
   const setChannelEvents = useCallback(
     async (client) => {
       client.on('messageAdded', (message: Message) => {
-        if (message.participantSid != participantSid) { // Don't add our own messages
+        // Update read index
+        chatClientConversation.current.updateLastReadMessageIndex(chatClientConversation.current.lastMessage.index)
+        // Don't add our own messages
+        if (message.participantSid != participantSid) { 
           setMessages((prevMessages) => [{
             id: message.sid,
             text: message.body,
