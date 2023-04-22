@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
-
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { VStack } from 'native-base'
 import { Controller, useForm } from 'react-hook-form'
 import { DeviceEventEmitter } from 'react-native'
+import { RouteProp } from '@react-navigation/native'
 
 import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
@@ -13,18 +13,20 @@ import { Address } from '../api/UseCustomers'
 import UseCreateJob from '../api/UseCreateJob'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'AddJobScreen'>
+type JobRouteProp = RouteProp<RootStackParamList, 'AddJobScreen'>
 
 type Props = {
   navigation: NavigationProp
+  route: JobRouteProp
 }
 
-const AddJobScreen: React.FC<Props> = ({ navigation }) => {
+const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
   const useCreateJob = UseCreateJob()
-  
+  const { customerId } = route.params
+   
   const { control, handleSubmit, formState: { errors }, getValues } = useForm({
     defaultValues: {
       name: '',
-      customer_id: '',
       description: '',
       type: '',
       status: '',
@@ -53,7 +55,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
   const onSubmit = () => { 
     useCreateJob.mutate({
       name: getValues('name'),
-      customer_id: getValues('customer_id'),
+      customer_id: customerId,
       description: getValues('description'),
       home_size: getValues('home_size'),
       bedrooms: getValues('bedrooms'),
@@ -93,7 +95,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
               )}
               name="name"
             />
-            <Controller
+            {/* <Controller
               control={control}
               rules={{
                 required: true,
@@ -109,7 +111,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
                 </TextInputWrapper>
               )}
               name="customer_id"
-            />
+            /> */}
             <Controller
               control={control}
               rules={{
@@ -138,7 +140,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
                       onChangeText={onChange}
                       value={value}
                       onBlur={onBlur}
-                      placeholder="Type"
+                      placeholder="Type (optional)"
                   />
                 </TextInputWrapper>
               )}
@@ -177,7 +179,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
                       value={value}
                       onBlur={onBlur}
                       placeholder="Address 1"
-                      textContentType="streetAddressLine1"
+                      autoCapitalize={'words'}
                   />
                 </TextInputWrapper>
               )}
@@ -195,6 +197,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
                       value={value}
                       onBlur={onBlur}
                       placeholder="Address 2 (optional)"
+                      autoCapitalize={'words'}
                   />
                 </TextInputWrapper>
               )}
@@ -212,6 +215,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
                       value={value}
                       onBlur={onBlur}
                       placeholder="City"
+                      autoCapitalize={'words'}
                   />
                 </TextInputWrapper>
               )}
@@ -229,6 +233,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
                       value={value}
                       onBlur={onBlur}
                       placeholder="State"
+                      autoCapitalize={'words'}
                   />
                 </TextInputWrapper>
               )}
@@ -257,7 +262,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
             <Controller
                 control={control}
                 rules={{
-                  required: true,
+                  required: false,
                 }}
                 render={({ field: { onChange, value, onBlur } }) => (
                   <TextInputWrapper>
@@ -265,7 +270,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
                         onChangeText={onChange}
                         value={value}
                         onBlur={onBlur}
-                        placeholder="Home size"            
+                        placeholder="Home size (optional)"            
                     />
                   </TextInputWrapper>
                 )}
@@ -274,7 +279,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
               <Controller
                 control={control}
                 rules={{
-                  required: true,
+                  required: false,
                 }}
                 render={({ field: { onChange, value, onBlur } }) => (
                   <TextInputWrapper>
@@ -282,7 +287,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
                         onChangeText={onChange}
                         value={value}
                         onBlur={onBlur}
-                        placeholder="Bedrooms"            
+                        placeholder="Bedrooms (optional)"            
                     />
                   </TextInputWrapper>
                 )}
@@ -291,7 +296,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
               <Controller
                 control={control}
                 rules={{
-                  required: true,
+                  required: false,
                 }}
                 render={({ field: { onChange, value, onBlur } }) => (
                   <TextInputWrapper>
@@ -299,7 +304,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation }) => {
                         onChangeText={onChange}
                         value={value}
                         onBlur={onBlur}
-                        placeholder="Bathrooms"            
+                        placeholder="Bathrooms (optional)"            
                     />
                   </TextInputWrapper>
                 )}

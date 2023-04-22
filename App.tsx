@@ -27,7 +27,7 @@ type RootStackParamList = {
   AddCustomerScreen: undefined
   JobsScreen: undefined
   JobDetailScreen: { jobId: string }
-  AddJobScreen: undefined
+  AddJobScreen: { customerId: string }
   InboxScreen: undefined
   ChatDetail: { conversationSid: string, name: string }
   TeamScreen: undefined

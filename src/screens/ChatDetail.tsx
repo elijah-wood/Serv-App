@@ -3,10 +3,12 @@ import { Chat, MessageType, defaultTheme } from '@flyerhq/react-native-chat-ui'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import styled from 'styled-components/native'
 import { RouteProp } from '@react-navigation/native'
-import { Client, Conversation, Message, Paginator } from '@twilio/conversations'
+import { Client, Conversation, Message, Paginator, Participant } from '@twilio/conversations'
 
 import { RootStackParamList } from '../../App'
 import { TwilioService } from '../twilio/TwilioService'
+import { getUserFromToken } from '../api/Session'
+import { UserResponse } from '../api/UserResponse'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'ChatDetail'>
 type ChatDetailRouteProp = RouteProp<RootStackParamList, 'ChatDetail'>
@@ -19,42 +21,60 @@ type Props = {
 const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
   const { conversationSid, name } = route.params
   const [messages, setMessages] = useState<MessageType.Any[]>([])
-  const [participantSid, setParticipantSid] = useState<string>('MB298bd975cbed4e59a1beec3430859b17')
+  const [participantId, setParticipantID] = useState<string>()
+  const [participants, setParticipants] = useState<Participant[]>([])
   const [isLoading, setIsLoading] = useState(true)
   
   const chatClientConversation = useRef<Conversation>()
   const chatMessagesPaginator = useRef<Paginator<Message>>()
 
   useEffect(() => {
-    TwilioService.getInstance()
-      .getChatClient(null)
-      .then(setChannelEvents)
-      .then((client: Client) => client.getConversationBySid(conversationSid))
-      .then((conversation: Conversation) => {
-        conversation.updateLastReadMessageIndex(conversation.lastMessage?.index ?? 0)
-        chatClientConversation.current = conversation
-        return conversation.getMessages()
+    navigation.setOptions({ title: name })
+
+    const fetchMessages = async () => {
+      let client = await TwilioService.getInstance().getChatClient(null)
+    
+      let conversation = await client.getConversationBySid(conversationSid)
+      conversation.updateLastReadMessageIndex(conversation.lastMessage?.index ?? 0)
+      chatClientConversation.current = conversation
+      // Get our participant id
+      let user = await getUserFromToken()
+      let participants = await conversation.getParticipants()
+      let participantSid: string = null
+      participants.forEach(participant => {
+        if (participant.attributes['type'] == 'user') {
+          // Find out which user is us
+          let id = participant.attributes['user_id']
+          if (id == user.id) {
+            participantSid = participant.sid
+          }
+        }
       })
-      .then((paginator: Paginator<Message>) => {
-        chatMessagesPaginator.current = paginator
-        addNewMessages(false)
-        setIsLoading(false)
-      })
-      .catch((err) => { 
-        console.log(err)
-      })
-      navigation.setOptions({ title: name })
+      setChannelEvents(client, participants)
+      setParticipantID(participantSid)
+      setParticipants(participants)
+
+      let messages = await conversation.getMessages()
+      chatMessagesPaginator.current = messages
+      addNewMessages(participants, false)
+
+      setIsLoading(false)
+    }
+
+    fetchMessages()
   }, [])
 
-  const addNewMessages = (includePreviousMessages: boolean) => {
+  const addNewMessages =  (participants: Participant[], includePreviousMessages: boolean) => {
     let newMessages = chatMessagesPaginator.current.items.map(item => {
+      let participant = participants.find(participant => participant.sid === item.participantSid )
       return {
         id: item.sid,
         text: item.body,
         createdAt: item.dateCreated.getTime(),
         author: {
           id: item.participantSid,
-          firstName: item.author,
+          firstName: participant?.attributes['first_name'],
+          lastName: participant?.attributes['last_name']
         },
         type: 'text'
       } as MessageType.Any
@@ -67,50 +87,28 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
   }
 
   const setChannelEvents = useCallback(
-    async (client) => {
+    async (client, participants) => {
       client.on('messageAdded', (message: Message) => {
         // Update read index
         chatClientConversation.current.updateLastReadMessageIndex(chatClientConversation.current.lastMessage?.index ?? 0)
-        // Don't add our own messages
-        if (message.participantSid != participantSid) { 
-          setMessages((prevMessages) => [{
-            id: message.sid,
-            text: message.body,
-            createdAt: message.dateCreated.getTime(),
-            author: {
-              id: message.participantSid,
-              firstName: message.author,
-            },
-            type: 'text'
-          }  as MessageType.Any, ...prevMessages])
-        }
+        let participant = participants.find(participant => participant.sid === message.participantSid )
+        setMessages((prevMessages) => [{
+          id: message.sid,
+          text: message.body,
+          createdAt: message.dateCreated.getTime(),
+          author: {
+            id: message.participantSid,
+            firstName: participant?.attributes['first_name'],
+            lastName: participant?.attributes['last_name'],
+          },
+          type: 'text'
+        }  as MessageType.Any, ...prevMessages])
       })
       return client
   }, [])
 
   const onSend = (message: MessageType.PartialText) => {
-    const uuidv4 = () => {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-        const r = Math.floor(Math.random() * 16)
-        const v = c === 'x' ? r : (r % 4) + 8
-        return v.toString(16)
-      })
-    }
-
-    const addMessage = (message: MessageType.Any) => {
-      setMessages([message, ...messages])
-    }
-
-    const textMessage: MessageType.Text = {
-      author: { id: participantSid },
-      createdAt: Date.now(),
-      id: uuidv4(),
-      text: message.text,
-      type: 'text',
-    }
-
-    addMessage(textMessage)
-    chatClientConversation.current?.sendMessage(textMessage.text, textMessage.metadata)
+    chatClientConversation.current?.sendMessage(message.text, message.metadata)
   }
 
   if (isLoading) {
@@ -133,12 +131,12 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
           colors: { ...defaultTheme.colors, inputBackground: '#0062FF', primary: '#0062FF', userAvatarNameColors: ['#363636'] },
         }}
         user={{
-          id: participantSid,
+          id: participantId,
         }}
         onEndReached={async () => {
           if (chatMessagesPaginator.current.hasPrevPage) {
             chatMessagesPaginator.current = await chatMessagesPaginator.current.prevPage()
-            addNewMessages(true)
+            addNewMessages(participants, true)
           }
         }}
         />

@@ -23,7 +23,10 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
   const [jobs, setJobs] = useState<Job[]>([])
 
   useEffect(() => {
-    DeviceEventEmitter.addListener("event.refetchJobs", () => useJobs.refetch())
+    DeviceEventEmitter.addListener("event.refetchJobs", () => { 
+      useJobs.refetch()
+      console.log("refetch jobs")
+    })
     return () => {
       DeviceEventEmitter.removeAllListeners("event.refetchJobs")
     }
@@ -36,19 +39,22 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
   }, [])
 
   useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <IconButton icon={<Icon name='plus' color={'#0062FF'} size={25}/>} onPress={() => {
-          navigation.navigate('AddJobScreen')
-        }}/>
-      ),
-    })
+    // Only allow jobs to be added from the customer!
+    
+    // navigation.setOptions({
+    //   headerRight: () => (
+    //     <IconButton icon={<Icon name='plus' color={'#0062FF'} size={25}/>} onPress={() => {
+    //       navigation.navigate('AddJobScreen')
+    //     }}/>
+    //   ),
+    // })
   }, [navigation])
 
   useEffect(() => {
     switch (useJobs.status) {
       case 'success':
         if (useJobs.data.result) {
+          console.log("success jobs")
           setJobs(useJobs.data.result)
           setJobsToDisplay(useJobs.data.result)
         }
@@ -84,9 +90,7 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
       <FlatList
         refreshing={useJobs.isLoading}
         refreshControl={
-          <RefreshControl refreshing={useJobs.isLoading} onRefresh={() => {
-            useJobs.refetch()
-          }}/>
+          <RefreshControl refreshing={useJobs.isLoading} onRefresh={() => useJobs.refetch()}/>
         }
         data={jobsToDisplay}
         keyExtractor={(item) => item.id}

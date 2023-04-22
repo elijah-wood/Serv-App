@@ -11,7 +11,7 @@ import UseGetCustomer from '../api/UseGetCustomer'
 import { Customer } from '../api/UseCustomers'
 import { openMap } from '../utils/OpenMap'
 import { renderAddress } from '../utils/RenderAddress'
-import { FlatList } from 'react-native'
+import { DeviceEventEmitter, FlatList } from 'react-native'
 import { makeCall } from '../utils/MakeCall'
 import { composeEmail } from '../utils/ComposeEmail'
 import { JobRow } from '../components/JobRow'
@@ -20,6 +20,7 @@ import { getInitials } from '../utils/GetStringInitials'
 import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import { MapButton } from '../components/MapButton'
 import DefaultButton from '../components/DefaultButton'
+import { Job } from '../api/UseJobs'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
 type CustomerRouteProp = RouteProp<RootStackParamList, 'CustomerDetailScreen'>
@@ -32,26 +33,33 @@ type Props = {
 const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const useGetCustomer = UseGetCustomer(route.params.customerId)
   const [customer, setCustomer] = useState<Customer>()
+  const [jobs, setJobs] = useState<Job[]>([])
 
+  useEffect(() => {
+    DeviceEventEmitter.addListener("event.refetchJobs", () => useGetCustomer.refetch())
+    return () => {
+      DeviceEventEmitter.removeAllListeners("event.refetchJobs")
+    }
+  }, [])
+  
   useEffect(() => {
     switch (useGetCustomer.status) {
       case 'success':
         if (useGetCustomer.data.result) {
           setCustomer(useGetCustomer.data.result)
+          setJobs(useGetCustomer.data.result.Job)
         }
         break
       default:
         break
     }
-  }, [useGetCustomer.isLoading])
+  }, [useGetCustomer.data])
   
   if (useGetCustomer.isLoading) {
     return (
       <PaddedActivityIndicator/>
     )
   }
-
-
 
   return (
     <ContainerView>
@@ -86,8 +94,9 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <SectionContainer>
             <SectionTitle>Jobs</SectionTitle>
             <JobsListContainer>
-              <FlatList
-                  data={customer?.Job}
+              <VStack space={jobs.length > 0 ? 4 : 0}>
+                <FlatList
+                  data={jobs}
                   keyExtractor={(item) => item.id}
                   ItemSeparatorComponent={() => <View style={{height: 16}}/>}
                   renderItem={({ item }) => (
@@ -97,8 +106,9 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                   )}
                 />
                 <DefaultButton label='Add Job' onPress={() => {
-                  
+                  navigation.navigate('AddJobScreen', { customerId: route.params.customerId})
                 }}/>
+              </VStack>
             </JobsListContainer>
           </SectionContainer>
           <Spacer/>

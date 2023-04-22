@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import jwt_decode from "jwt-decode"
+import { UserResponse } from './UserResponse';
 
 type Session = {
   token: string
@@ -34,6 +36,21 @@ const getUserSession = async (): Promise<Session | undefined> => {
   }
 }
 
+const getUserFromToken = async (): Promise<UserResponse | undefined> => {
+  try {
+    const session = await AsyncStorage.getItem('user_session')
+    if (session) {
+      let token = JSON.parse(session).token as string
+      let user = jwt_decode(token) as UserResponse
+      return user
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error)
+    return undefined
+  }
+}
+
 const removeUserSession = async (): Promise<void> => {
   try {
     await AsyncStorage.removeItem('user_session')
@@ -43,5 +60,6 @@ const removeUserSession = async (): Promise<void> => {
   }
 }
 
-export { setUserSession, getUserSession, removeUserSession }
+export { setUserSession, getUserSession, removeUserSession, getUserFromToken }
 export type { Session }
+

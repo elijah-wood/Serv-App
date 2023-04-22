@@ -139,6 +139,11 @@ export const CustomersStackScreen: React.FC<Props> = () => {
                     title: 'Chat',
                 }}
             />
+            <Stack.Screen name={Routes.ADD_JOB} component={AddJobScreen} 
+                options={{
+                    title: 'Create Job',
+                }}
+             />
         </Stack.Navigator>
     )
 }

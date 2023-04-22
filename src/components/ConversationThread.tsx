@@ -5,6 +5,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { Conversation } from '@twilio/conversations'
 
 import { getInitials } from '../utils/GetStringInitials'
+import { getUserFromToken } from '../api/Session'
 
 type ThreadProps = {
     conversation: Conversation
@@ -18,15 +19,21 @@ export const Thread: React.FC<ThreadProps> = ({
     const [name, setName] = useState('Unknown')
   
     useEffect(() => {    
-      props.conversation._participants.forEach((participant) => {
-        console.log(participant.attributes)
-        let fn = participant.attributes['first_name'] as string
-        let ln = participant.attributes['last_name'] as string
-        
-        if (fn && ln) {
-          setName(fn + ' ' + ln)
-        } 
-      })
+        const getName = () => {
+            props.conversation._participants.forEach((participant) => {
+                if (participant.attributes['type'] == 'customer') {
+                    let fn = participant.attributes['first_name'] as string
+                    let ln = participant.attributes['last_name'] as string
+                    
+                    if (fn && ln) {
+                      setName(fn + ' ' + ln)
+                    }
+                    return          
+                }
+            })
+        }
+
+        getName()
     }, [])
 
     useEffect(() => {
@@ -67,7 +74,7 @@ export const Thread: React.FC<ThreadProps> = ({
         <>
             {(unreadState == true) && <>
                 <UnreadContainer>
-                <UnreadCircle/>
+                    <UnreadCircle/>
                 </UnreadContainer>
             </>}
             <ThreadContainerView>
