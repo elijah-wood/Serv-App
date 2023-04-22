@@ -5,10 +5,10 @@ import { AlphabetList, IData } from 'react-native-section-alphabet-list'
 import { SearchBar } from '@rneui/themed'
 import Icon from 'react-native-vector-icons/Entypo'
 import { IconButton } from 'native-base'
+import { RefreshControl, DeviceEventEmitter } from 'react-native'
 
 import { RootStackParamList } from '../../App'
 import UseCustomers, { Customer } from '../api/UseCustomers'
-import { RefreshControl } from 'react-native'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomersScreen'>
 
@@ -21,6 +21,13 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
   const [search, setSearch] = useState("")
   const [customerIData, setCustomerIData] = useState<IData[]>([])
   const [customers, setCustomers] = useState<Customer[]>([])
+
+  useEffect(() => {
+    DeviceEventEmitter.addListener("event.refetchCustomers", () => useCustomers.refetch())
+    return () => {
+      DeviceEventEmitter.removeAllListeners("event.refetchCustomers")
+    }
+  }, [])
 
   useEffect(() => {
     navigation.setOptions({
@@ -55,7 +62,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
       default:
         break
     }
-  }, [useCustomers.isLoading])
+  }, [useCustomers.status])
 
   const updateSearch = (search) => {
     let filteredArray: IData[] = []
@@ -68,13 +75,11 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
       return fullName.toUpperCase().includes(search.toUpperCase())
     }).forEach(element => filteredArray.push({ key: element.id.toString(), value: element.first_name + ' ' + element.last_name}))
 
-    console.log(filteredArray)
-    console.log(search)
     setCustomerIData(filteredArray)
     setSearch(search)
   }
 
-  if (useCustomers.isLoading) {
+  if (useCustomers.isLoading && customers.length === 0) {
     return (
       <ContainerView>
           <PaddedActivityIndicator/>

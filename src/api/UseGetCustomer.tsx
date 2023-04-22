@@ -10,7 +10,7 @@ type UseGetCustomerResponse = {
 const UseGetCustomer = (customerId: string): UseQueryResult<UseGetCustomerResponse, Error> => {
     return useQuery<UseGetCustomerResponse, Error>('Customer', async () => {
         return API.getCustomer(customerId)
-    })
+    }, { retry: 0 })
 }
 
 export default UseGetCustomer

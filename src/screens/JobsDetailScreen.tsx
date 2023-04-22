@@ -16,10 +16,10 @@ import DefaultButton from '../components/DefaultButton'
 import { MapButton } from '../components/MapButton'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
-type CustomerRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
+type JobRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
 
 type Props = {
-  route: CustomerRouteProp
+  route: JobRouteProp
   navigation: NavigationProp
 }
 

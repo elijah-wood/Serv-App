@@ -18,8 +18,8 @@ export const errorResponseHandler = (error: AxiosError): Promise<never> => {
     let message = "Unknown error."
     if (response) {
         message = response.error
+        Alert.alert('Error', message)
     }
-    Alert.alert('Error', message)
 
     return Promise.reject(error)
 }

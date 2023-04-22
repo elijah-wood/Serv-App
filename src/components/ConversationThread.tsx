@@ -19,6 +19,7 @@ export const Thread: React.FC<ThreadProps> = ({
   
     useEffect(() => {    
       props.conversation._participants.forEach((participant) => {
+        console.log(participant.attributes)
         let fn = participant.attributes['first_name'] as string
         let ln = participant.attributes['last_name'] as string
         

@@ -31,7 +31,7 @@ type UseCustomersResult = {
 const UseCustomers = (): UseQueryResult<UseCustomersResult, Error> => {
     return useQuery<UseCustomersResult, Error>('Customers', async () => {
         return API.getCustomers()
-    })
+    }, { retry: 0 })
 }
 
 export default UseCustomers

@@ -10,7 +10,7 @@ type UseGetJobResponse = {
 const UseGetJob = (jobId: string): UseQueryResult<UseGetJobResponse, Error> => {
     return useQuery<UseGetJobResponse, Error>('Job', async () => {
         return API.getJob(jobId)
-    })
+    }, { retry: 0 })
 }
 
 export default UseGetJob
