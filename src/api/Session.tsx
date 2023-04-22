@@ -1,5 +1,4 @@
-import * as SecureStore from 'expo-secure-store'
-import { TokenResponse } from './TokenResponse'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Session = {
   token: string
@@ -7,7 +6,7 @@ type Session = {
 
 const setUserSession = async (token: string): Promise<void> => {
   try {
-    await SecureStore.setItemAsync(
+    await AsyncStorage.setItem(
       'user_session',
       JSON.stringify({
         token: token,
@@ -21,7 +20,7 @@ const setUserSession = async (token: string): Promise<void> => {
 
 const getUserSession = async (): Promise<Session | undefined> => {
   try {
-    const session = await SecureStore.getItemAsync('user_session')
+    const session = await AsyncStorage.getItem('user_session')
 
     if (session) {
       return JSON.parse(session)
@@ -37,7 +36,7 @@ const getUserSession = async (): Promise<Session | undefined> => {
 
 const removeUserSession = async (): Promise<void> => {
   try {
-    await SecureStore.deleteItemAsync('user_session')
+    await AsyncStorage.removeItem('user_session')
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error)

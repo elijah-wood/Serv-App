@@ -31,7 +31,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
       .then(setChannelEvents)
       .then((client: Client) => client.getConversationBySid(conversationSid))
       .then((conversation: Conversation) => {
-        conversation.updateLastReadMessageIndex(conversation.lastMessage.index)
+        conversation.updateLastReadMessageIndex(conversation.lastMessage?.index ?? 0)
         chatClientConversation.current = conversation
         return conversation.getMessages()
       })
@@ -70,7 +70,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
     async (client) => {
       client.on('messageAdded', (message: Message) => {
         // Update read index
-        chatClientConversation.current.updateLastReadMessageIndex(chatClientConversation.current.lastMessage.index)
+        chatClientConversation.current.updateLastReadMessageIndex(chatClientConversation.current.lastMessage?.index ?? 0)
         // Don't add our own messages
         if (message.participantSid != participantSid) { 
           setMessages((prevMessages) => [{

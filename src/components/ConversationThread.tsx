@@ -41,7 +41,7 @@ export const Thread: React.FC<ThreadProps> = ({
             }
         }
         getUnreadCount()
-    }, [props.conversation.lastMessage.dateCreated])
+    }, [props.conversation.lastMessage?.dateCreated])
   
     function formatDate(date: Date): string {
       const now = new Date();
@@ -85,7 +85,7 @@ export const Thread: React.FC<ThreadProps> = ({
                         <HStack alignItems={"center"}>
                         <ThreadTitle>{name}</ThreadTitle>
                         <Spacer/>
-                        <ThreadTime>{formatDate(props.conversation.lastMessage.dateCreated)}</ThreadTime>
+                        <ThreadTime>{formatDate(props.conversation.lastMessage?.dateCreated ?? props.conversation.dateCreated)}</ThreadTime>
                         </HStack>
                         <Spacer/>
                         <ThreadLastMessage numberOfLines={1}>{'Customer'}</ThreadLastMessage>

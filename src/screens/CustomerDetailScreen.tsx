@@ -19,6 +19,7 @@ import { DetailSection, SectionContainer, SectionTitle, SectionValue } from '../
 import { getInitials } from '../utils/GetStringInitials'
 import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import { MapButton } from '../components/MapButton'
+import DefaultButton from '../components/DefaultButton'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
 type CustomerRouteProp = RouteProp<RootStackParamList, 'CustomerDetailScreen'>
@@ -95,6 +96,9 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                     }}/>
                   )}
                 />
+                <DefaultButton label='Add Job' onPress={() => {
+                  
+                }}/>
             </JobsListContainer>
           </SectionContainer>
           <Spacer/>

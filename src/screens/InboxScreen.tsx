@@ -70,7 +70,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
       client.on('messageAdded', (message: Message) => {
         setConversations((prevConversations) =>
           prevConversations.map((conversation) => {
-            if (conversation.sid === message.conversation.sid) {
+            if (conversation.sid === message.conversation.sid && conversation.lastMessage != undefined) {
               let updatedConvo = conversation
               updatedConvo.lastMessage.dateCreated = message.dateCreated
               return updatedConvo

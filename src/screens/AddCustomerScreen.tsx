@@ -118,7 +118,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                 <TextInputWrapper>
                   {errors.phone && <ErrorIndicator/>}
                   <PhoneInput
-                      onChangeText={onChange}
+                      onChangeFormattedText={onChange}
                       value={value}
                       placeholder="Phone"
                       defaultCode="US"
