@@ -55,7 +55,7 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   }, [useGetCustomer.data])
   
-  if (useGetCustomer.isLoading) {
+  if (useGetCustomer.isFetching) {
     return (
       <PaddedActivityIndicator/>
     )

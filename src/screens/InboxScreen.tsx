@@ -17,25 +17,10 @@ type Props = {
 }
 
 const InboxScreen: React.FC<Props> = ({ navigation }) => {
-  const [search, setSearch] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [conversations, setConversations] = useState<Conversation[]>([])
-  // const [channelsToDisplay, setChannelsToDisplay] = useState<Conversation[]>([])
 
   const conversationPaginator = useRef<Paginator<Conversation>>()
-
-  // React.useEffect(() => {
-  //   let filteredArray: Channel[] = []
-  //   channels.forEach(element => filteredArray.push(element))
-  //   setChannelsToDisplay(filteredArray)
-  // }, [channels])
-
-  // const updateSearch = (search) => {
-  //   let filteredArray: Channel[] = []
-  //   channels.filter(channel => channel.name.toUpperCase().includes(search.toUpperCase())).forEach(element => filteredArray.push(element))
-  //   setChannelsToDisplay(filteredArray)
-  //   setSearch(search)
-  // }
 
   useEffect(() => {
     setIsLoading(true)
@@ -94,7 +79,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
         if (state === 'initialized') {
           const conversations = await client.getSubscribedConversations()
           conversationPaginator.current = conversations
-          setConversations(conversations.items.reverse())
+          setConversations(conversations.items)
           setIsLoading(false)
         } 
       })

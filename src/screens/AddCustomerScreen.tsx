@@ -22,7 +22,7 @@ type Props = {
 const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
   const useCreateCustomer = UseCreateCustomer()
   
-  const { control, handleSubmit, formState: { errors }, getValues } = useForm({
+  const { control, handleSubmit, formState: { errors }, getValues, setFocus } = useForm({
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -66,7 +66,10 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <ContainerView>
-      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView 
+      showsVerticalScrollIndicator={false} 
+      keyboardShouldPersistTaps={'always'}
+      >
         <VStack space={5}>
           <VStack>
             <Controller
@@ -82,6 +85,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       value={value}
                       onBlur={onBlur}
                       placeholder="First name"
+                      autoCapitalize={'words'}                    
                   />
                 </TextInputWrapper>
               )}
@@ -100,6 +104,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       value={value}
                       onBlur={onBlur}
                       placeholder="Last name"
+                      autoCapitalize={'words'}
                   />
                 </TextInputWrapper>
               )}
@@ -123,8 +128,9 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       placeholder="Phone"
                       defaultCode="US"
                       layout="second"
-                      countryPickerButtonStyle={{ backgroundColor: '#eaeaea' }}
-                  />
+                      countryPickerButtonStyle={{ backgroundColor: 'white' }}
+                      textContainerStyle={{ backgroundColor: 'white' }}  
+                      />
                 </TextInputWrapper>
               )}
               name="phone"
@@ -147,6 +153,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       onBlur={onBlur}
                       placeholder="Email"
                       autoCapitalize="none"
+                      keyboardType='email-address'
                   />
                 </TextInputWrapper>
               )}
@@ -168,6 +175,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       value={value}
                       onBlur={onBlur}
                       placeholder="Address 1"
+                      autoCapitalize={'words'}
                   />
                 </TextInputWrapper>
               )}
@@ -186,6 +194,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       value={value}
                       onBlur={onBlur}
                       placeholder="Address 2 (optional)"
+                      autoCapitalize={'words'}
                   />
                 </TextInputWrapper>
               )}
@@ -204,6 +213,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       value={value}
                       onBlur={onBlur}
                       placeholder="City"
+                      autoCapitalize={'words'}
                   />
                 </TextInputWrapper>
               )}
@@ -222,6 +232,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       value={value}
                       onBlur={onBlur}
                       placeholder="State"
+                      autoCapitalize={'words'}
                   />
                 </TextInputWrapper>
               )}
@@ -240,13 +251,18 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
                       value={value}
                       onBlur={onBlur}
                       placeholder="Zip"
+                      keyboardType='number-pad'
+                      returnKeyType="done"
                   />
                 </TextInputWrapper>
               )}
               name="zip"
             />
           </VStack>
+          <AddButtonWrapper>
           <DefaultButton label='Add new customer' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useCreateCustomer.isLoading}/>
+          </AddButtonWrapper>
+          
         </VStack>
       </KeyboardAwareScrollView>
     </ContainerView>
@@ -254,22 +270,22 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
 }
 
 const ContainerView = styled.View`
-  background-color: white;
+  background-color: #f4f4f4;
   height: 100%;
   width: 100%;
-  padding: 12px;
+  padding-vertical: 12px;
 `
 
 const ErrorIndicator = styled.View`
   position: absolute;
-  background: red;
+  background: #e96245;
   height: 100%
-  width: 10px;
+  width: 4px;
   right: 0px;
 `
 
 const TextInputWrapper = styled.View`
-  background-color: #F8F9F9;
+  background-color: white;
   height: 54px;
 `
 
@@ -280,9 +296,8 @@ const TextInput = styled.TextInput`
   flex: 1;
 `
 
-const ErrorText = styled.Text`
-  font-size: 12px;
-  color: red;
+const AddButtonWrapper = styled.View`
+  padding-horizontal: 12px;
 `
 
 export default AddCustomerScreen

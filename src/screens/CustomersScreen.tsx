@@ -8,7 +8,7 @@ import { IconButton } from 'native-base'
 import { RefreshControl, DeviceEventEmitter } from 'react-native'
 
 import { RootStackParamList } from '../../App'
-import UseCustomers, { Customer } from '../api/UseCustomers'
+import UseCustomers from '../api/UseCustomers'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomersScreen'>
 
@@ -19,8 +19,6 @@ type Props = {
 const CustomersScreen: React.FC<Props> = ({ navigation }) => {
   const useCustomers = UseCustomers()
   const [search, setSearch] = useState("")
-  const [customerIData, setCustomerIData] = useState<IData[]>([])
-  const [customers, setCustomers] = useState<Customer[]>([])
 
   useEffect(() => {
     DeviceEventEmitter.addListener("event.refetchCustomers", () => useCustomers.refetch())
@@ -39,47 +37,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
     })
   }, [navigation])
 
-  useEffect(() => {
-    const updateCustomers = async (customers: Customer[]) => {
-      setCustomers(customers)
-
-      const customerDataArray: IData[] = []
-      customers.forEach(customer => {
-        customerDataArray.push({
-          key: customer.id.toString(),
-          value: `${customer.first_name} ${customer.last_name}`
-        })
-      })
-      setCustomerIData(customerDataArray)
-    }
-
-    switch (useCustomers.status) {
-      case 'success':
-        if (useCustomers.data.result) {
-          updateCustomers(useCustomers.data.result)
-        }
-        break
-      default:
-        break
-    }
-  }, [useCustomers.status])
-
-  const updateSearch = (search) => {
-    let filteredArray: IData[] = []
-    customers.filter(customer => {
-      let fullName = ''
-      if (customer.first_name && customer.last_name) {
-        fullName = customer.first_name + ' ' + customer.last_name
-      }
-      
-      return fullName.toUpperCase().includes(search.toUpperCase())
-    }).forEach(element => filteredArray.push({ key: element.id.toString(), value: element.first_name + ' ' + element.last_name}))
-
-    setCustomerIData(filteredArray)
-    setSearch(search)
-  }
-
-  if (useCustomers.isLoading && customers.length === 0) {
+  if (useCustomers.isLoading) {
     return (
       <ContainerView>
           <PaddedActivityIndicator/>
@@ -92,18 +50,23 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
       <SearchBar
         platform="ios"
         placeholder="Search"
-        onChangeText={updateSearch}
+        onChangeText={setSearch}
         value={search}
       />
       <AlphabetList
       style={{height: '100%'}}
-      refreshing={useCustomers.isLoading}
+      refreshing={useCustomers.isFetching}
       refreshControl={
-        <RefreshControl refreshing={useCustomers.isLoading} onRefresh={() => {
+        <RefreshControl refreshing={useCustomers.isFetching} onRefresh={() => {
           useCustomers.refetch()
         }}/>
       }
-      data={customerIData}
+      data={useCustomers.data.result.map(customer => {
+        return {
+          key: customer.id.toString(),
+          value: `${customer.first_name} ${customer.last_name}`
+        }
+      }).filter(customer => customer.value.toUpperCase().includes(search.toUpperCase()))}
       indexLetterStyle={{ 
         color: 'black',
       }}

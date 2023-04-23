@@ -64,6 +64,8 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
                         onChangeFormattedText={onChange}
                         defaultCode="US"
                         layout="second"
+                        countryPickerButtonStyle={{ backgroundColor: '#eaeaea' }}
+                        textContainerStyle={{ backgroundColor: '#f4f4f4' }}
                         autoFocus
                       />
                     )}
@@ -112,7 +114,7 @@ const ErrorText = styled.Text`
 `
 
 const ContainerView = styled.View`
-  background-color: transparent;
+  background-color: white;
   height: 100%;
   width: 100%;
 `

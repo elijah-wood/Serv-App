@@ -39,7 +39,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   }, [useGetJob])
   
-  if (useGetJob.isLoading) {
+  if (useGetJob.isFetching) {
     return (
       <PaddedActivityIndicator/>
     )

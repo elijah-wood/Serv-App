@@ -103,7 +103,7 @@ const sendCodeAgain = () => {
 }
 
 const CodeInputWrapper = styled.View`
-  background-color: #F8F9F9;
+  background-color: #f4f4f4;
   height: 54px;
 `
 
@@ -124,7 +124,7 @@ const ErrorText = styled.Text`
 `
 
 const ContainerView = styled.View`
-  background-color: transparent;
+  background-color: white;
   height: 100%;
   width: 100%;
 `

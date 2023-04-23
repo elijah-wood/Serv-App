@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { VStack } from 'native-base'
 import { Controller, useForm } from 'react-hook-form'
-import { DeviceEventEmitter } from 'react-native'
-import { RouteProp } from '@react-navigation/native'
+import { DeviceEventEmitter, Keyboard } from 'react-native'
+import { RouteProp, useFocusEffect } from '@react-navigation/native'
+import SelectDropdown from 'react-native-select-dropdown'
 
 import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
@@ -24,12 +25,12 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
   const useCreateJob = UseCreateJob()
   const { customerId } = route.params
    
-  const { control, handleSubmit, formState: { errors }, getValues } = useForm({
+  const { control, handleSubmit, formState: { errors }, getValues, setFocus } = useForm({
     defaultValues: {
       name: '',
       description: '',
       type: '',
-      status: '',
+      status: 'prospect',
       home_size: '',
       bedrooms: '',
       bathrooms: '',
@@ -53,6 +54,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [useCreateJob])
 
   const onSubmit = () => { 
+    Keyboard.dismiss()
     useCreateJob.mutate({
       name: getValues('name'),
       customer_id: customerId,
@@ -60,7 +62,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
       home_size: getValues('home_size'),
       bedrooms: getValues('bedrooms'),
       bathrooms: getValues('bathrooms'),
-      status: getValues('status'),
+      status: getValues('status').toLowerCase(),
       type: getValues('type'),
       address: { 
         line1: getValues('address1'),
@@ -74,7 +76,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <ContainerView>
-      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'always'}>
         <VStack space={5}>
           <VStack>
             <Controller
@@ -84,12 +86,13 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
               }}
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInputWrapper>
+                  {errors.name && <ErrorIndicator/>}
                   <TextInput
                       onChangeText={onChange}
                       value={value}
                       onBlur={onBlur}
                       autoCapitalize={'words'}
-                      placeholder="Job name"                
+                      placeholder="Job name"                                      
                   />
                 </TextInputWrapper>
               )}
@@ -119,12 +122,22 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
               }}
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInputWrapper>
-                  <TextInput
+                  <SelectDropdown
+                  data={['Prospect', 'Estimated', 'Scheduled', 'Invoiced', 'Completed']}
+                  onSelect={(selectedItem) => {
+                    onChange(selectedItem)
+                  }}
+                  buttonStyle={{ backgroundColor: 'white', width: '100%' }}
+                  buttonTextStyle={{ textAlign: 'left', fontSize: 16, marginLeft: 3 }}
+                  defaultValue={'Prospect'}
+                  />
+
+                  {/* <TextInput
                       onChangeText={onChange}
                       value={value}
                       onBlur={onBlur}
                       placeholder="Status"
-                  />
+                  /> */}
                 </TextInputWrapper>
               )}
               name="status"
@@ -153,6 +166,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
               }}
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInputWrapper>
+                  {errors.description && <ErrorIndicator/>}
                   <TextInput
                       onChangeText={onChange}
                       value={value}
@@ -174,6 +188,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
               }}
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInputWrapper>
+                  {errors.address1 && <ErrorIndicator/>}
                   <TextInput
                       onChangeText={onChange}
                       value={value}
@@ -210,6 +225,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
               }}
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInputWrapper>
+                  {errors.city && <ErrorIndicator/>}
                   <TextInput
                       onChangeText={onChange}
                       value={value}
@@ -228,6 +244,7 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
               }}
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInputWrapper>
+                  {errors.state && <ErrorIndicator/>}
                   <TextInput
                       onChangeText={onChange}
                       value={value}
@@ -246,11 +263,13 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
               }}
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInputWrapper>
+                  {errors.zip && <ErrorIndicator/>}
                   <TextInput
                       onChangeText={onChange}
                       value={value}
                       onBlur={onBlur}
                       placeholder="Zip"
+                      keyboardType='number-pad'
                   />
                 </TextInputWrapper>
               )}
@@ -311,7 +330,9 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
                 name="bathrooms"
               />
           </VStack>
-          <DefaultButton label='Create new job' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useCreateJob.isLoading}/>
+          <AddButtonWrapper>
+            <DefaultButton label='Create new job' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useCreateJob.isLoading}/>
+          </AddButtonWrapper>
         </VStack>
       </KeyboardAwareScrollView>
     </ContainerView>
@@ -319,14 +340,22 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
 }
 
 const ContainerView = styled.View`
-  background-color: white;
+  background-color: #f4f4f4;
   height: 100%;
   width: 100%;
-  padding: 12px;
+  padding-vertical: 12px;
+`
+
+const ErrorIndicator = styled.View`
+  position: absolute;
+  background: #e96245;
+  height: 100%
+  width: 4px;
+  right: 0px;
 `
 
 const TextInputWrapper = styled.View`
-  background-color: #F8F9F9;
+  background-color: white;
   height: 54px;
 `
 
@@ -336,9 +365,8 @@ const TextInput = styled.TextInput`
   flex: 1;
 `
 
-const ErrorText = styled.Text`
-  font-size: 12px;
-  color: red;
+const AddButtonWrapper = styled.View`
+  padding-horizontal: 12px;
 `
 
 export default AddJobScreen

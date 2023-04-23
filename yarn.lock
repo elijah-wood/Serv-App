@@ -9103,6 +9103,11 @@ react-native-section-list-get-item-layout@^2.2.3:
   resolved "https://registry.npmjs.org/react-native-section-list-get-item-layout/-/react-native-section-list-get-item-layout-2.2.3.tgz"
   integrity sha512-fzCW5SiYP6qCZyDHebaElHonIFr8NFrZK9JDkxFLnpxMJih4d+HQ4rHyOs0Z4Gb/FjyCVbRH7RtEnjeQ0XffMg==
 
+react-native-select-dropdown@^3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/react-native-select-dropdown/-/react-native-select-dropdown-3.3.2.tgz#f874bc48f7633b914c202782bbbf988a8b5863a2"
+  integrity sha512-2rsPgAzeZ4Pdsf/kCuwYyzmLd5OO+cT3yZ0gAvVZ9C+5xkchiY7iE9u5M5F0DCgMqmwJjBBsiBEvULJ/Eaxpng==
+
 react-native-size-matters@^0.4.0:
   version "0.4.0"
   resolved "https://registry.npmjs.org/react-native-size-matters/-/react-native-size-matters-0.4.0.tgz"
