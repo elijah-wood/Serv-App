@@ -19,8 +19,9 @@ export const Thread: React.FC<ThreadProps> = ({
     const [name, setName] = useState('Unknown')
   
     useEffect(() => {    
-        const getName = () => {
-            props.conversation._participants.forEach((participant) => {
+        const getName = async () => {
+          let participants = await props.conversation.getParticipants()
+          participants.forEach((participant) => {
                 if (participant.attributes['type'] == 'customer') {
                     let fn = participant.attributes['first_name'] as string
                     let ln = participant.attributes['last_name'] as string

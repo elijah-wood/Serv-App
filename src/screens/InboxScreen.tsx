@@ -24,6 +24,8 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
 
   useEffect(() => {
     setIsLoading(true)
+    navigation.setOptions({ headerShown: true })
+
     API.createTwilioAccessToken()
       .then((response) => TwilioService.getInstance().getChatClient(response.result))
       .then(() => TwilioService.getInstance().addTokenListener(API.createTwilioAccessToken()))
@@ -34,7 +36,6 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
         console.log(err)
         setIsLoading(false)
       })
-    navigation.setOptions({headerShown: true})
     return () => {
       TwilioService.serviceInstance.clientShutdown()
     }
