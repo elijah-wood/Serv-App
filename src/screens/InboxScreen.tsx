@@ -102,7 +102,21 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
         value={search}
       /> */}
       <FlatList
-        data={conversations}
+        data={conversations.sort((a, b) => { 
+          let dateA: Date
+          if (a.lastMessage) {
+            dateA = a.lastMessage.dateCreated
+          } else {
+            dateA = a.dateCreated
+          }
+          let dateB: Date
+          if (b.lastMessage) {
+            dateB = b.lastMessage.dateCreated
+          } else {
+            dateB = b.dateCreated
+          }
+          return +new Date(dateB) - +new Date(dateA)
+        })}
         keyExtractor={(item) => item.sid}
         renderItem={({ item }) => (
           <Thread conversation={item} onPress={(name: string) => {
