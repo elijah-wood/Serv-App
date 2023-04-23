@@ -9,7 +9,6 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { RootNavigator } from './src/navigation/RootNavigator'
 import TokenIntercepter from './src/api/TokenIntercepter'
-import { Conversation } from '@twilio/conversations'
 
 AppRegistry.registerComponent(expo.name, () => App)
 
