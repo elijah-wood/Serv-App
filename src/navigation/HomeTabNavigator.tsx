@@ -52,7 +52,7 @@ export const HomeTabs: React.FC<Props> = () => {
         <Tab.Navigator screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true}} >
             <Tab.Screen name={Routes.INBOX} component={InboxScreen}
                 options={({
-                    title: 'Inbox',
+                    title: 'Messages',
                     tabBarIcon: ({ color }) => (
                         <Image
                         source={require('../assets/Inbox.png')}

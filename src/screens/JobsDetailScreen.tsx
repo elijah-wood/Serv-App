@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
-import { FlatList, Spacer, VStack, View } from 'native-base'
+import { Avatar, Divider, FlatList, HStack, Spacer, VStack, View } from 'native-base'
 import { ScrollView } from 'react-native-virtualized-view'
 
 import { RootStackParamList } from '../../App'
@@ -14,6 +14,7 @@ import { DetailSection, SectionContainer, SectionTitle } from '../components/Det
 import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import DefaultButton from '../components/DefaultButton'
 import { MapButton } from '../components/MapButton'
+import { getInitials } from '../utils/GetStringInitials'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type JobRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -86,9 +87,12 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
               {/* <FlatList
                   data={job?.Team.User}
                   keyExtractor={(item) => item.id}
-                  ItemSeparatorComponent={() => <View style={{height: 16}}/>}
+                  ItemSeparatorComponent={() => <Divider/>}
                   renderItem={({ item }) => (
-                    <TitleText>{item.id}</TitleText>
+                    <HStack>
+                      <Avatar>{getInitials(item?.first_name + ' ' + item?.last_name)}</Avatar>
+                      <TitleText>{item?.first_name + ' ' + item?.last_name}</TitleText>
+                    </HStack>
                   )}
                 /> */}
                 <DefaultButton label='Add Member'/>

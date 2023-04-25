@@ -124,6 +124,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
       <Chat
         showUserAvatars
         showUserNames
+        textInputProps={{ placeholder: 'Type message here' }}
         messages={messages}
         onSendPress={messages => onSend(messages)}
         theme={{
