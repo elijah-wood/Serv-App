@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { RootNavigator } from './src/navigation/RootNavigator'
 import TokenIntercepter from './src/api/TokenIntercepter'
+import { Job } from './src/api/UseJobs'
 
 AppRegistry.registerComponent(expo.name, () => App)
 
@@ -31,6 +32,7 @@ type RootStackParamList = {
   ChatDetail: { conversationSid: string, name: string }
   TeamScreen: undefined
   AnalyticsScreen: undefined
+  InvoiceScreen: { job: Job }
 }
 
 const queryClient = new QueryClient()

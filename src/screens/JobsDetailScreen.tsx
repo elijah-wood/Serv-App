@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
-import { FlatList, HStack, Spacer, VStack, View } from 'native-base'
+import { FlatList, Spacer, VStack, View } from 'native-base'
 import { ScrollView } from 'react-native-virtualized-view'
 
 import { RootStackParamList } from '../../App'
