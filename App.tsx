@@ -6,7 +6,7 @@ import { NativeBaseProvider } from 'native-base'
 import { expo } from './app.json'
 import { AppRegistry } from 'react-native'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import * as Sentry from 'sentry-expo'
+import * as Sentry from '@sentry/react-native'
 
 import { RootNavigator } from './src/navigation/RootNavigator'
 import TokenIntercepter from './src/api/TokenIntercepter'
@@ -50,12 +50,7 @@ const App: React.FC<Props> = () => {
 
     Sentry.init({
       dsn: "https://3aea386828174449ae479b8159d4efc1@o4505076625113088.ingest.sentry.io/4505076626423808",
-    
-      // Set tracesSampleRate to 1.0 to capture 100%
-      // of transactions for performance monitoring.
-      // We recommend adjusting this value in production
-      enableInExpoDevelopment: true,
-      debug: true, 
+      tracesSampleRate: 1.0
     })
   }, [])
 
