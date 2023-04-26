@@ -28,7 +28,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
 
     API.createTwilioAccessToken()
       .then((response) => TwilioService.getInstance().getChatClient(response.result))
-      .then(() => TwilioService.getInstance().addTokenListener(API.createTwilioAccessToken()))
+      .then(() => TwilioService.getInstance().addTokenListener())
       .then(setChannelEvents)
       .then(getSubscribedConversations)
       .catch((err) => {

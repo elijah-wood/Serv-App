@@ -1,4 +1,5 @@
 import { Client } from '@twilio/conversations'
+import { API } from '../api/API'
 
 export class TwilioService {
   static serviceInstance: TwilioService
@@ -25,16 +26,18 @@ export class TwilioService {
   }
 
   // Manage our token expiration
-  addTokenListener(getToken): Client {
+  addTokenListener(): Client {
     if (!TwilioService.chatClient) {
       throw new Error('Twilio client is null or undefined')
     }
     TwilioService.chatClient.on('tokenAboutToExpire', () => {
-      getToken().then(TwilioService.chatClient.updateToken)
+      API.createTwilioAccessToken()
+        .then((response) => TwilioService.chatClient.updateToken(response.result))
     })
 
     TwilioService.chatClient.on('tokenExpired', () => {
-      getToken().then(TwilioService.chatClient.updateToken)
+      API.createTwilioAccessToken()
+        .then((response) => TwilioService.chatClient.updateToken(response.result))
     })
     return TwilioService.chatClient
   }
