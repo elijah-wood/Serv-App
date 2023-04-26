@@ -350,7 +350,7 @@ const ErrorIndicator = styled.View`
   position: absolute;
   background: #e96245;
   height: 100%
-  width: 4px;
+  width: 8px;
   right: 0px;
 `
 

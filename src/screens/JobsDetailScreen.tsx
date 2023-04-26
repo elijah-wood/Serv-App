@@ -72,7 +72,9 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                     <TitleText>{item.id}</TitleText>
                   )}
                 />
-                <DefaultButton label='+ New Estimate / Invoice'/>
+                <DefaultButton label='+ New Estimate / Invoice' onPress={() => {
+                  // navigation.navigate('InvoiceScreen', { job: job })
+                }}/>
             </InvoiceListContainer>
           </SectionContainer>
           <DetailSection title='Address' value={renderAddress(job?.address)} customRightComponent={

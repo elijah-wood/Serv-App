@@ -48,10 +48,13 @@ const App: React.FC<Props> = () => {
     // TODO: Refresh token call to be updated
     // TokenInterceptor.addRefreshTokenInterceptor()
 
-    Sentry.init({
-      dsn: "https://3aea386828174449ae479b8159d4efc1@o4505076625113088.ingest.sentry.io/4505076626423808",
-      tracesSampleRate: 1.0
-    })
+    if (!__DEV__) {
+      Sentry.init({
+        dsn: "https://3aea386828174449ae479b8159d4efc1@o4505076625113088.ingest.sentry.io/4505076626423808",
+        tracesSampleRate: 1.0,
+        debug: false
+      })
+    }
   }, [])
 
   return (
@@ -70,5 +73,6 @@ const App: React.FC<Props> = () => {
   )
 }
 
-export default App
+export default Sentry.wrap(App)
+
 export type { RootStackParamList }

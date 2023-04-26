@@ -9,6 +9,7 @@ export default {
     JOBS: 'JobsScreen',
     JOB_DETAIL: 'JobDetailScreen',
     ADD_JOB: 'AddJobScreen',
+    CREATE_INVOICE: 'InvoiceScreen',
     TEAM_TAB: 'TeamTab',
     TEAM: 'Team',
     ANALYTICS_TAB: 'AnalyticsTab',
