@@ -30,7 +30,6 @@ const ButtonContainerView = styled.View<{ isDisabled: boolean }>`
   background-color: ${props => props.isDisabled ? '#E3E9ED' : '#0062FF'};
   border-radius: 9px;
   height: 63px;
-  width: 100%;
 `
 
 const ButtonText = styled.Text`

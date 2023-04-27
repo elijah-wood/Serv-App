@@ -21,6 +21,11 @@ type Job = {
     Team: Team
 }  
 
+type Collaborator = {
+    id: string
+    Member: Member
+}
+
 type Invoice = {
     id: string
     price: number
@@ -39,8 +44,12 @@ type Photo = {
 type Team = {
     id: string
     name: string
-    website?: string
-    User: UserResponse[]
+    Member: Member[]
+}
+
+type Member = {
+    id: string
+    User: UserResponse
 }
 
 type Payment = {
@@ -59,4 +68,4 @@ const UseJobs = (): UseQueryResult<UseJobsResponse, Error> => {
 }
 
 export default UseJobs
-export type { Job, Invoice, Photo, Team, Payment, UseJobsResponse }
+export type { Job, Invoice, Photo, Team, Payment, UseJobsResponse, Member, Collaborator }

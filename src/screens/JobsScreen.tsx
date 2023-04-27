@@ -7,6 +7,7 @@ import { DeviceEventEmitter, FlatList, RefreshControl } from 'react-native'
 import { RootStackParamList } from '../../App'
 import UseJobs from '../api/UseJobs'
 import { JobRow } from '../components/JobRow'
+import { ScrollView } from 'native-base'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobsScreen'>
 
@@ -35,26 +36,22 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <ContainerView>
-      {/* <SearchBar
-        platform="ios"
-        placeholder="Search"
-        onChangeText={setSearch}
-        value={search}
-      /> */}
-      <FlatList
-        contentInset={{ bottom: 16 }}
-        refreshing={useJobs.isFetching}
+        <SearchBar
+          platform="ios"
+          placeholder="Search Job Name"
+          onChangeText={setSearch}
+          value={search}
+        />
+      <ScrollView         
         refreshControl={
           <RefreshControl refreshing={useJobs.isFetching} onRefresh={() => useJobs.refetch()}/>
-        }
-        data={useJobs.data.result}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <JobRow showBorder={false} job={item} customer={item.Customer} onPress={() => {
+        }>
+        {useJobs.data.result.filter(job => job.name.toUpperCase().includes(search.toUpperCase())).map((item, index) => (
+          <JobRow showBorder={false} job={item} customer={item.Customer} key={index} onPress={() => {
             navigation.navigate('JobDetailScreen', { jobId: item.id })
           }}/>
-        )}
-      />
+        ))}     
+      </ScrollView>    
     </ContainerView>
   )
 }

@@ -73,7 +73,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                   )}
                 />
                 <DefaultButton label='+ New Estimate / Invoice' onPress={() => {
-                  // navigation.navigate('InvoiceScreen', { job: job })
+                  navigation.navigate('InvoiceScreen', { job: job })
                 }}/>
             </InvoiceListContainer>
           </SectionContainer>
@@ -86,17 +86,17 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <SectionContainer>
             <SectionTitle>Collaborators</SectionTitle>
             <InvoiceListContainer>
-              {/* <FlatList
-                  data={job?.Team.User}
+              <FlatList
+                  data={job?.Customer.Collaborator}
                   keyExtractor={(item) => item.id}
                   ItemSeparatorComponent={() => <Divider/>}
                   renderItem={({ item }) => (
                     <HStack>
-                      <Avatar>{getInitials(item?.first_name + ' ' + item?.last_name)}</Avatar>
-                      <TitleText>{item?.first_name + ' ' + item?.last_name}</TitleText>
+                      <Avatar>{getInitials(item?.Member.User.first_name + ' ' + item?.Member.User.last_name)}</Avatar>
+                      <TitleText>{item?.Member.User.first_name + ' ' + item?.Member.User.last_name}</TitleText>
                     </HStack>
                   )}
-                /> */}
+                />
                 <DefaultButton label='Add Member'/>
             </InvoiceListContainer>
           </SectionContainer>

@@ -1,6 +1,6 @@
 import { useQuery, UseQueryResult } from 'react-query'
 import { API } from './API'
-import { Job } from './UseJobs'
+import { Collaborator, Job } from './UseJobs'
 
 type Customer = {
     id: string
@@ -12,6 +12,7 @@ type Customer = {
     address?: Address
     twilio_conversation_sid: string
     Job: Job[]
+    Collaborator: Collaborator[]
 }  
 
 type Address = {
