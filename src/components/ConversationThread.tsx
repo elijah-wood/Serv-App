@@ -52,24 +52,31 @@ export const Thread: React.FC<ThreadProps> = ({
     }, [props.conversation.lastMessage?.dateCreated])
   
     function formatDate(date: Date): string {
-      const now = new Date();
-      
-      const dateStr = date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: '2-digit' });
-      
+      const now = new Date()
+    
       // Check if the date is today
       if (date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
         return date.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric', hour12: true })
       }
-      
+    
       // Check if the date is yesterday
       now.setDate(now.getDate() - 1)
       if (date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
         return 'Yesterday'
       }
-      
-      // If the date is not today or yesterday, display the date in mm/dd/yyyy format
-      return dateStr
-    }
+    
+      // Check if the date is within a week but not yesterday
+      const weekAgo = new Date()
+      weekAgo.setDate(weekAgo.getDate() - 6)
+      if (date >= weekAgo && date < now) {
+        const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        const dayOfWeek = weekday[date.getDay()]
+        return dayOfWeek
+      }
+    
+      // If the date is not today, yesterday, or within a week, display the date in mm/dd/yyyy format
+      return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' })
+    }    
   
     return (
         <>
