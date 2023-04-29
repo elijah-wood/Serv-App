@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { Avatar, Divider, HStack, Spacer, VStack } from 'native-base'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { Conversation } from '@twilio/conversations'
+import { Conversation, Message } from '@twilio/conversations'
 
 import { getInitials } from '../utils/GetStringInitials'
-import { getUserFromToken } from '../api/Session'
 
 type ThreadProps = {
     conversation: Conversation
@@ -17,7 +16,17 @@ export const Thread: React.FC<ThreadProps> = ({
   }) => {
     const [unreadState, setUnreadState] = useState(false)
     const [name, setName] = useState('Unknown')
+    const [lastMessage, setLastMessage] = useState('New Conversation')
   
+    const getMostRecentMessage = async (): Promise<string> => {
+      let messagesPaginator = await props.conversation.getMessages(1)
+      let mostRecentMessage = messagesPaginator.items[0]?.body 
+      if (mostRecentMessage) {
+        setLastMessage(mostRecentMessage)
+      }
+      return mostRecentMessage
+    }
+
     useEffect(() => {    
         const getName = async () => {
           let participants = await props.conversation.getParticipants()
@@ -31,24 +40,26 @@ export const Thread: React.FC<ThreadProps> = ({
                     }
                     return          
                 }
-            })
+            })            
         }
 
         getName()
+        getMostRecentMessage()
     }, [])
 
     useEffect(() => {
         const getUnreadCount = async () => {
-            if (props.conversation) {
-                let count = await props.conversation.getUnreadMessagesCount()
-                if (count == null) {
-                    setUnreadState(true)
-                } else if (count > 0) {
-                    setUnreadState(true)
-                }
-            }
+          if (props.conversation) {
+              let count = await props.conversation.getUnreadMessagesCount()
+              if (count == null) {
+                  setUnreadState(true)
+              } else if (count > 0) {
+                  setUnreadState(true)
+              }
+          }
         }
         getUnreadCount()
+        getMostRecentMessage()
     }, [props.conversation.lastMessage?.dateCreated])
   
     function formatDate(date: Date): string {
@@ -103,7 +114,7 @@ export const Thread: React.FC<ThreadProps> = ({
                         <ThreadTime>{formatDate(props.conversation.lastMessage?.dateCreated ?? props.conversation.dateCreated)}</ThreadTime>
                         </HStack>
                         <Spacer/>
-                        <ThreadLastMessage numberOfLines={1}>{'Customer'}</ThreadLastMessage>
+                        <ThreadLastMessage numberOfLines={1}>{lastMessage}</ThreadLastMessage>
                     </ThreadFlexFillWidth>
                     </HStack>
                     <Divider/>
