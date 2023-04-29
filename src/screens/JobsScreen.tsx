@@ -46,7 +46,7 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
         refreshControl={
           <RefreshControl refreshing={useJobs.isFetching} onRefresh={() => useJobs.refetch()}/>
         }>
-        {useJobs.data.result.filter(job => job.name.toUpperCase().includes(search.toUpperCase())).map((item, index) => (
+        {useJobs.data.result.map((item, index) => (
           <JobRow showBorder={false} job={item} customer={item.Customer} key={index} onPress={() => {
             navigation.navigate('JobDetailScreen', { jobId: item.id })
           }}/>
