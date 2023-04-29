@@ -35,10 +35,8 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
       let client = await TwilioService.getInstance().getChatClient(null)
     
       let conversation = await client.getConversationBySid(conversationSid)
-      if (conversation.lastMessage?.index) {
-        conversation.updateLastReadMessageIndex(conversation.lastMessage.index)
-      }
-      
+      conversation.setAllMessagesRead()
+ 
       chatClientConversation.current = conversation
       // Get our participant id
       let user = await getUserFromToken()
@@ -93,9 +91,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
     async (client, participants) => {
       client.on('messageAdded', (message: Message) => {
         // Update read index
-        if (chatClientConversation.current.lastMessage?.index) {
-          chatClientConversation.current.updateLastReadMessageIndex(chatClientConversation.current.lastMessage?.index ?? 0)
-        }
+        chatClientConversation.current.setAllMessagesRead()
         let participant = participants.find(participant => participant.sid === message.participantSid )
         setMessages((prevMessages) => [{
           id: message.sid,
