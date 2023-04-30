@@ -20,6 +20,7 @@ export const errorResponseHandler = (error: AxiosError): Promise<never> => {
         message = response.error
         Alert.alert('Error', message)
     }
+    console.log(response)
 
     return Promise.reject(error)
 }

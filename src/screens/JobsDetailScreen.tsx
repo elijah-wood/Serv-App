@@ -15,6 +15,8 @@ import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import DefaultButton from '../components/DefaultButton'
 import { MapButton } from '../components/MapButton'
 import { getInitials } from '../utils/GetStringInitials'
+import { DeviceEventEmitter } from 'react-native'
+import { capitalizeFirstLetter } from '../utils/CapitalizeFirstLetter'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type JobRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -27,6 +29,13 @@ type Props = {
 const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const useGetJob = UseGetJob(route.params.jobId)
   const [job, setJob] = useState<Job>()
+
+  useEffect(() => {
+    DeviceEventEmitter.addListener("event.refetchInvoices", () => useGetJob.refetch())
+    return () => {
+      DeviceEventEmitter.removeAllListeners("event.refetchInvoices")
+    }
+  }, [])
 
   useEffect(() => {
     switch (useGetJob.status) {
@@ -54,7 +63,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <DetailSection title='Description' value={job?.description ?? ''} onPress={() => {
             
           }}/>
-          <DetailSection title='Status' value={job?.status ?? ''} showDisclosure={true} onPress={() => {
+          <DetailSection title='Status' value={capitalizeFirstLetter(job?.status ?? '')} showDisclosure={true} onPress={() => {
             
           }}/>
           <DetailSection title='Customer' value={renderCustomerFullName(job?.Customer)} color={'#0062FF'} onPress={() => {

@@ -7,6 +7,7 @@ import { renderCustomerFullName } from "../utils/RenderCustomerFullName"
 import { renderAddress } from "../utils/RenderAddress"
 import { getInitials } from "../utils/GetStringInitials"
 import { Customer } from '../api/UseCustomers'
+import { capitalizeFirstLetter } from '../utils/CapitalizeFirstLetter'
 
 type JobProps = {
     job: Job
@@ -28,11 +29,11 @@ return (
                     <JobTitle>{props.job.name}</JobTitle>            
                     <JobSubtitle>{renderCustomerFullName(props.customer)}</JobSubtitle>
                     <JobSubtitle>{renderAddress(props.job.address)}</JobSubtitle>
-                    <JobBoldSubtitle>{props.job.status + ' • ' + 'You & Unknown'}</JobBoldSubtitle>
+                    <JobBoldSubtitle>{capitalizeFirstLetter(props.job.status) + ' • ' + 'You'}</JobBoldSubtitle>
                 </JobFlexFillWidth>
-                <Avatar>
+                {/* <Avatar>
                     {getInitials(renderCustomerFullName(props.customer))}
-                </Avatar>
+                </Avatar> */}
             </HStack>
             {(props.showBorder == false) && 
                 <Divider/>

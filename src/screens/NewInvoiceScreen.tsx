@@ -2,17 +2,17 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
-import { Box, Divider, FlatList, Flex, HStack, Icon, Spacer, Text, VStack, View } from 'native-base'
+import { Box, Divider, Flex, HStack, Spacer, VStack } from 'native-base'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { MaskedText, MaskedTextInput } from "react-native-mask-text"
-import { Alert, Button, Modal, Pressable, TextInput, TouchableOpacity } from 'react-native'
+import { MaskedText } from "react-native-mask-text"
+import { Alert, Button, DeviceEventEmitter, Pressable, TextInput, TouchableOpacity } from 'react-native'
 import DatePicker from 'react-native-date-picker'
 import CurrencyInput from 'react-native-currency-input'
-import { Ionicons } from '@expo/vector-icons'
 
 import { RootStackParamList } from '../../App'
 import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import DefaultButton from '../components/DefaultButton'
+import UseCreateInvoice, { InvoiceItem as InvoiceItemAPI } from '../api/UseCreateInvoice'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'InvoiceScreen'>
 type InvoiceRouteProp = RouteProp<RootStackParamList, 'InvoiceScreen'>
@@ -32,29 +32,21 @@ type InvoiceItem = {
 
 const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
     const { job } = route.params
+    const useCreateInvoice = UseCreateInvoice()
 
     const [date, setDate] = useState(new Date())
     const [openDatePicker, setOpenDatePicker] = useState(false)
 
-    // const useCreateInvoice = UseCreateInvoice()
-
-    // useEffect(() => {
-    // switch (useGetJob.status) {
-    //     case 'success':
-    //         if (useGetJob.data.result) {
-    //             setJob(useGetJob.data.result)
-    //         }
-    //     break
-    //     default:
-    //     break
-    // }
-    // }, [useGetJob])
-
-    // if (useGetJob.isFetching) {
-    //     return (
-    //         <PaddedActivityIndicator/>
-    //     )
-    // }
+    useEffect(() => {
+        switch (useCreateInvoice.status) {
+            case 'success':
+                DeviceEventEmitter.emit("event.refetchInvoices")
+                navigation.goBack()
+            break
+            default:
+            break
+        }
+    }, [useCreateInvoice])
 
     const [items, setItems] = useState<Item[]>([{ name: '', price: 0, quantity: 1 }])
     const [grandTotal, setGrandTotal] = useState(0)
@@ -148,19 +140,21 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                             </TotalContainer>                               
                         </VStack>
                     </CellContainer>
-                    <Flex direction='row' style={{ padding: 12, gap: 12 }}>
-                        <Box flexGrow={1}>
+                    <Flex direction='row' justifyContent={'space-between'} style={{ padding: 12, gap: 12 }}>
+                        <Box flex={1}>
                             <DefaultButton label='Send Estimate'/>
                         </Box>     
-                        <Box flexGrow={1}>
-                            <DefaultButton label='Send Invoice' onPress={() => {
-                                let items = []
+                        <Box flex={1}>
+                            <DefaultButton loading={useCreateInvoice.isLoading} label='Send Invoice' onPress={() => {
+                                let items: Item[] = []
                                 itemRefs.current.forEach(ref => { 
-                                    if (ref !== null) {
+                                    if (ref !== null) {                                        
                                         items.push(ref.get()) 
                                     }                                    
                                 })
-                                Alert.alert(`To do`)
+                                useCreateInvoice.mutate({ items: items.map(item => {                                     
+                                    return { description: item.name, unit_amount: item.price, amount: item.price * item.quantity } as InvoiceItemAPI 
+                                })})
                             }}/>
                         </Box>                                                                 
                     </Flex>              
