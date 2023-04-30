@@ -2,12 +2,13 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
-import { Box, Divider, FlatList, Flex, HStack, Spacer, VStack, View } from 'native-base'
-import { ScrollView } from 'react-native-virtualized-view'
+import { Box, Divider, FlatList, Flex, HStack, Icon, Spacer, Text, VStack, View } from 'native-base'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { MaskedText, MaskedTextInput } from "react-native-mask-text"
-import { Alert, Button, Modal, TextInput, TouchableOpacity } from 'react-native'
+import { Alert, Button, Modal, Pressable, TextInput, TouchableOpacity } from 'react-native'
 import DatePicker from 'react-native-date-picker'
 import CurrencyInput from 'react-native-currency-input'
+import { Ionicons } from '@expo/vector-icons'
 
 import { RootStackParamList } from '../../App'
 import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
@@ -59,15 +60,15 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
     const [grandTotal, setGrandTotal] = useState(0)
     const itemRefs = useRef<InvoiceItemHandle[]>([])  
     const itemTotals = useRef<number[]>([])
-    
-    useEffect(() => {
-        updateTotal()
-    }, [items])
 
     const addItem = () => {
         const newItem: Item = { name: '', price: 0, quantity: 1 }
         let existingItems: Item[] = []
-        itemRefs.current.forEach(ref => existingItems.push(ref.get()))        
+        itemRefs.current.forEach(ref => {
+            if (ref !== null) {
+                existingItems.push(ref.get())
+            }
+        })        
         setItems([...existingItems, newItem])
     }
 
@@ -91,7 +92,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                 }}
             />
             <ContainerView>
-                <ScrollView>
+                <KeyboardAwareScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'always'}>
                     <CellContainer>
                         <VStack>
                             <Cell title={'Customer'} subtitle={renderCustomerFullName(job.Customer)}/>
@@ -100,7 +101,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                                 <Cell title={'Due Date'} subtitle={date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: '2-digit' })}/>
                             </TouchableOpacity>
                             <VStack space={2}>
-                                <CellTitle>Items</CellTitle>
+                                <CellTitle>Items</CellTitle>                                
                                 {items.map((item, index) => (
                                     <InvoiceItem
                                         key={index}
@@ -110,7 +111,20 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                                         }}               
                                         onUpdate={(total) => { 
                                             itemTotals.current[index] = total
-                                        }}                                           
+                                            updateTotal()
+                                        }}     
+                                        onDelete={() => {
+                                            let updatedItems: Item[] = []                                        
+                                            itemRefs.current.forEach((ref, i) => { 
+                                                if (i != index && ref !== null) {
+                                                    updatedItems.push(ref.get())
+                                                }
+                                            })
+                                            setItems(updatedItems)
+                                            itemRefs.current.splice(index, 1)
+                                            itemTotals.current.splice(index, 1)
+                                            updateTotal()
+                                        }}                                      
                                     />
                                 ))}       
                                 <Box alignItems={'left'} marginLeft={-2}>                                    
@@ -141,12 +155,16 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                         <Box flexGrow={1}>
                             <DefaultButton label='Send Invoice' onPress={() => {
                                 let items = []
-                                itemRefs.current.forEach(ref => items.push(ref.get()))
-                                console.log(items)
+                                itemRefs.current.forEach(ref => { 
+                                    if (ref !== null) {
+                                        items.push(ref.get()) 
+                                    }                                    
+                                })
+                                Alert.alert(`To do`)
                             }}/>
                         </Box>                                                                 
                     </Flex>              
-                </ScrollView>
+                </KeyboardAwareScrollView>
             </ContainerView>
         </>
     )
@@ -174,6 +192,7 @@ type InvoiceItemHandle = {
 type InvoiceItemProps = {
     item: Item
     onUpdate: (total: number) => void
+    onDelete: () => void
     ref: React.ForwardedRef<InvoiceItemHandle>
 }
 
@@ -181,6 +200,12 @@ const InvoiceItem: React.FC<InvoiceItemProps> = forwardRef((props, ref) => {
     const [name, setName] = useState(props.item.name)
     const [price, setPrice] = useState(props.item.price)
     const [quantity, setQuantity] = useState(props.item.quantity.toString())
+
+    useEffect(() => {
+        setName(props.item.name)
+        setPrice(props.item.price)
+        setQuantity(props.item.quantity.toString())
+    }, [props.item])
 
     const total = (price * 100) * parseFloat(quantity)
 
@@ -196,12 +221,20 @@ const InvoiceItem: React.FC<InvoiceItemProps> = forwardRef((props, ref) => {
   
     return (
         <VStack space={2}>
-            <TextInput
-                style={{ fontSize: 17 }}
-                onChangeText={setName}
-                value={name}                
-                placeholder={'Enter item name here'}
-            />            
+            <HStack>
+                <TextInput
+                    style={{ fontSize: 17 }}
+                    onChangeText={setName}
+                    value={name}                
+                    placeholder={'Enter item name here'}
+                />  
+                <Spacer/>
+                <Pressable onPress={() => {
+                    props.onDelete()
+                }}> 
+                    <DeleteText>Delete</DeleteText>
+                </Pressable>                                    
+            </HStack>          
             <Flex direction='row'>
                 <Box width={'33.3%'} alignSelf={'flex-left'}>
                     <CurrencyInput
@@ -241,6 +274,12 @@ const InvoiceItem: React.FC<InvoiceItemProps> = forwardRef((props, ref) => {
         </VStack>  
     )
 })
+
+const DeleteText = styled.Text`
+  font-size: 17px;
+  font-weight: 500;
+  color: red;
+`
 
 const TotalContainer = styled.View`
   padding-top: 12px;
