@@ -18,13 +18,7 @@ type Job = {
     Customer: Customer
     Invoice: Invoice[]
     Photo: Photo[]
-    Team: Team
 }  
-
-type Collaborator = {
-    id: string
-    Member: Member
-}
 
 type Invoice = {
     id: string
@@ -39,17 +33,6 @@ type Photo = {
     id: string
     url?: string
     created_at?: string
-}
-
-type Team = {
-    id: string
-    name: string
-    Member: Member[]
-}
-
-type Member = {
-    id: string
-    User: UserResponse
 }
 
 type Payment = {
@@ -68,4 +51,4 @@ const UseJobs = (): UseQueryResult<UseJobsResponse, Error> => {
 }
 
 export default UseJobs
-export type { Job, Invoice, Photo, Team, Payment, UseJobsResponse, Member, Collaborator }
+export type { Job, Invoice, Photo, Payment, UseJobsResponse }

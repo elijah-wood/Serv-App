@@ -1,6 +1,7 @@
 import { useQuery, UseQueryResult } from 'react-query'
 import { API } from './API'
-import { Collaborator, Job } from './UseJobs'
+import { Job } from './UseJobs'
+import { UserResponse } from './UserResponse'
 
 type Customer = {
     id: string
@@ -14,6 +15,17 @@ type Customer = {
     Job: Job[]
     Collaborator: Collaborator[]
 }  
+
+type Collaborator = {
+    id: string
+    Member: Member
+    isYou?: boolean
+}
+
+type Member = {
+    id: string
+    User: UserResponse
+}
 
 type Address = {
     city: string
@@ -36,4 +48,4 @@ const UseCustomers = (): UseQueryResult<UseCustomersResult, Error> => {
 }
 
 export default UseCustomers
-export type { Customer, Address, UseCustomersResult }
+export type { Customer, Address, UseCustomersResult, Member, Collaborator }

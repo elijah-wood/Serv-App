@@ -4,10 +4,11 @@ import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
 import { Avatar, ChevronRightIcon, Divider, FlatList, HStack, Spacer, VStack, View } from 'native-base'
 import { ScrollView } from 'react-native-virtualized-view'
+import { DeviceEventEmitter, TouchableOpacity } from 'react-native'
 
 import { RootStackParamList } from '../../App'
 import UseGetJob from '../api/UseGetJob'
-import { Collaborator, Job } from '../api/UseJobs'
+import { Job } from '../api/UseJobs'
 import { renderAddress } from '../utils/RenderAddress'
 import { openMap } from '../utils/OpenMap'
 import { DetailSection, SectionContainer, SectionTitle } from '../components/DetailSection'
@@ -15,9 +16,9 @@ import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import DefaultButton from '../components/DefaultButton'
 import { MapButton } from '../components/MapButton'
 import { getInitials } from '../utils/GetStringInitials'
-import { DeviceEventEmitter, TouchableOpacity } from 'react-native'
 import { capitalizeFirstLetter } from '../utils/CapitalizeFirstLetter'
 import { getUserFromToken } from '../api/Session'
+import { Collaborator } from '../api/UseCustomers'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type JobRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -40,22 +41,22 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [])
 
   useEffect(() => {
-    const renderCollaborators = async () => {
+    const renderCollaborators = async (job: Job) => {
       let user = await getUserFromToken()
-      setCollaborators([{ id: '0', Member: { id: '0', User: user }}])
+      setCollaborators([{ id: '1', Member: { id: '1', User: user }, isYou: true}, ...job.Customer.Collaborator])
     }
 
     switch (useGetJob.status) {
       case 'success':
         if (useGetJob.data.result) {
           setJob(useGetJob.data.result)
-          renderCollaborators()
+          renderCollaborators(useGetJob.data.result)
         }
         break
       default:
         break
     }
-  }, [useGetJob])
+  }, [useGetJob.data])
   
   if (useGetJob.isFetching) {
     return (
@@ -80,7 +81,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           {/* Invoices */}
           <SectionContainer>
             <SectionTitle>Invoices</SectionTitle>
-            <InvoiceListContainer>
+            <InlineListContainer>
               <FlatList
                   data={job?.Invoice}
                   keyExtractor={(item) => item.id}
@@ -92,7 +93,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                 <DefaultButton label='+ New Estimate / Invoice' onPress={() => {
                   navigation.navigate('InvoiceScreen', { job: job })
                 }}/>
-            </InvoiceListContainer>
+            </InlineListContainer>
           </SectionContainer>
           <DetailSection title='Address' value={renderAddress(job?.address)} customRightComponent={
               <MapButton/>
@@ -102,18 +103,18 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           {/* Collaborators */}
           <SectionContainer>
             <SectionTitle>Collaborators</SectionTitle>
-            <InvoiceListContainer>
+            <InlineListContainer>
               <VStack space={collaborators.length > 0 ? 4 : 0}>
                 <FlatList
                     data={collaborators}
                     keyExtractor={(item) => item.id}
                     ItemSeparatorComponent={() => <DividerWrapper><Divider/></DividerWrapper>}
-                    renderItem={({ item }) => (
+                    renderItem={({ item }) => (                      
                       <TouchableOpacity>
                         <HStack alignItems={'center'}>
                           <HStack space={2}>
                             <Avatar>{getInitials(item?.Member.User.first_name + ' ' + item?.Member.User.last_name)}</Avatar>
-                            <CollaboratorNameText>{item?.Member.User.first_name + ' ' + item?.Member.User.last_name}</CollaboratorNameText>
+                            <CollaboratorNameText>{item?.Member.User.first_name + ' ' + item?.Member.User.last_name + (item?.isYou ? ' (you)' : '')}</CollaboratorNameText>
                           </HStack>
                           <Spacer/>
                           <CollaboratorDisclosureContainer>
@@ -125,7 +126,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                   />
                   <DefaultButton label='Add Member'/>
                 </VStack>
-            </InvoiceListContainer>
+            </InlineListContainer>
           </SectionContainer>
           <Spacer/>
         </VStack>
@@ -138,7 +139,7 @@ const DividerWrapper = styled.View`
   padding-vertical: 12px;
 `
 
-const InvoiceListContainer = styled.View`
+const InlineListContainer = styled.View`
   padding: 16px;
 `
 
