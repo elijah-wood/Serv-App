@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
-import { Avatar, Divider, FlatList, HStack, Spacer, VStack, View } from 'native-base'
+import { Avatar, ChevronRightIcon, Divider, FlatList, HStack, Spacer, VStack, View } from 'native-base'
 import { ScrollView } from 'react-native-virtualized-view'
 
 import { RootStackParamList } from '../../App'
 import UseGetJob from '../api/UseGetJob'
-import { Job } from '../api/UseJobs'
+import { Collaborator, Job } from '../api/UseJobs'
 import { renderAddress } from '../utils/RenderAddress'
 import { openMap } from '../utils/OpenMap'
 import { DetailSection, SectionContainer, SectionTitle } from '../components/DetailSection'
@@ -15,8 +15,9 @@ import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import DefaultButton from '../components/DefaultButton'
 import { MapButton } from '../components/MapButton'
 import { getInitials } from '../utils/GetStringInitials'
-import { DeviceEventEmitter } from 'react-native'
+import { DeviceEventEmitter, TouchableOpacity } from 'react-native'
 import { capitalizeFirstLetter } from '../utils/CapitalizeFirstLetter'
+import { getUserFromToken } from '../api/Session'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type JobRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -29,6 +30,7 @@ type Props = {
 const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const useGetJob = UseGetJob(route.params.jobId)
   const [job, setJob] = useState<Job>()
+  const [collaborators, setCollaborators] = useState<Collaborator[]>([])
 
   useEffect(() => {
     DeviceEventEmitter.addListener("event.refetchInvoices", () => useGetJob.refetch())
@@ -38,10 +40,16 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [])
 
   useEffect(() => {
+    const renderCollaborators = async () => {
+      let user = await getUserFromToken()
+      setCollaborators([{ id: '0', Member: { id: '0', User: user }}])
+    }
+
     switch (useGetJob.status) {
       case 'success':
         if (useGetJob.data.result) {
           setJob(useGetJob.data.result)
+          renderCollaborators()
         }
         break
       default:
@@ -95,18 +103,28 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <SectionContainer>
             <SectionTitle>Collaborators</SectionTitle>
             <InvoiceListContainer>
-              <FlatList
-                  data={job?.Customer.Collaborator}
-                  keyExtractor={(item) => item.id}
-                  ItemSeparatorComponent={() => <Divider/>}
-                  renderItem={({ item }) => (
-                    <HStack>
-                      <Avatar>{getInitials(item?.Member.User.first_name + ' ' + item?.Member.User.last_name)}</Avatar>
-                      <TitleText>{item?.Member.User.first_name + ' ' + item?.Member.User.last_name}</TitleText>
-                    </HStack>
-                  )}
-                />
-                <DefaultButton label='Add Member'/>
+              <VStack space={collaborators.length > 0 ? 4 : 0}>
+                <FlatList
+                    data={collaborators}
+                    keyExtractor={(item) => item.id}
+                    ItemSeparatorComponent={() => <DividerWrapper><Divider/></DividerWrapper>}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity>
+                        <HStack alignItems={'center'}>
+                          <HStack space={2}>
+                            <Avatar>{getInitials(item?.Member.User.first_name + ' ' + item?.Member.User.last_name)}</Avatar>
+                            <CollaboratorNameText>{item?.Member.User.first_name + ' ' + item?.Member.User.last_name}</CollaboratorNameText>
+                          </HStack>
+                          <Spacer/>
+                          <CollaboratorDisclosureContainer>
+                              <ChevronRightIcon />
+                          </CollaboratorDisclosureContainer>
+                        </HStack>
+                      </TouchableOpacity>                   
+                    )}
+                  />
+                  <DefaultButton label='Add Member'/>
+                </VStack>
             </InvoiceListContainer>
           </SectionContainer>
           <Spacer/>
@@ -116,12 +134,26 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   )
 }
 
+const DividerWrapper = styled.View`
+  padding-vertical: 12px;
+`
+
 const InvoiceListContainer = styled.View`
   padding: 16px;
 `
 
 const PaddedActivityIndicator = styled.ActivityIndicator`
   padding: 12px;
+`
+
+const CollaboratorNameText = styled.Text`
+  font-size: 17px;
+  align-self: center;
+`
+
+const CollaboratorDisclosureContainer = styled.View`
+  padding-vertical: 16px;
+  padding-right: 16px;
 `
 
 const TitleText = styled.Text`

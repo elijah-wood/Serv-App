@@ -57,8 +57,8 @@ const JobFlexFillWidth = styled.View`
 
 const JobContainerView = styled.View<{ showBorder: boolean }>`
   width: 100%;
-  padding-horizontal: 15px;
-  padding-top: 15px;
+  padding-horizontal: 16px;
+  padding-top: 16px;
   ${props => props.showBorder ? 'border: grey; border-radius: 9px;' : ''};
 `
 

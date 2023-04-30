@@ -20,7 +20,6 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
   const useJobs = UseJobs()
   const [search, setSearch] = useState("")
   const [groupedJobs, setGroupedJobs] = useState<{ title: string, data: Job[], hidden: boolean}[]>([{ title: '', data: [], hidden: false}])
-  const [animatedValue] = useState(new Animated.Value(0))
 
   useEffect(() => {
     DeviceEventEmitter.addListener("event.refetchJobs", () => useJobs.refetch() )
@@ -136,8 +135,8 @@ const GroupStatus = styled.Text`
   font-size: 21px;
   font-weight: bold;
   color: #007AFF;
-  padding-top: 15px;
-  padding-horizontal: 15px;
+  padding-top: 16px;
+  padding-horizontal: 16px;
 `
 
 const PaddedActivityIndicator = styled.ActivityIndicator`
