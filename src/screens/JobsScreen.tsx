@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { SearchBar } from '@rneui/themed'
-import { DeviceEventEmitter, FlatList, RefreshControl, Animated } from 'react-native'
-import { HStack, Spacer, View } from 'native-base'
-import { ScrollView } from 'react-native-virtualized-view'
+import { DeviceEventEmitter, RefreshControl, Animated, SectionListData, SectionList } from 'react-native'
+import { HStack, Spacer } from 'native-base'
 
 import { RootStackParamList } from '../../App'
 import UseJobs, { Job } from '../api/UseJobs'
@@ -20,7 +19,8 @@ type Props = {
 const JobsScreen: React.FC<Props> = ({ navigation }) => {
   const useJobs = UseJobs()
   const [search, setSearch] = useState("")
-  const [groupedJobs, setGroupedJobs] = useState<{ status: string, jobs: Job[]}[]>()
+  const [groupedJobs, setGroupedJobs] = useState<{ title: string, data: Job[], hidden: boolean}[]>([{ title: '', data: [], hidden: false}])
+  const [animatedValue] = useState(new Animated.Value(0))
 
   useEffect(() => {
     DeviceEventEmitter.addListener("event.refetchJobs", () => useJobs.refetch() )
@@ -50,14 +50,51 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
     }, {} as Record<string, Job[]>)
   
     const sortedGroups = [
-      { status: 'Prospect', jobs: groups['prospect'] || [] },
-      { status: 'Estimated', jobs: groups['estimated'] || [] },
-      { status: 'Scheduled', jobs: groups['scheduled'] || [] },
-      { status: 'Invoice Sent', jobs: groups['invoiced'] || [] },
-      { status: 'Completed', jobs: groups['completed'] || [] },
+      { title: 'Prospect', data: groups['prospect'] || [], hidden: false },
+      { title: 'Estimated', data: groups['estimated'] || [], hidden: false },
+      { title: 'Scheduled', data: groups['scheduled'] || [], hidden: false },
+      { title: 'Invoiced', data: groups['invoiced'] || [], hidden: false },
+      { title: 'Completed', data: groups['completed'] || [], hidden: false },
     ]
-  
-    return sortedGroups.filter(group => group.jobs.length > 0)
+
+    return sortedGroups.filter(group => group.data.length > 0)
+  }
+
+  const toggleJobs = (index: number) => {
+    // Animated.timing(animatedValue, {
+    //   toValue: animatedValue === new Animated.Value(0) ? 1 : 0,
+    //   duration: 300,
+    //   useNativeDriver: true,
+    // }).start(() => {
+    //   const newData = [...groupedJobs]
+    //   newData[index].hidden = !newData[index].hidden
+    //   setGroupedJobs(newData)
+    // })
+  }
+
+  const renderSectionHeader = ({ section }: { section: SectionListData<Job> }) => {
+    const jobCount = section.data.length
+    const status = section.title
+
+    return (
+      <TouchableOpacity onPress={() => toggleJobs(section.index)}>
+        <SectionHeaderContainer>
+          <HStack>
+            <GroupStatus>{status}</GroupStatus>
+            <Spacer/>
+            <GroupStatus>{`${jobCount}`}</GroupStatus>
+          </HStack>
+        </SectionHeaderContainer>
+      </TouchableOpacity>
+    )
+  }
+
+  const renderItem = ({ item }: { item: Job }) => {
+    return (
+      <JobRow showBorder={false} job={item} customer={item.Customer} key={item.id} onPress={() => {
+        navigation.navigate('JobDetailScreen', { jobId: item.id })
+      }}/>
+    )
   }
 
   if (useJobs.isLoading) {
@@ -68,27 +105,6 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
     )
   }
 
-  const renderStatusGroup = ({ item }: { item: { status: string, jobs: Job[] } }) => (
-    <View>
-      <TouchableOpacity>
-        <HStack>
-          <GroupStatus>{item.status}</GroupStatus>
-          <Spacer/>
-          <GroupStatusJobCount>{`${item.jobs.length}`}</GroupStatusJobCount>
-        </HStack>
-      </TouchableOpacity>    
-      <FlatList
-        data={item.jobs}
-        keyExtractor={(job) => job.id}
-        renderItem={({ item }) => (
-          <JobRow showBorder={false} job={item} customer={item.Customer} key={item.id} onPress={() => {
-            navigation.navigate('JobDetailScreen', { jobId: item.id })
-          }}/>
-        )}
-      />
-    </View>
-  )
-
   return (
     <ContainerView>
         <SearchBar
@@ -97,29 +113,26 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
           onChangeText={setSearch}
           value={search}
         />
-      <ScrollView         
-        refreshControl={
-          <RefreshControl refreshing={useJobs.isFetching} onRefresh={() => useJobs.refetch()}/>
-        }>
-          <FlatList
-            data={groupedJobs}
-            keyExtractor={(item) => item.status}
-            renderItem={renderStatusGroup}
-          />
-      </ScrollView>    
+        <SectionList
+          refreshControl={
+            <RefreshControl refreshing={useJobs.isFetching} onRefresh={() => useJobs.refetch()}/>
+          }
+          refreshing={useJobs.isFetching}
+          sections={groupedJobs}
+          keyExtractor={item => item.id}
+          renderItem={renderItem}
+          renderSectionHeader={renderSectionHeader}
+          stickySectionHeadersEnabled={true}
+        />
     </ContainerView>
   )
 }
 
-const GroupStatus = styled.Text`
-  font-size: 21px;
-  font-weight: bold;
-  color: #007AFF;
-  padding-top: 15px;
-  padding-horizontal: 15px;
+const SectionHeaderContainer = styled.View`
+  background: white;
 `
 
-const GroupStatusJobCount = styled.Text`
+const GroupStatus = styled.Text`
   font-size: 21px;
   font-weight: bold;
   color: #007AFF;
