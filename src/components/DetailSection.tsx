@@ -17,7 +17,7 @@ export const DetailSection: React.FC<Props> = ({
   }) => {
     return (
         <SectionContainer>
-            <TouchableOpacity onPress={onPress}>
+            <TouchableOpacity onPress={onPress} disabled={props.disabled}>
                 <HStack alignItems={'center'}>
                     <VStack>
                         <SectionTitle>{props.title}</SectionTitle>

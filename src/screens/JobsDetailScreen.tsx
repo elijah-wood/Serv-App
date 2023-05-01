@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
-import { Avatar, ChevronRightIcon, Divider, FlatList, HStack, Spacer, VStack, View } from 'native-base'
+import { Avatar, Box, ChevronRightIcon, Divider, FlatList, HStack, Spacer, VStack, View } from 'native-base'
 import { ScrollView } from 'react-native-virtualized-view'
 import { DeviceEventEmitter, TouchableOpacity } from 'react-native'
+import SelectDropdown from 'react-native-select-dropdown'
 
 import { RootStackParamList } from '../../App'
 import UseGetJob from '../api/UseGetJob'
@@ -31,6 +32,7 @@ type Props = {
 const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const useGetJob = UseGetJob(route.params.jobId)
   const [job, setJob] = useState<Job>()
+  const [status, setStatus] = useState('')
   const [collaborators, setCollaborators] = useState<Collaborator[]>([])
 
   useEffect(() => {
@@ -50,6 +52,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       case 'success':
         if (useGetJob.data.result) {
           setJob(useGetJob.data.result)
+          setStatus(useGetJob.data.result.status)
           renderCollaborators(useGetJob.data.result)
         }
         break
@@ -72,9 +75,20 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <DetailSection title='Description' value={job?.description ?? ''} onPress={() => {
             
           }}/>
-          <DetailSection title='Status' value={capitalizeFirstLetter(job?.status ?? '')} showDisclosure={true} onPress={() => {
-            
-          }}/>
+           <SelectDropdown
+              data={['Prospect', 'Estimated', 'Scheduled', 'Invoiced', 'Completed']}
+              onSelect={(selectedItem) => {
+                setStatus(selectedItem.toLowerCase())
+              }}
+              renderCustomizedButtonChild={(selectedItem, index) => {
+                return (       
+                  <DetailSection title='Status' value={capitalizeFirstLetter(status ?? '')} showDisclosure={true} disabled={true}/>                    
+                )
+              }}
+              // Height shouldn't be a fixed value here, but this is the only way it will fill right now
+              buttonStyle={{ width: '100%', paddingHorizontal: 0, height: 85 }}
+              />
+
           <DetailSection title='Customer' value={renderCustomerFullName(job?.Customer)} color={'#0062FF'} onPress={() => {
             navigation.navigate('CustomerDetailScreen', { customerId: job?.customer_id })
           }}/>
