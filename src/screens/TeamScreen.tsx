@@ -1,11 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
+import { ScrollView } from 'react-native-virtualized-view'
+import { VStack } from 'native-base'
+import { Alert, View } from 'react-native'
+import { CommonActions } from '@react-navigation/native'
+
+// Conditionally import
+let Clipboard
+try {
+  Clipboard = require('@react-native-clipboard/clipboard').Clipboard
+} catch {
+  Clipboard = View
+}
 
 import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
-import { removeUserSession } from '../api/Session'
-import { CommonActions } from '@react-navigation/native'
+import { getUserFromToken, removeUserSession } from '../api/Session'
+import { DetailSection } from '../components/DetailSection'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'TeamScreen'>
 
@@ -14,39 +26,69 @@ type Props = {
 }
 
 const TeamScreen: React.FC<Props> = ({ navigation }) => {
+  const [servPhone, setServPhone] = useState('')
 
-    const signOut = async () => { 
-        await removeUserSession()
-        navigation.dispatch(
-            // Reset stack for Android
-            CommonActions.reset({
-                index: 1,
-                routes: [{ name: 'Account' }],
-            })
-          )
+  useEffect(() => {
+    const getUserInfo = async () => {
+      let user = await getUserFromToken()
+      setServPhone(user.team.twilio_phone_number)
     }
-    
+
+    getUserInfo()
+  }, [])
+
+  const signOut = async () => { 
+      await removeUserSession()
+      navigation.dispatch(
+          // Reset stack for Android
+          CommonActions.reset({
+              index: 1,
+              routes: [{ name: 'Account' }],
+          })
+        )
+  }
+  
   return (
     <ContainerView>
-      <ScrollViewWrapper>
-        <ScrollView>
-            <DefaultButton label='Log out' onPress={signOut}/>
-        </ScrollView>
-      </ScrollViewWrapper>
+      <ScrollView>
+        <VStack>
+          <ServNumberWrapper>
+            <DetailSection title='Serv Number' value={servPhone} color={'#0062FF'} onPress={() => {
+                Clipboard.setString(servPhone)
+                Alert.alert('Copied to clipboard!')
+            }}/>
+          </ServNumberWrapper>
+          <PaddedContainer>
+            <ServNumberSubtitle>
+              Give this number to customers in order to ensure that they can reach you via Serv.
+            </ServNumberSubtitle>
+          </PaddedContainer>
+        </VStack>     
+        <PaddedContainer>
+          <DefaultButton label='Log out' onPress={signOut}/>
+        </PaddedContainer>        
+      </ScrollView>
     </ContainerView>
   )
 }
+
+const ServNumberWrapper = styled.View`
+  padding-top: 16px;
+`
+
+const ServNumberSubtitle = styled.Text`
+  font-size: 13px;
+  color: gray;
+`
+
+const PaddedContainer = styled.View`
+  padding: 16px;
+`
 
 const ContainerView = styled.View`
   background-color: transparent;
   height: 100%;
   width: 100%;
-`
-
-const ScrollViewWrapper = styled.SafeAreaView``
-
-const ScrollView = styled.ScrollView`
-    padding: 10px;
 `
 
 export default TeamScreen

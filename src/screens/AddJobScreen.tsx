@@ -131,13 +131,6 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
                   buttonTextStyle={{ textAlign: 'left', fontSize: 16, marginLeft: 3 }}
                   defaultValue={'Prospect'}
                   />
-
-                  {/* <TextInput
-                      onChangeText={onChange}
-                      value={value}
-                      onBlur={onBlur}
-                      placeholder="Status"
-                  /> */}
                 </TextInputWrapper>
               )}
               name="status"

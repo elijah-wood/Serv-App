@@ -1,9 +1,14 @@
 type UserResponse = {
-    id: string
-    first_name: string
-    last_name?: string
-    email?: string
-  }
+  id: string
+  first_name: string
+  last_name?: string
+  email?: string
+  team?: Team
+}
   
-  export type { UserResponse }
+type Team = {
+  twilio_phone_number: string
+}
+
+export type { UserResponse }
   

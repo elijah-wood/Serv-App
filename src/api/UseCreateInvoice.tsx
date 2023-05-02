@@ -2,10 +2,14 @@ import { UseMutationResult, useMutation } from 'react-query'
 import { API } from './API'
 
 type CreateInvoiceInput = {
+    customer_id: string
+    job_id: string
+    price: number
     items: InvoiceItem[]
 }
 
 type InvoiceItem = {
+    quantity: number
     description: string
     unit_amount: number
     amount: number

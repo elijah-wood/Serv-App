@@ -68,6 +68,34 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
         setGrandTotal(itemTotals.current.reduce((accumulator, a) => accumulator + a, 0))
     }
 
+    const onSubmit = () => {
+        let items: Item[] = []
+        itemRefs.current.forEach(ref => { 
+            if (ref !== null) {                                        
+                items.push(ref.get()) 
+            }                                    
+        })
+        // Check if descriptions are filled out
+        items.forEach(item => {
+            if (item.name == '') {
+                Alert.alert('Please fill out all descriptions')
+                return
+            }
+        })
+        if (isNaN(grandTotal)) {
+            Alert.alert('Please make sure all prices and quantities are filled out correctly')
+            return
+        }
+        useCreateInvoice.mutate({ 
+            customer_id: job.Customer.id,
+            job_id: job.id,
+            price: grandTotal,
+            items: items.map(item => {                                     
+                return { description: item.name, unit_amount: item.price, amount: item.price * item.quantity, quantity: item.quantity } as InvoiceItemAPI 
+            }
+        )})
+    }
+
     return (
         <>
             <DatePicker
@@ -146,15 +174,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                         </Box>     
                         <Box flex={1}>
                             <DefaultButton loading={useCreateInvoice.isLoading} label='Send Invoice' onPress={() => {
-                                let items: Item[] = []
-                                itemRefs.current.forEach(ref => { 
-                                    if (ref !== null) {                                        
-                                        items.push(ref.get()) 
-                                    }                                    
-                                })
-                                useCreateInvoice.mutate({ items: items.map(item => {                                     
-                                    return { description: item.name, unit_amount: item.price, amount: item.price * item.quantity } as InvoiceItemAPI 
-                                })})
+                                onSubmit()
                             }}/>
                         </Box>                                                                 
                     </Flex>              
@@ -201,7 +221,7 @@ const InvoiceItem: React.FC<InvoiceItemProps> = forwardRef((props, ref) => {
         setQuantity(props.item.quantity.toString())
     }, [props.item])
 
-    const total = (price * 100) * parseFloat(quantity)
+    const total = price * parseFloat(quantity)
 
     useEffect(() => {
         props.onUpdate(total)
@@ -233,8 +253,8 @@ const InvoiceItem: React.FC<InvoiceItemProps> = forwardRef((props, ref) => {
                 <Box width={'33.3%'} alignSelf={'flex-left'}>
                     <CurrencyInput
                         style={{ fontSize: 17 }}                        
-                        value={price}
-                        onChangeValue={setPrice}
+                        value={price / 100}
+                        onChangeValue={value => setPrice(value * 100)}
                         prefix="$"
                         delimiter=","
                         separator="."
