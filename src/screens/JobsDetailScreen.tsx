@@ -106,7 +106,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                     ItemSeparatorComponent={() => <View style={{ height: 16 }}/>}
                     renderItem={(item) => (                    
                       <InvoiceCell invoice={item.item} onPress={() => {
-                        navigation.navigate('InvoiceScreen', { job: job })
+                        navigation.navigate('InvoiceScreen', { job: job, invoice: item.item })
                       }}/>
                     )}
                   />

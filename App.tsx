@@ -10,7 +10,7 @@ import * as Sentry from '@sentry/react-native'
 
 import { RootNavigator } from './src/navigation/RootNavigator'
 import TokenIntercepter from './src/api/TokenIntercepter'
-import { Job } from './src/api/UseJobs'
+import { Invoice, Job } from './src/api/UseJobs'
 
 AppRegistry.registerComponent(expo.name, () => App)
 
@@ -33,7 +33,7 @@ type RootStackParamList = {
   ChatDetail: { conversationSid: string, name: string }
   TeamScreen: undefined
   AnalyticsScreen: undefined
-  InvoiceScreen: { job: Job }
+  InvoiceScreen: { job: Job, invoice?: Invoice }
 }
 
 const queryClient = new QueryClient()

@@ -31,7 +31,7 @@ type InvoiceItem = {
 }
 
 const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
-    const { job } = route.params
+    const { job, invoice } = route.params
     const useCreateInvoice = UseCreateInvoice()
 
     const [date, setDate] = useState(new Date())
@@ -48,7 +48,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
         }
     }, [useCreateInvoice])
 
-    const [items, setItems] = useState<Item[]>([{ name: '', price: 0, quantity: 1 }])
+    const [items, setItems] = useState<Item[]>(invoice ? invoice.InvoiceItem.map(item => { return { name: item.description, price: item.unit_amount, quantity: item.quantity } }) : [{ name: '', price: 0, quantity: 1 }])
     const [grandTotal, setGrandTotal] = useState(0)
     const itemRefs = useRef<InvoiceItemHandle[]>([])  
     const itemTotals = useRef<number[]>([])
