@@ -16,7 +16,7 @@ export const Thread: React.FC<ThreadProps> = ({
   }) => {
     const [unreadState, setUnreadState] = useState(false)
     const [name, setName] = useState('Unknown')
-    const [lastMessage, setLastMessage] = useState('New Conversation')
+    const [lastMessage, setLastMessage] = useState('New Customer')
   
     const getMostRecentMessage = async (): Promise<string> => {
       let messagesPaginator = await props.conversation.getMessages(1)

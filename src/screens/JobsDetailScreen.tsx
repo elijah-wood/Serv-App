@@ -9,7 +9,7 @@ import SelectDropdown from 'react-native-select-dropdown'
 
 import { RootStackParamList } from '../../App'
 import UseGetJob from '../api/UseGetJob'
-import { Job } from '../api/UseJobs'
+import { Invoice, Job } from '../api/UseJobs'
 import { renderAddress } from '../utils/RenderAddress'
 import { openMap } from '../utils/OpenMap'
 import { DetailSection, SectionContainer, SectionTitle } from '../components/DetailSection'
@@ -20,6 +20,7 @@ import { getInitials } from '../utils/GetStringInitials'
 import { capitalizeFirstLetter } from '../utils/CapitalizeFirstLetter'
 import { getUserFromToken } from '../api/Session'
 import { Collaborator } from '../api/UseCustomers'
+import { InvoiceCell } from '../components/InvoiceCell'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type JobRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -96,17 +97,23 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <SectionContainer>
             <SectionTitle>Invoices</SectionTitle>
             <InlineListContainer>
-              <FlatList
-                  data={job?.Invoice}
-                  keyExtractor={(item) => item.id}
-                  ItemSeparatorComponent={() => <View style={{height: 16}}/>}
-                  renderItem={({ item }) => (
-                    <TitleText>{item.id}</TitleText>
-                  )}
-                />
-                <DefaultButton label='+ New Estimate / Invoice' onPress={() => {
-                  navigation.navigate('InvoiceScreen', { job: job })
-                }}/>
+              {/* <VStack space={job.Invoice.length > 0 ? 4 : 0}> */}
+              <VStack space={4}>
+                <FlatList
+                    // data={job?.Invoice}
+                    data={[{ id: '0', number: 'EW-001', price: 25000, job_id: '', Payment: [], InvoiceItem: [{"amount": 25000, "description": "Hours", "quantity": 10, "unit_amount": 2500}]} as Invoice]}
+                    keyExtractor={(item) => item.id}
+                    ItemSeparatorComponent={() => <View style={{ height: 16 }}/>}
+                    renderItem={(item) => (                    
+                      <InvoiceCell invoice={item.item} onPress={() => {
+                        navigation.navigate('InvoiceScreen', { job: job })
+                      }}/>
+                    )}
+                  />
+                  <DefaultButton label='+ New Estimate / Invoice' onPress={() => {
+                    navigation.navigate('InvoiceScreen', { job: job })
+                  }}/>
+                </VStack>
             </InlineListContainer>
           </SectionContainer>
           <DetailSection title='Address' value={renderAddress(job?.address)} customRightComponent={
