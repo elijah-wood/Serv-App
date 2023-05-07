@@ -97,11 +97,9 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <SectionContainer>
             <SectionTitle>Invoices</SectionTitle>
             <InlineListContainer>
-              {/* <VStack space={job.Invoice.length > 0 ? 4 : 0}> */}
-              <VStack space={4}>
+              <VStack space={job?.Invoice.length > 0 ? 4 : 0}>
                 <FlatList
-                    // data={job?.Invoice}
-                    data={[{ id: '0', number: 'EW-001', price: 25000, job_id: '', Payment: [], InvoiceItem: [{"amount": 25000, "description": "Hours", "quantity": 10, "unit_amount": 2500}]} as Invoice]}
+                    data={job?.Invoice}
                     keyExtractor={(item) => item.id}
                     ItemSeparatorComponent={() => <View style={{ height: 16 }}/>}
                     renderItem={(item) => (                    

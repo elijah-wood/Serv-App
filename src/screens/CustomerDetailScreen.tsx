@@ -21,6 +21,7 @@ import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import { MapButton } from '../components/MapButton'
 import DefaultButton from '../components/DefaultButton'
 import { Job } from '../api/UseJobs'
+import { renderPhoneNumber } from '../utils/RenderPhoneNumber'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
 type CustomerRouteProp = RouteProp<RootStackParamList, 'CustomerDetailScreen'>
@@ -84,7 +85,7 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           } onPress={() => {
             openMap(customer?.address)
           }}/>
-          <DetailSection title='Phone' value={customer?.phone ?? ''} color={'#0062FF'} onPress={() => {
+          <DetailSection title='Phone' value={renderPhoneNumber(customer?.phone)} color={'#0062FF'} onPress={() => {
             makeCall(customer?.phone)
           }}/>
           <DetailSection title='Email' value={customer?.email ?? ''} color={'#0062FF'} onPress={() => {
@@ -98,7 +99,7 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                 <FlatList
                   data={jobs}
                   keyExtractor={(item) => item.id}
-                  ItemSeparatorComponent={() => <View style={{height: 16}}/>}
+                  ItemSeparatorComponent={() => <View style={{ height: 16 }}/>}
                   renderItem={({ item }) => (
                     <JobRow showBorder={true} job={item} customer={customer} onPress={() => {
                       navigation.navigate('JobDetailScreen', { jobId: item.id })

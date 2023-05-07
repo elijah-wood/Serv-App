@@ -106,12 +106,12 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <ContainerView>
-        <SearchBar
+        {/* <SearchBar
           platform="ios"
           placeholder="Search Job Name"
           onChangeText={setSearch}
           value={search}
-        />
+        /> */}
         <SectionList
           refreshControl={
             <RefreshControl refreshing={useJobs.isFetching} onRefresh={() => useJobs.refetch()}/>

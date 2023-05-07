@@ -1,7 +1,6 @@
 import React from 'react'
 import { Image } from 'react-native'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
@@ -17,7 +16,7 @@ import JobDetailScreen from '../screens/JobsDetailScreen'
 import AnalyticsScreen from '../screens/AnalyticsScreen'
 import TeamScreen from '../screens/TeamScreen'
 import AddJobScreen from '../screens/AddJobScreen'
-import InvoiceScreen from '../screens/NewInvoiceScreen'
+import InvoiceScreen from '../screens/InvoiceScreen'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'HomeNavigator'>
 

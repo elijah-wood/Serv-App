@@ -5,6 +5,7 @@ type CreateInvoiceInput = {
     customer_id: string
     job_id: string
     price: number
+    due_date: number
     items: InvoiceItem[]
 }
 
@@ -12,7 +13,6 @@ type InvoiceItem = {
     quantity: number
     description: string
     unit_amount: number
-    amount: number
 }
 
 type CreateInvoiceResponse = {
@@ -21,7 +21,6 @@ type CreateInvoiceResponse = {
 
 const UseCreateInvoice = (): UseMutationResult<CreateInvoiceResponse, Error, CreateInvoiceInput> => {
     return useMutation<CreateInvoiceResponse, Error, CreateInvoiceInput>(async values => {
-        console.log(values)
         return API.createInvoice(values)
     })
 }

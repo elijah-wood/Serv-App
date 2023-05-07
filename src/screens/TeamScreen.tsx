@@ -18,6 +18,7 @@ import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
 import { getUserFromToken, removeUserSession } from '../api/Session'
 import { DetailSection } from '../components/DetailSection'
+import { renderPhoneNumber } from '../utils/RenderPhoneNumber'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'TeamScreen'>
 
@@ -53,8 +54,8 @@ const TeamScreen: React.FC<Props> = ({ navigation }) => {
       <ScrollView>
         <VStack>
           <ServNumberWrapper>
-            <DetailSection title='Serv Number' value={servPhone} color={'#0062FF'} onPress={() => {
-                Clipboard.setString(servPhone)
+            <DetailSection title='Serv Number' value={renderPhoneNumber(servPhone)} color={'#0062FF'} onPress={() => {
+                Clipboard.setString(renderPhoneNumber(servPhone))
                 Alert.alert('Copied to clipboard!')
             }}/>
           </ServNumberWrapper>

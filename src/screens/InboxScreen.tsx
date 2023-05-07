@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { FlatList } from 'react-native'
+import { Alert, FlatList } from 'react-native'
 import { Icon, IconButton } from 'native-base'
+import { useFocusEffect } from '@react-navigation/native'
+import { Client, Conversation, Paginator, Message } from '@twilio/conversations'
 
 import { RootStackParamList } from '../../App'
 import { TwilioService } from '../twilio/TwilioService'
 import { API } from '../api/API'
-import { Client, Conversation, Paginator, Message } from '@twilio/conversations'
 import { Thread } from '../components/ConversationThread'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
@@ -19,8 +20,10 @@ type Props = {
 const InboxScreen: React.FC<Props> = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [conversations, setConversations] = useState<Conversation[]>([])
-
+  const [userViewingConversationSid, setUserViewingConversationSid] = useState<string>()
   const conversationPaginator = useRef<Paginator<Conversation>>()
+
+  // const focusedConversationSid = useRef<string>()
 
   useEffect(() => {
     setIsLoading(true)
@@ -40,6 +43,13 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
       TwilioService.serviceInstance.clientShutdown()
     }
   }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      // Reset focused conversation
+      setUserViewingConversationSid(null)
+    }, [])
+  )
   
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -53,21 +63,21 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
 
   const setChannelEvents = useCallback(
     (client) => {
-      client.on('messageAdded', (message: Message) => {
+      client.on('messageAdded', (message: Message) => {        
         setConversations((prevConversations) =>
           prevConversations.map((conversation) => {
             if (conversation.sid === message.conversation.sid && conversation.lastMessage != undefined) {
               let updatedConvo = conversation
-              updatedConvo.lastMessage.dateCreated = message.dateCreated
+              updatedConvo.lastMessage.dateCreated = message.dateCreated  
               return updatedConvo
             } else {
               return conversation
             }
           })
-        )
+        )    
       })
       client.on('conversationAdded', (conversation: Conversation) => {
-        setConversations([conversation, ...conversations])
+        setConversations((prevConversations) => [conversation, ...prevConversations])        
       })
       return client
     },
@@ -78,11 +88,14 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
     async (client: Client) => {
       client.on('stateChanged', async (state) => {
         if (state === 'initialized') {
-          const conversations = await client.getSubscribedConversations()
-          conversationPaginator.current = conversations
-          setConversations(conversations.items)
+          const subscribedConversations = await client.getSubscribedConversations()
+          conversationPaginator.current = subscribedConversations
+          // Conversations set during conversationAdded event
           setIsLoading(false)
         } 
+        if (state == 'failed') {
+          Alert.alert("Something went wrong.")
+        }
       })
     },
     [],
@@ -119,8 +132,9 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
           return +new Date(dateB) - +new Date(dateA)
         })}
         keyExtractor={(item) => item.sid}
-        renderItem={({ item }) => (
-          <Thread conversation={item} onPress={(name: string) => {
+        renderItem={({ item }) => (          
+          <Thread conversation={item} userViewingConversationSid={userViewingConversationSid} onPress={(name: string) => {
+            setUserViewingConversationSid(item.sid)
             navigation.navigate('ChatDetail', { conversationSid: item.sid, name: name})
           }}/>
         )}

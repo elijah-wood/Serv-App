@@ -1,8 +1,9 @@
 import styled from 'styled-components/native'
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { Divider, HStack, VStack } from "native-base"
+import { useEffect, useState } from 'react'
 
-import { Invoice } from "../api/UseJobs"
+import { Invoice } from '../api/UseJobs'
 
 type InvoiceProps = {
     invoice: Invoice
@@ -10,52 +11,69 @@ type InvoiceProps = {
 }
 
 export const InvoiceCell: React.FC<InvoiceProps> = ({
-...props
+    ...props
 }) => {
+    const [totalPrice, setTotalPrice] = useState('')
 
-return (
-    <JobContainerView showBorder={true}>
-        <TouchableOpacity onPress={props.onPress}>
-        <VStack space={5}>
-            <HStack space={2}>
-                <JobFlexFillWidth>
-                    <JobTitle>${props.invoice.price / 100}</JobTitle>            
-                    <JobSubtitle>{'Estimate'}</JobSubtitle>
-                    <JobSubtitle>{props.invoice.number}</JobSubtitle>
-                    <JobSubtitle>{'May 1 at 3:14pm'}</JobSubtitle>
-                </JobFlexFillWidth>
-                {/* <Avatar>
-                    {getInitials(renderCustomerFullName(props.customer))}
-                </Avatar> */}
-            </HStack>
-            <Divider/>        
-        </VStack>
-        </TouchableOpacity>
-    </JobContainerView>
-)
+    const renderDate = (dateString: string): string => {
+        let date = new Date(dateString)
+        return date.toLocaleString()
+    }
+
+    useEffect(() => {
+        const getTotalPrice = async () => {
+            let total = 0
+            console.log(props.invoice)
+            props.invoice?.InvoiceItem?.forEach(item => {
+                let itemPrice = (item.quantity * item.unit_amount) / 100
+                total += itemPrice
+            })
+            setTotalPrice(total.toString())
+        }
+        getTotalPrice()
+    }, [])
+
+    return (
+        <ContainerView showBorder={true}>
+            <TouchableOpacity onPress={props.onPress}>
+            <VStack space={5}>
+                <HStack space={2}>
+                    <FlexFillWidth>
+                        <Title>${totalPrice}</Title>            
+                        <Subtitle>{'Estimate'}</Subtitle>
+                        <Subtitle>{props.invoice.number}</Subtitle>
+                        <Subtitle>{renderDate(props.invoice.created_at)}</Subtitle>
+                    </FlexFillWidth>
+                </HStack>
+                <Divider/>        
+            </VStack>
+            </TouchableOpacity>
+        </ContainerView>
+    )
 }
 
 
-const JobFlexFillWidth = styled.View`
+const FlexFillWidth = styled.View`
   flex: 1;
   row-gap: 5px;
   width: 100%;
 `
 
-const JobContainerView = styled.View<{ showBorder: boolean }>`
+const ContainerView = styled.View<{ showBorder: boolean }>`
   width: 100%;
   padding-horizontal: 16px;
   padding-top: 16px;
   ${props => props.showBorder ? 'border: grey; border-radius: 9px;' : ''};
 `
 
-const JobTitle = styled.Text`
+const Title = styled.Text`
   font-size: 17px;
+  color: #0062FF;
   font-weight: bold;
   text-align: left;
 `
 
-const JobSubtitle = styled.Text`
+const Subtitle = styled.Text`
   font-size: 15px;
   text-align: left;
 `

@@ -8,6 +8,7 @@ import { getInitials } from '../utils/GetStringInitials'
 
 type ThreadProps = {
     conversation: Conversation
+    userViewingConversationSid: string
     onPress: (name: string) => void
 }
   
@@ -49,7 +50,8 @@ export const Thread: React.FC<ThreadProps> = ({
 
     useEffect(() => {
         const getUnreadCount = async () => {
-          if (props.conversation) {
+          // Don't update unread state if the user is viewing this conversation
+          if (props.conversation && props.conversation.sid != props.userViewingConversationSid) {
               let count = await props.conversation.getUnreadMessagesCount()
               if (count == null) {
                   setUnreadState(true)

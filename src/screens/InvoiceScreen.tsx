@@ -34,7 +34,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
     const { job, invoice } = route.params
     const useCreateInvoice = UseCreateInvoice()
 
-    const [date, setDate] = useState(new Date())
+    const [date, setDate] = useState(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
     const [openDatePicker, setOpenDatePicker] = useState(false)
 
     useEffect(() => {
@@ -90,8 +90,9 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
             customer_id: job.Customer.id,
             job_id: job.id,
             price: grandTotal,
+            due_date: Math.floor(date.getTime() / 1000),
             items: items.map(item => {                                     
-                return { description: item.name, unit_amount: item.price, amount: item.price * item.quantity, quantity: item.quantity } as InvoiceItemAPI 
+                return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
             }
         )})
     }
@@ -170,7 +171,9 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                     </CellContainer>
                     <Flex direction='row' justifyContent={'space-between'} style={{ padding: 12, gap: 12 }}>
                         <Box flex={1}>
-                            <DefaultButton label='Send Estimate'/>
+                            <DefaultButton label='Send Estimate' onPress={() => {
+                                Alert.alert('Coming soon...')
+                            }}/>
                         </Box>     
                         <Box flex={1}>
                             <DefaultButton loading={useCreateInvoice.isLoading} label='Send Invoice' onPress={() => {

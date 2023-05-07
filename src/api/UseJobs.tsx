@@ -23,7 +23,6 @@ type Job = {
 
 type Invoice = {
     id: string
-    price: number
     number: string
     created_at?: string
     job_id: string

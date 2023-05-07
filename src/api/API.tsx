@@ -36,7 +36,6 @@ export const API = {
         return response.data
     },
     createCustomer: async (values: CreateCustomerInput) => {
-        console.log(values)
         const response = await APIClient.post('/customers', values, {
             headers: await AuthenticatedHeaders(),
         })
