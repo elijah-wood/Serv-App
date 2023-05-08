@@ -4,6 +4,7 @@ import { Divider, HStack, VStack } from "native-base"
 import { useEffect, useState } from 'react'
 
 import { Invoice } from '../api/UseJobs'
+import { renderCurrency } from '../utils/RenderCurrency'
 
 type InvoiceProps = {
     invoice: Invoice
@@ -13,7 +14,7 @@ type InvoiceProps = {
 export const InvoiceCell: React.FC<InvoiceProps> = ({
     ...props
 }) => {
-    const [totalPrice, setTotalPrice] = useState('')
+    const [totalPrice, setTotalPrice] = useState(0)
 
     const renderDate = (dateString: string): string => {
         let date = new Date(dateString)
@@ -28,7 +29,7 @@ export const InvoiceCell: React.FC<InvoiceProps> = ({
                 let itemPrice = (item.quantity * item.unit_amount) / 100
                 total += itemPrice
             })
-            setTotalPrice(total.toString())
+            setTotalPrice(total)
         }
         getTotalPrice()
     }, [])
@@ -39,9 +40,9 @@ export const InvoiceCell: React.FC<InvoiceProps> = ({
             <VStack space={5}>
                 <HStack space={2}>
                     <FlexFillWidth>
-                        <Title>${totalPrice}</Title>            
+                        <Title>{renderCurrency(totalPrice)}</Title>            
                         <Subtitle>{'Estimate'}</Subtitle>
-                        <Subtitle>{props.invoice.number}</Subtitle>
+                        <Subtitle>Invoice #{props.invoice.number}</Subtitle>
                         <Subtitle>{renderDate(props.invoice.created_at)}</Subtitle>
                     </FlexFillWidth>
                 </HStack>

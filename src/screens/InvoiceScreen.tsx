@@ -13,6 +13,7 @@ import { RootStackParamList } from '../../App'
 import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import DefaultButton from '../components/DefaultButton'
 import UseCreateInvoice, { InvoiceItem as InvoiceItemAPI } from '../api/UseCreateInvoice'
+import { renderCurrency } from '../utils/RenderCurrency'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'InvoiceScreen'>
 type InvoiceRouteProp = RouteProp<RootStackParamList, 'InvoiceScreen'>
@@ -156,15 +157,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                                 <HStack>
                                     <TotalText>Total Amount</TotalText>
                                     <Spacer/>
-                                    <MaskedText
-                                        style={{ fontSize: 17, textAlign: 'right', fontWeight: 'bold' }}
-                                        type="currency"
-                                        options={{
-                                            prefix: '$',
-                                            decimalSeparator: '.',
-                                            groupSeparator: ',',
-                                            precision: 2
-                                        }}>{grandTotal}</MaskedText> 
+                                    <TotalText>{renderCurrency(grandTotal / 100)}</TotalText>                                  
                                 </HStack>
                             </TotalContainer>                               
                         </VStack>
@@ -276,21 +269,18 @@ const InvoiceItem: React.FC<InvoiceItemProps> = forwardRef((props, ref) => {
                     />
                 </Box>     
                 <Box width={'33.3%'} alignSelf={'flex-right'}>
-                    <MaskedText
-                        style={{ fontSize: 17, textAlign: 'right' }}
-                        type="currency"
-                        options={{
-                            prefix: '$',
-                            decimalSeparator: '.',
-                            groupSeparator: ',',
-                            precision: 2
-                        }}>{total}</MaskedText> 
+                    <ItemTotal>{renderCurrency(total / 100)}</ItemTotal>
                 </Box>                                                       
             </Flex>
             <Divider/>
         </VStack>  
     )
 })
+
+const ItemTotal = styled.Text`
+  font-size: 17px;
+  text-align: right;
+`
 
 const DeleteText = styled.Text`
   font-size: 17px;

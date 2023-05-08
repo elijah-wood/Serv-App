@@ -4,7 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
 import { Avatar, Box, ChevronRightIcon, Divider, FlatList, HStack, Spacer, VStack, View } from 'native-base'
 import { ScrollView } from 'react-native-virtualized-view'
-import { DeviceEventEmitter, TouchableOpacity } from 'react-native'
+import { Alert, DeviceEventEmitter, TouchableOpacity } from 'react-native'
 import SelectDropdown from 'react-native-select-dropdown'
 
 import { RootStackParamList } from '../../App'
@@ -79,7 +79,8 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
            <SelectDropdown
               data={['Prospect', 'Estimated', 'Scheduled', 'Invoiced', 'Completed']}
               onSelect={(selectedItem) => {
-                setStatus(selectedItem.toLowerCase())
+                Alert.alert('Coming soon...')
+                //setStatus(selectedItem.toLowerCase())
               }}
               renderCustomizedButtonChild={(selectedItem, index) => {
                 return (       
