@@ -19,7 +19,7 @@ export const API = {
     refreshToken: async () => {        
         const response = await APIClient.post('/refresh-token', {
             headers: await AuthenticatedHeaders(),
-        })
+        })    
         return response.data
     },
     getCustomers: async () => {

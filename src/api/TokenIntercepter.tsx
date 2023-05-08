@@ -35,7 +35,7 @@ const refreshTokenCall = async (failedRequest: any) => {
 
 const addRefreshTokenInterceptor = (): void => {
   // Instantiate the interceptor (you can chain it as it returns the axios instance)
-  createAuthRefreshInterceptor(APIClient, refreshTokenCall)
+  createAuthRefreshInterceptor(APIClient, refreshTokenCall, { statusCodes: [500, 401]})
 }
 
 export default { addRequestInterceptor, addRefreshTokenInterceptor, addResponseInterceptor }
