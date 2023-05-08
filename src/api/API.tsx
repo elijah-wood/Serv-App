@@ -16,10 +16,9 @@ export const API = {
         const response = await APIClient.post('/complete-login', values)
         return response.data
     },
-    refreshToken: async () => {
-        const session = await getUserSession()
+    refreshToken: async () => {        
         const response = await APIClient.post('/refresh-token', {
-          token: session?.token, // the parameter would be the refresh token
+            headers: await AuthenticatedHeaders(),
         })
         return response.data
     },

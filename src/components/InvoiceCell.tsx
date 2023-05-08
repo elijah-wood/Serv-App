@@ -24,7 +24,6 @@ export const InvoiceCell: React.FC<InvoiceProps> = ({
     useEffect(() => {
         const getTotalPrice = async () => {
             let total = 0
-            console.log(props.invoice)
             props.invoice?.InvoiceItem?.forEach(item => {
                 let itemPrice = (item.quantity * item.unit_amount) / 100
                 total += itemPrice
@@ -41,8 +40,8 @@ export const InvoiceCell: React.FC<InvoiceProps> = ({
                 <HStack space={2}>
                     <FlexFillWidth>
                         <Title>{renderCurrency(totalPrice)}</Title>            
-                        <Subtitle>{'Estimate'}</Subtitle>
-                        <Subtitle>Invoice #{props.invoice.number}</Subtitle>
+                        <Subtitle>{'Invoice'}</Subtitle>
+                        <Subtitle>{props.invoice.number}</Subtitle>
                         <Subtitle>{renderDate(props.invoice.created_at)}</Subtitle>
                     </FlexFillWidth>
                 </HStack>

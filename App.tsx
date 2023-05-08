@@ -46,7 +46,7 @@ const App: React.FC<Props> = () => {
     TokenIntercepter.addResponseInterceptor()
 
     // TODO: Refresh token call to be updated
-    // TokenInterceptor.addRefreshTokenInterceptor()
+    TokenIntercepter.addRefreshTokenInterceptor()
 
     if (!__DEV__) {
       Sentry.init({

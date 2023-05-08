@@ -61,7 +61,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
           useCustomers.refetch()
         }}/>
       }
-      data={useCustomers.data.result.map(customer => {
+      data={useCustomers.data?.result.map(customer => {
         return {
           key: customer.id.toString(),
           value: `${customer.first_name} ${customer.last_name}`

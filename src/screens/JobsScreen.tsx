@@ -31,7 +31,7 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     switch (useJobs.status) {
       case 'success':
-        setGroupedJobs(groupByStatus(useJobs.data.result))
+        setGroupedJobs(groupByStatus(useJobs.data?.result))
         break
       default:
         break

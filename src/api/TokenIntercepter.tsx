@@ -28,7 +28,7 @@ const addResponseInterceptor = (): void => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const refreshTokenCall = async (failedRequest: any) => {
   const data = await API.refreshToken()
-  data && setUserSession(data)
+  data && await setUserSession(data.token)
   failedRequest.response.config.headers.Authorization = 'Bearer ' + data.token
   return Promise.resolve()
 }
