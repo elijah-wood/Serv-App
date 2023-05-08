@@ -5,14 +5,7 @@ import { ScrollView } from 'react-native-virtualized-view'
 import { VStack } from 'native-base'
 import { Alert, View } from 'react-native'
 import { CommonActions } from '@react-navigation/native'
-
-// Conditionally import
-let Clipboard
-try {
-  Clipboard = require('@react-native-clipboard/clipboard').Clipboard
-} catch {
-  Clipboard = View
-}
+import * as Clipboard from 'expo-clipboard'
 
 import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
@@ -55,7 +48,7 @@ const TeamScreen: React.FC<Props> = ({ navigation }) => {
         <VStack>
           <ServNumberWrapper>
             <DetailSection title='Serv Number' value={renderPhoneNumber(servPhone)} color={'#0062FF'} onPress={() => {
-                Clipboard.setString(renderPhoneNumber(servPhone))
+                Clipboard.setStringAsync(renderPhoneNumber(servPhone))                
                 Alert.alert('Copied to clipboard!')
             }}/>
           </ServNumberWrapper>
