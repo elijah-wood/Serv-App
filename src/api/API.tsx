@@ -6,6 +6,7 @@ import { CreateCustomerInput } from "./UseCreateCustomer"
 import { CreateInvoiceInput } from "./UseCreateInvoice"
 import { CreateJobInput } from "./UseCreateJob"
 import { SignInInput } from "./UseSignIn"
+import { UpdateJobInput } from "./UseUpdateJob"
 
 export const API = {
     login: async (values: SignInInput) => {
@@ -51,9 +52,15 @@ export const API = {
             headers: await AuthenticatedHeaders(),
         })
         return response.data
-    },
+    },    
     createJob: async (values: CreateJobInput) => {
         const response = await APIClient.post('/jobs', values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },
+    updateJob: async (id: string, values: UpdateJobInput) => {
+        const response = await APIClient.patch(`/jobs/${id}`, values, {
             headers: await AuthenticatedHeaders(),
         })
         return response.data

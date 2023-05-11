@@ -74,8 +74,14 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
           })
         )    
       })
-      client.on('conversationAdded', (conversation: Conversation) => {
-        setConversations((prevConversations) => [conversation, ...prevConversations])        
+      client.on('conversationAdded', (conversation: Conversation) => {        
+        setConversations((prevConversations) => {
+          // Check if conversation already exists in the array
+          if (prevConversations.some((conv) => conv.sid === conversation.sid)) {
+            return prevConversations
+          }
+          return [conversation, ...prevConversations]
+        })               
       })
       return client
     },

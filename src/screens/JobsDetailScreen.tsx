@@ -21,6 +21,7 @@ import { capitalizeFirstLetter } from '../utils/CapitalizeFirstLetter'
 import { getUserFromToken } from '../api/Session'
 import { Collaborator } from '../api/UseCustomers'
 import { InvoiceCell } from '../components/InvoiceCell'
+import UseUpdateJob from '../api/UseUpdateJob'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type JobRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -32,6 +33,7 @@ type Props = {
 
 const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const useGetJob = UseGetJob(route.params.jobId)
+  const useUpdateJob = UseUpdateJob(route.params.jobId)
   const [job, setJob] = useState<Job>()
   const [status, setStatus] = useState('')
   const [collaborators, setCollaborators] = useState<Collaborator[]>([])
@@ -61,8 +63,21 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
         break
     }
   }, [useGetJob.data])
+
+  useEffect(() => {
+    switch (useUpdateJob.status) {
+      case 'success':
+        if (useUpdateJob.data.ok) {
+          useGetJob.refetch()
+          DeviceEventEmitter.emit("event.refetchJobs")
+        }
+        break
+      default:
+        break
+    }
+  }, [useUpdateJob.data])
   
-  if (useGetJob.isFetching) {
+  if (useGetJob.isFetching || useUpdateJob.isLoading) {
     return (
       <PaddedActivityIndicator/>
     )
@@ -78,9 +93,11 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           }}/>
            <SelectDropdown
               data={['Prospect', 'Estimated', 'Scheduled', 'Invoiced', 'Completed']}
-              onSelect={(selectedItem) => {
-                Alert.alert('Coming soon...')
-                //setStatus(selectedItem.toLowerCase())
+              onSelect={(selectedItem) => {                
+                setStatus(selectedItem.toLowerCase())
+                if (job != undefined) {
+                  useUpdateJob.mutate({ status: selectedItem.toLowerCase() })
+                }                
               }}
               renderCustomizedButtonChild={(selectedItem, index) => {
                 return (       
