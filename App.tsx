@@ -8,7 +8,7 @@ import { AppRegistry } from 'react-native'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import * as Sentry from '@sentry/react-native'
 
-import { RootNavigator } from './src/navigation/RootNavigator'
+import { RootNavigator, navigationRef } from './src/navigation/RootNavigator'
 import TokenIntercepter from './src/api/TokenIntercepter'
 import { Invoice, Job } from './src/api/UseJobs'
 

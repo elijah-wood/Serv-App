@@ -3,7 +3,7 @@ import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { ScrollView } from 'react-native-virtualized-view'
 import { VStack } from 'native-base'
-import { Alert, View } from 'react-native'
+import { Alert } from 'react-native'
 import { CommonActions } from '@react-navigation/native'
 import * as Clipboard from 'expo-clipboard'
 
@@ -39,7 +39,7 @@ const TeamScreen: React.FC<Props> = ({ navigation }) => {
               index: 1,
               routes: [{ name: 'Account' }],
           })
-        )
+      )
   }
   
   return (

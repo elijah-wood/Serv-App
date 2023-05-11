@@ -61,12 +61,12 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
           useCustomers.refetch()
         }}/>
       }
-      data={useCustomers.data?.result.map(customer => {
+      data={useCustomers.data != undefined ? useCustomers.data?.result.map(customer => {
         return {
           key: customer.id.toString(),
           value: `${customer.first_name} ${customer.last_name}`
         }
-      }).filter(customer => customer.value.toUpperCase().includes(search.toUpperCase()))}
+      }).filter(customer => customer.value.toUpperCase().includes(search.toUpperCase())) : []}
       indexLetterStyle={{ 
         color: 'black',
       }}

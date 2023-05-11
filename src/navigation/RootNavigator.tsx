@@ -1,18 +1,32 @@
 import React, { useEffect, useState } from 'react'
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native'
+import { NavigationContainer, DefaultTheme, DarkTheme, NavigationContainerRef, CommonActions } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { ActivityIndicator, useColorScheme, View } from 'react-native'
 
 import Routes from './Routes'
 import { AccountNavigator } from './AccountNavigator'
 import { HomeNavigator } from './HomeTabNavigator'
-import { getUserSession } from '../api/Session'
+import { getUserSession, removeUserSession } from '../api/Session'
+import { RootStackParamList } from '../../App'
 
 function SplashScreen() {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <ActivityIndicator size="large" />
     </View>
+  )
+}
+
+export const navigationRef = React.createRef<NavigationContainerRef<RootStackParamList>>()
+
+export const logOut = async () => {
+  await removeUserSession()
+  navigationRef.current.dispatch(
+      // Reset stack for Android
+      CommonActions.reset({
+          index: 1,
+          routes: [{ name: 'Account' }],
+      })
   )
 }
 
@@ -39,7 +53,7 @@ export const RootNavigator = () => {
   }
 
   return (
-    <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <NavigationContainer ref={navigationRef} theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack.Navigator initialRouteName={isLoggedIn ? Routes.HOME : Routes.ACCOUNT} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={Routes.HOME} component={HomeNavigator} options={{ headerShown: false }} />
         <Stack.Screen name={Routes.ACCOUNT} component={AccountNavigator} options={{  headerShown: false }} />

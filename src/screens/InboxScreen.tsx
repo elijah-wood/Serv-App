@@ -10,7 +10,6 @@ import { RootStackParamList } from '../../App'
 import { TwilioService } from '../twilio/TwilioService'
 import { API } from '../api/API'
 import { Thread } from '../components/ConversationThread'
-import { setUserSession } from '../api/Session'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
 
@@ -39,7 +38,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
         setIsLoading(false)
       })
     return () => {
-      TwilioService.serviceInstance.clientShutdown()
+      TwilioService.serviceInstance?.clientShutdown()
     }
   }, [])
 
