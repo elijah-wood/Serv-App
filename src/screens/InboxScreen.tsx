@@ -38,7 +38,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
         setIsLoading(false)
       })
     return () => {
-      TwilioService.serviceInstance?.clientShutdown()
+      TwilioService.getInstance()?.clientShutdown()
     }
   }, [])
 
@@ -92,7 +92,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
           setIsLoading(false)
         } 
         if (state == 'failed') {
-          Alert.alert("Something went wrong.")
+          Alert.alert("Error initializing Twilio.")
         }
       })
     },
