@@ -1,14 +1,14 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { StatusBar } from 'expo-status-bar'
-import * as React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NativeBaseProvider } from 'native-base'
 import { expo } from './app.json'
-import { AppRegistry } from 'react-native'
+import { AppRegistry, Platform } from 'react-native'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import * as Sentry from '@sentry/react-native'
+import { useEffect, useRef } from 'react'
 
-import { RootNavigator, navigationRef } from './src/navigation/RootNavigator'
+import { RootNavigator } from './src/navigation/RootNavigator'
 import TokenIntercepter from './src/api/TokenIntercepter'
 import { Invoice, Job } from './src/api/UseJobs'
 
@@ -39,15 +39,8 @@ type RootStackParamList = {
 const queryClient = new QueryClient()
 
 const App: React.FC<Props> = () => {
-  React.useEffect(() => {
+  useEffect(() => {
     // Init
-    // Adding interceptors for request token, refresh token and response error handling
-    TokenIntercepter.addRequestInterceptor()
-    TokenIntercepter.addResponseInterceptor()
-
-    // TODO: Refresh token call to be updated
-    TokenIntercepter.addRefreshTokenInterceptor()
-
     if (!__DEV__) {
       Sentry.init({
         dsn: "https://3aea386828174449ae479b8159d4efc1@o4505076625113088.ingest.sentry.io/4505076626423808",
@@ -55,6 +48,13 @@ const App: React.FC<Props> = () => {
         debug: false
       })
     }
+
+    // Adding interceptors for request token, refresh token and response error handling
+    TokenIntercepter.addRequestInterceptor()
+    TokenIntercepter.addResponseInterceptor()
+
+    // TODO: Refresh token call to be updated
+    TokenIntercepter.addRefreshTokenInterceptor()
   }, [])
 
   return (

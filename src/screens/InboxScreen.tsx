@@ -1,15 +1,17 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { Alert, FlatList, RefreshControl } from 'react-native'
+import { Alert, FlatList, Platform } from 'react-native'
 import { Icon, IconButton } from 'native-base'
 import { useFocusEffect } from '@react-navigation/native'
 import { Client, Conversation, Paginator, Message } from '@twilio/conversations'
+import * as Notifications from 'expo-notifications'
 
 import { RootStackParamList } from '../../App'
 import { TwilioService } from '../twilio/TwilioService'
 import { API } from '../api/API'
 import { Thread } from '../components/ConversationThread'
+import { registerForPushNotificationsAsync } from '../utils/PushNotifications'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
 
@@ -22,6 +24,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [userViewingConversationSid, setUserViewingConversationSid] = useState<string>()
   const conversationPaginator = useRef<Paginator<Conversation>>()
+  const notificationListener = useRef<Notifications.Subscription>()
 
   useEffect(() => {
     navigation.setOptions({ headerShown: true })
@@ -30,6 +33,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
     API.createTwilioAccessToken()
       .then((response) => TwilioService.getInstance().getChatClient(response.result))
       .then(() => TwilioService.getInstance().addTokenListener())
+      .then(configurePushNotifications)
       .then(setChannelEvents)
       .then(getSubscribedConversations)
       .catch((err) => {
@@ -39,6 +43,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
       })
     return () => {
       TwilioService.getInstance()?.clientShutdown()
+      Notifications.removeNotificationSubscription(notificationListener.current)
     }
   }, [])
 
@@ -59,8 +64,26 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
     })
   }, [navigation])
 
+  const configurePushNotifications = useCallback(
+    (client: Client) => {            
+      registerForPushNotificationsAsync().then(token => {
+        if (token) {
+          if (Platform.OS === 'android') {            
+            client.setPushRegistrationId('fcm', token)
+          } else if (Platform.OS === 'ios') {
+            client.setPushRegistrationId('apn', token)
+          }                    
+        }     
+      })
+      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        client.handlePushNotification(notification)
+      })
+      return client
+    }, [],
+  )
+
   const setChannelEvents = useCallback(
-    (client) => {
+    (client: Client) => {            
       client.on('messageAdded', (message: Message) => {        
         setConversations((prevConversations) =>
           prevConversations.map((conversation) => {

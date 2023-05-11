@@ -115,13 +115,23 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <SectionContainer>
             <SectionTitle>Invoices</SectionTitle>
             <InlineListContainer>
-              <VStack space={job?.Invoice.length > 0 ? 4 : 0}>
+              <VStack space={(job?.Invoice?.length ?? 0) + (job?.Estimate?.length ?? 0) > 0 ? 4 : 0}>
+                {/* <FlatList
+                    data={job?.Estimate}
+                    keyExtractor={(item) => item.id}
+                    ItemSeparatorComponent={() => <View style={{ height: 16 }}/>}
+                    renderItem={(item) => (                    
+                      <InvoiceCell type={'Estimate'} subtitle={item.item.status} created_at={item.item.created_at} items={item.item.EstimateItem} onPress={() => {
+                        // navigation.navigate('InvoiceScreen', { job: job, invoice: item.item })
+                      }}/>
+                    )}
+                  /> */}
                 <FlatList
                     data={job?.Invoice}
                     keyExtractor={(item) => item.id}
                     ItemSeparatorComponent={() => <View style={{ height: 16 }}/>}
                     renderItem={(item) => (                    
-                      <InvoiceCell invoice={item.item} onPress={() => {
+                      <InvoiceCell type={'Invoice'} subtitle={item.item.number} created_at={item.item.created_at} items={item.item.InvoiceItem} onPress={() => {
                         navigation.navigate('InvoiceScreen', { job: job, invoice: item.item })
                       }}/>
                     )}
@@ -161,7 +171,9 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                       </TouchableOpacity>                   
                     )}
                   />
-                  <DefaultButton label='Add Member'/>
+                  <DefaultButton label='Add Member' onPress={() => {
+                    Alert.alert('Coming soon...')
+                  }}/>
                 </VStack>
             </InlineListContainer>
           </SectionContainer>

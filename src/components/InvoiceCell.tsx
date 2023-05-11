@@ -3,11 +3,14 @@ import { TouchableOpacity } from "react-native-gesture-handler"
 import { Divider, HStack, VStack } from "native-base"
 import { useEffect, useState } from 'react'
 
-import { Invoice } from '../api/UseJobs'
 import { renderCurrency } from '../utils/RenderCurrency'
+import { InvoiceItem } from '../api/UseCreateInvoice'
 
 type InvoiceProps = {
-    invoice: Invoice
+    type: string
+    items: InvoiceItem[]
+    subtitle: string
+    created_at: string
     onPress: () => void
 }
 
@@ -24,7 +27,7 @@ export const InvoiceCell: React.FC<InvoiceProps> = ({
     useEffect(() => {
         const getTotalPrice = async () => {
             let total = 0
-            props.invoice?.InvoiceItem?.forEach(item => {
+            props.items?.forEach(item => {
                 let itemPrice = (item.quantity * item.unit_amount) / 100
                 total += itemPrice
             })
@@ -40,9 +43,9 @@ export const InvoiceCell: React.FC<InvoiceProps> = ({
                 <HStack space={2}>
                     <FlexFillWidth>
                         <Title>{renderCurrency(totalPrice)}</Title>            
-                        <Subtitle>{'Invoice'}</Subtitle>
-                        <Subtitle>{props.invoice.number}</Subtitle>
-                        <Subtitle>{renderDate(props.invoice.created_at)}</Subtitle>
+                        <Subtitle>{props.type}</Subtitle>
+                        <Subtitle>{props.subtitle}</Subtitle>
+                        <Subtitle>{renderDate(props.created_at)}</Subtitle>
                     </FlexFillWidth>
                 </HStack>
                 <Divider/>        
