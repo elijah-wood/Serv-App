@@ -8,6 +8,7 @@ type UserResponse = {
   
 type Team = {
   twilio_phone_number: string
+  name: string
 }
 
 export type { UserResponse }
