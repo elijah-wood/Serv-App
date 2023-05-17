@@ -12,8 +12,16 @@ import CurrencyInput from 'react-native-currency-input'
 import { RootStackParamList } from '../../App'
 import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import DefaultButton from '../components/DefaultButton'
-import UseCreateInvoice, { InvoiceItem as InvoiceItemAPI } from '../api/UseCreateInvoice'
+import UseCreateInvoice, { InvoiceEstimateItem as InvoiceItemAPI } from '../api/UseCreateInvoice'
 import { renderCurrency } from '../utils/RenderCurrency'
+import UseCreateEstimate from '../api/UseCreateEstimate'
+import UseSendEstimate from '../api/UseSendEstimate'
+import UseSendInvoice from '../api/UseSendInvoice'
+
+export enum InvoiceEstimateType {
+    Invoice,
+    Estimate,
+}
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'InvoiceScreen'>
 type InvoiceRouteProp = RouteProp<RootStackParamList, 'InvoiceScreen'>
@@ -32,11 +40,25 @@ type InvoiceItem = {
 }
 
 const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
-    const { job, invoice } = route.params
+    const { job, type, invoiceId, estimateId, dueDate, invoiceEstimateItems } = route.params
+    const [createIsLoading, setCreateIsLoading] = useState<boolean>(false)
+    const [sendIsLoading, setSendIsLoading] = useState<boolean>(false)
     const useCreateInvoice = UseCreateInvoice()
+    const useSendInvoice = UseSendInvoice(invoiceId)
+    const useCreateEstimate = UseCreateEstimate()
+    const useSendEstimate = UseSendEstimate(estimateId)
 
-    const [date, setDate] = useState(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
+    const [items, setItems] = useState<Item[]>(invoiceEstimateItems ? invoiceEstimateItems.map(item => { return { name: item.description, price: item.unit_amount, quantity: item.quantity } }) : [{ name: '', price: 0, quantity: 1 }])
+    const [grandTotal, setGrandTotal] = useState(0)
+    const itemRefs = useRef<InvoiceItemHandle[]>([])  
+    const itemTotals = useRef<number[]>([])
+    
+    const [date, setDate] = useState(dueDate ? new Date(dueDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
     const [openDatePicker, setOpenDatePicker] = useState(false)
+
+    useEffect(() => {
+        navigation.setOptions({ title: type == undefined ? 'New' : (type == InvoiceEstimateType.Invoice ? 'Invoice' : 'Estimate') })
+    }, [])
 
     useEffect(() => {
         switch (useCreateInvoice.status) {
@@ -44,15 +66,55 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                 DeviceEventEmitter.emit("event.refetchInvoices")
                 navigation.goBack()
             break
+            case 'error':
+                setSendIsLoading(false)
+                setCreateIsLoading(false)
             default:
             break
         }
     }, [useCreateInvoice])
 
-    const [items, setItems] = useState<Item[]>(invoice ? invoice.InvoiceItem.map(item => { return { name: item.description, price: item.unit_amount, quantity: item.quantity } }) : [{ name: '', price: 0, quantity: 1 }])
-    const [grandTotal, setGrandTotal] = useState(0)
-    const itemRefs = useRef<InvoiceItemHandle[]>([])  
-    const itemTotals = useRef<number[]>([])
+    useEffect(() => {
+        switch (useSendInvoice.status) {
+            case 'success':
+                DeviceEventEmitter.emit("event.refetchInvoices")
+                navigation.goBack()
+            break
+            case 'error':
+                setSendIsLoading(false)
+                setCreateIsLoading(false)
+            default:
+            break
+        }
+    }, [useSendInvoice])
+
+    useEffect(() => {
+        switch (useCreateEstimate.status) {
+            case 'success':
+                DeviceEventEmitter.emit("event.refetchInvoices")
+                navigation.goBack()
+            break
+            case 'error':
+                setSendIsLoading(false)
+                setCreateIsLoading(false)
+            default:
+            break
+        }
+    }, [useCreateEstimate])
+
+    useEffect(() => {
+        switch (useSendEstimate.status) {
+            case 'success':
+                DeviceEventEmitter.emit("event.refetchInvoices")
+                navigation.goBack()
+            break
+            case 'error':
+                setSendIsLoading(false)
+                setCreateIsLoading(false)
+            default:
+            break
+        }
+    }, [useSendEstimate])
 
     const addItem = () => {
         const newItem: Item = { name: '', price: 0, quantity: 1 }
@@ -69,8 +131,9 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
         setGrandTotal(itemTotals.current.reduce((accumulator, a) => accumulator + a, 0))
     }
 
-    const onSubmit = () => {
+    const verifyItems = (): Item[] => {
         let items: Item[] = []
+        let isError = false
         itemRefs.current.forEach(ref => { 
             if (ref !== null) {                                        
                 items.push(ref.get()) 
@@ -80,22 +143,106 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
         items.forEach(item => {
             if (item.name == '') {
                 Alert.alert('Please fill out all descriptions')
-                return
+                isError = true                
             }
         })
         if (isNaN(grandTotal)) {
             Alert.alert('Please make sure all prices and quantities are filled out correctly')
-            return
+            isError = true            
         }
-        useCreateInvoice.mutate({ 
-            customer_id: job.Customer.id,
-            job_id: job.id,
-            price: grandTotal,
-            due_date: Math.floor(date.getTime() / 1000),
-            items: items.map(item => {                                     
-                return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
+        return isError ? [] : items
+    }
+
+    const onCreateEstimate = () => {
+        let items: Item[] = verifyItems()
+        if (items.length > 0) {
+            setCreateIsLoading(true)
+            useCreateEstimate.mutate({ 
+                customer_id: job.Customer.id,
+                job_id: job.id,
+                price: grandTotal,
+                items: items.map(item => {                                     
+                    return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
+                }
+            )})
+        }    
+    }
+
+    const onSendEstimate = (estimateId: string) => {
+        let items: Item[] = verifyItems()
+        if (items.length > 0) {
+            setSendIsLoading(true)
+            if (estimateId != undefined) {
+                // Estimate already exists
+                useSendEstimate.mutate({ 
+                    customer_id: job.Customer.id,
+                    job_id: job.id,
+                    price: grandTotal,
+                    items: items.map(item => {                                     
+                        return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
+                    }
+                )})
+            } else {
+                // Create it
+                useCreateEstimate.mutate({ 
+                    send: true,
+                    customer_id: job.Customer.id,
+                    job_id: job.id,
+                    price: grandTotal,
+                    items: items.map(item => {                                     
+                        return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
+                    }
+                )})
             }
-        )})
+           
+        }    
+    }
+
+    const onCreateInvoice = () => {
+        let items: Item[] = verifyItems()
+        if (items.length > 0) {
+            setCreateIsLoading(true)
+            useCreateInvoice.mutate({ 
+                customer_id: job.Customer.id,
+                job_id: job.id,
+                price: grandTotal,
+                due_date: Math.floor(date.getTime() / 1000),
+                items: items.map(item => {                                     
+                    return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
+                }
+            )})
+        }    
+    }
+
+    const onSendInvoice = () => {
+        let items: Item[] = verifyItems()
+        if (items.length > 0) {  
+            setSendIsLoading(true)      
+            if (invoiceId != undefined) {
+                // Invoice already exists
+                useSendInvoice.mutate({ 
+                    customer_id: job.Customer.id,
+                    job_id: job.id,
+                    price: grandTotal,
+                    due_date: Math.floor(date.getTime() / 1000),
+                    items: items.map(item => {                                     
+                        return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
+                    })
+                })
+            } else {
+                // Create it
+                useCreateInvoice.mutate({ 
+                    send: true,
+                    customer_id: job.Customer.id,
+                    job_id: job.id,
+                    price: grandTotal,
+                    due_date: Math.floor(date.getTime() / 1000),
+                    items: items.map(item => {                                     
+                        return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
+                    }
+                )})                
+            }            
+        }    
     }
 
     return (
@@ -119,9 +266,11 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                         <VStack>
                             <Cell title={'Customer'} subtitle={renderCustomerFullName(job.Customer)}/>
                             <Cell title={'Job'} subtitle={job.name}/>
-                            <TouchableOpacity onPress={() => setOpenDatePicker(true)}>
-                                <Cell title={'Due Date'} subtitle={date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: '2-digit' })}/>
-                            </TouchableOpacity>
+                            {type == InvoiceEstimateType.Invoice && (
+                                <TouchableOpacity onPress={() => setOpenDatePicker(true)}>
+                                    <Cell title={'Due Date'} subtitle={date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: '2-digit' })}/>
+                                </TouchableOpacity>
+                            )}
                             <VStack space={2}>
                                 <CellTitle>Items</CellTitle>                                
                                 {items.map((item, index) => (
@@ -162,18 +311,37 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                             </TotalContainer>                               
                         </VStack>
                     </CellContainer>
-                    <Flex direction='row' justifyContent={'space-between'} style={{ padding: 12, gap: 12 }}>
-                        <Box flex={1}>
-                            <DefaultButton label='Send Estimate' onPress={() => {
-                                Alert.alert('Coming soon...')
-                            }}/>
-                        </Box>     
-                        <Box flex={1}>
-                            <DefaultButton loading={useCreateInvoice.isLoading} label='Send Invoice' onPress={() => {
-                                onSubmit()
-                            }}/>
-                        </Box>                                                                 
-                    </Flex>              
+                    <VStack>
+                        {type == InvoiceEstimateType.Estimate && (
+                        <Flex direction='row' justifyContent={'space-between'} style={{ padding: 12, gap: 12 }}>                                                        
+                            <Box flex={1}>
+                                <DefaultButton loading={createIsLoading} label='Create Estimate' onPress={() => {
+                                    onCreateEstimate()
+                                }}/>
+                            </Box>                                                    
+                            <Box flex={1}>
+                                <DefaultButton loading={sendIsLoading} label='Send Estimate' onPress={() => {
+                                    onSendEstimate(estimateId)
+                                }}/>
+                            </Box>                                                                                            
+                        </Flex>   
+                        )}                     
+                        {type == InvoiceEstimateType.Invoice && (
+                        <Flex direction='row' justifyContent={'space-between'} style={{ padding: 12, gap: 12 }}>                                                        
+                            <Box flex={1}>
+                                <DefaultButton loading={createIsLoading} label='Create Invoice' onPress={() => {
+                                    onCreateInvoice()
+                                }}/>
+                            </Box>
+                            <Box flex={1}>
+                                <DefaultButton loading={sendIsLoading} label='Send Invoice' onPress={() => {
+                                    onSendInvoice()
+                                }}/>
+                            </Box>
+                        </Flex>                       
+                        )}                     
+                    </VStack>
+                             
                 </KeyboardAwareScrollView>
             </ContainerView>
         </>

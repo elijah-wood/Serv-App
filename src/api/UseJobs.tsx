@@ -1,8 +1,7 @@
 import { useQuery, UseQueryResult } from 'react-query'
 import { API } from './API'
 import { Address, Customer } from './UseCustomers'
-import { UserResponse } from './UserResponse'
-import { InvoiceItem } from './UseCreateInvoice'
+import { InvoiceEstimateItem } from './UseCreateInvoice'
 
 type Job = {
     id: string
@@ -24,17 +23,18 @@ type Job = {
 
 type Invoice = {
     id: string
-    number: string
     created_at?: string
+    due_date?: string
     job_id: string
-    InvoiceItem: InvoiceItem[]
+    status: string
+    InvoiceItem: InvoiceEstimateItem[]
     Payment: Payment[]
 }
 
 type Estimate = {
     id: string
     status: string
-    EstimateItem: InvoiceItem[]
+    EstimateItem: InvoiceEstimateItem[]
     created_at?: string
     job_id: string    
 }

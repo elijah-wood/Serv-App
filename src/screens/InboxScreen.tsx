@@ -75,9 +75,11 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
           }                    
         }     
       })
-      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-        client.handlePushNotification(notification)
-      })
+      if (notificationListener.current == undefined) {      
+        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+          client.handlePushNotification(notification)
+        })
+      }
       return client
     }, [],
   )

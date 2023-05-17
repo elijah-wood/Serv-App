@@ -4,11 +4,11 @@ import { Divider, HStack, VStack } from "native-base"
 import { useEffect, useState } from 'react'
 
 import { renderCurrency } from '../utils/RenderCurrency'
-import { InvoiceItem } from '../api/UseCreateInvoice'
+import { InvoiceEstimateItem } from '../api/UseCreateInvoice'
 
 type InvoiceProps = {
     type: string
-    items: InvoiceItem[]
+    items: InvoiceEstimateItem[]
     subtitle: string
     created_at: string
     onPress: () => void

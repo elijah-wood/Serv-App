@@ -10,7 +10,9 @@ import { useEffect, useRef } from 'react'
 
 import { RootNavigator } from './src/navigation/RootNavigator'
 import TokenIntercepter from './src/api/TokenIntercepter'
-import { Invoice, Job } from './src/api/UseJobs'
+import { Job } from './src/api/UseJobs'
+import { InvoiceEstimateItem } from './src/api/UseCreateInvoice'
+import { InvoiceEstimateType } from './src/screens/InvoiceScreen'
 
 AppRegistry.registerComponent(expo.name, () => App)
 
@@ -33,7 +35,7 @@ type RootStackParamList = {
   ChatDetail: { conversationSid: string, name: string }
   TeamScreen: undefined
   AnalyticsScreen: undefined
-  InvoiceScreen: { job: Job, invoice?: Invoice }
+  InvoiceScreen: { job: Job, type?: InvoiceEstimateType, invoiceId?: string, estimateId?: string, dueDate?: string, invoiceEstimateItems?: InvoiceEstimateItem[] }
 }
 
 const queryClient = new QueryClient()

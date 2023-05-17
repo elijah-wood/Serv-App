@@ -1,10 +1,12 @@
 import APIClient from "./APIClient"
 import { AuthenticatedHeaders } from "./AuthenticatedHeaders"
-import { getUserSession } from "./Session"
+import { AddMemberInput } from "./UseAddMember"
 import { CompleteSignInInput } from "./UseCompleteSignIn"
 import { CreateCustomerInput } from "./UseCreateCustomer"
+import { CreateEstimateInput } from "./UseCreateEstimate"
 import { CreateInvoiceInput } from "./UseCreateInvoice"
 import { CreateJobInput } from "./UseCreateJob"
+import { SendEstimateInput } from "./UseSendEstimate"
 import { SignInInput } from "./UseSignIn"
 import { UpdateJobInput } from "./UseUpdateJob"
 
@@ -73,6 +75,36 @@ export const API = {
     },
     createInvoice: async (values: CreateInvoiceInput) => {
         const response = await APIClient.post('/invoices', values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },
+    sendInvoice: async (invoiceId: string, values: CreateInvoiceInput) => {
+        const response = await APIClient.post(`/invoices/${invoiceId}/send`, values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },
+    createEstimate: async (values: CreateEstimateInput) => {
+        const response = await APIClient.post('/estimates', values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },
+    sendEstimate: async (estimateId: string, values: CreateEstimateInput) => {
+        const response = await APIClient.post(`/estimates/${estimateId}/send`, values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },
+    addMember: async (values: AddMemberInput) => {
+        const response = await APIClient.post('/members', values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },
+    getMembers: async () => {
+        const response = await APIClient.get('/members', {
             headers: await AuthenticatedHeaders(),
         })
         return response.data

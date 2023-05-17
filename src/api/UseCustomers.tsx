@@ -25,6 +25,7 @@ type Collaborator = {
 type Member = {
     id: string
     User: UserResponse
+    isYou?: boolean
 }
 
 type Address = {

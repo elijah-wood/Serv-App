@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
-import { Avatar, Box, ChevronRightIcon, Divider, FlatList, HStack, Spacer, VStack, View } from 'native-base'
+import { Avatar, Box, ChevronRightIcon, Divider, FlatList, Flex, HStack, Spacer, VStack, View } from 'native-base'
 import { ScrollView } from 'react-native-virtualized-view'
 import { Alert, DeviceEventEmitter, TouchableOpacity } from 'react-native'
 import SelectDropdown from 'react-native-select-dropdown'
@@ -22,6 +22,8 @@ import { getUserFromToken } from '../api/Session'
 import { Collaborator } from '../api/UseCustomers'
 import { InvoiceCell } from '../components/InvoiceCell'
 import UseUpdateJob from '../api/UseUpdateJob'
+import { InvoiceEstimateType } from './InvoiceScreen'
+import { InvoiceEstimateItem } from '../api/UseCreateInvoice'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type JobRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -111,35 +113,48 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <DetailSection title='Customer' value={renderCustomerFullName(job?.Customer)} color={'#0062FF'} onPress={() => {
             navigation.navigate('CustomerDetailScreen', { customerId: job?.customer_id })
           }}/>
-          {/* Invoices */}
+          {/* Invoices & Estimates */}
           <SectionContainer>
-            <SectionTitle>Invoices</SectionTitle>
+            <SectionTitle>Estimates & Invoices</SectionTitle>
             <InlineListContainer>
               <VStack space={(job?.Invoice?.length ?? 0) + (job?.Estimate?.length ?? 0) > 0 ? 4 : 0}>
-                {/* <FlatList
+                {job?.Estimate?.length > 0 && (
+                  <FlatList
                     data={job?.Estimate}
                     keyExtractor={(item) => item.id}
                     ItemSeparatorComponent={() => <View style={{ height: 16 }}/>}
-                    renderItem={(item) => (                    
-                      <InvoiceCell type={'Estimate'} subtitle={item.item.status} created_at={item.item.created_at} items={item.item.EstimateItem} onPress={() => {
-                        // navigation.navigate('InvoiceScreen', { job: job, invoice: item.item })
+                    renderItem={(item) => (                                          
+                      <InvoiceCell type={'Estimate'} subtitle={capitalizeFirstLetter(item.item.status)} created_at={item.item.created_at} items={item.item.EstimateItem} onPress={() => {
+                        navigation.navigate('InvoiceScreen', { job: job, type: InvoiceEstimateType.Estimate, estimateId: item.item.id, invoiceEstimateItems: item.item.EstimateItem })
                       }}/>
                     )}
-                  /> */}
-                <FlatList
+                  />
+                )}   
+                {job?.Invoice?.length > 0 && (   
+                  <FlatList
                     data={job?.Invoice}
                     keyExtractor={(item) => item.id}
                     ItemSeparatorComponent={() => <View style={{ height: 16 }}/>}
                     renderItem={(item) => (                    
-                      <InvoiceCell type={'Invoice'} subtitle={item.item.number} created_at={item.item.created_at} items={item.item.InvoiceItem} onPress={() => {
-                        navigation.navigate('InvoiceScreen', { job: job, invoice: item.item })
+                      <InvoiceCell type={`Invoice`} subtitle={capitalizeFirstLetter(item.item.status)} created_at={item.item.created_at} items={item.item.InvoiceItem} onPress={() => {
+                        navigation.navigate('InvoiceScreen', { job: job, type: InvoiceEstimateType.Invoice, invoiceId: item.item.id, dueDate: item.item.due_date, invoiceEstimateItems: item.item.InvoiceItem })
                       }}/>
                     )}
                   />
-                  <DefaultButton label='+ New Estimate / Invoice' onPress={() => {
-                    navigation.navigate('InvoiceScreen', { job: job })
-                  }}/>
-                </VStack>
+                )}    
+                <Flex direction='row' justifyContent={'space-between'} style={{ gap: 12 }}>                                                        
+                  <Box flex={1}>
+                    <DefaultButton label='New Estimate' onPress={() => {
+                      navigation.navigate('InvoiceScreen', { job: job, type: InvoiceEstimateType.Estimate })
+                    }}/>
+                  </Box>                                                    
+                  <Box flex={1}>
+                    <DefaultButton label='New Invoice' onPress={() => {
+                      navigation.navigate('InvoiceScreen', { job: job, type: InvoiceEstimateType.Invoice })
+                    }}/>
+                  </Box>                                                                                            
+                </Flex>                                          
+              </VStack>
             </InlineListContainer>
           </SectionContainer>
           <DetailSection title='Address' value={renderAddress(job?.address)} customRightComponent={
