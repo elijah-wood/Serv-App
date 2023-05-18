@@ -3,7 +3,7 @@ import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { ScrollView } from 'react-native-virtualized-view'
 import { Avatar, Center, ChevronRightIcon, Divider, HStack, Spacer, VStack } from 'native-base'
-import { Alert, Button, FlatList, TouchableOpacity } from 'react-native'
+import { Alert, Button, DeviceEventEmitter, FlatList, RefreshControl, TouchableOpacity } from 'react-native'
 import { CommonActions } from '@react-navigation/native'
 import * as Clipboard from 'expo-clipboard'
 
@@ -13,7 +13,6 @@ import { getUserFromToken, removeUserSession } from '../api/Session'
 import { DetailSection, SectionContainer, SectionTitle } from '../components/DetailSection'
 import { renderPhoneNumber } from '../utils/RenderPhoneNumber'
 import { getInitials } from '../utils/GetStringInitials'
-import { renderCustomerFullName } from '../utils/RenderCustomerFullName'
 import { UserResponse } from '../api/UserResponse'
 import { Member } from '../api/UseCustomers'
 import UseMembers from '../api/UseMembers'
@@ -30,6 +29,13 @@ const TeamScreen: React.FC<Props> = ({ navigation }) => {
   const [servPhone, setServPhone] = useState('')
   const [user, setUser] = useState<UserResponse>()
   const [members, setMembers] = useState<Member[]>([])
+
+  useEffect(() => {
+    DeviceEventEmitter.addListener("event.refetchTeamMembers", () => useMembers.refetch())
+    return () => {
+      DeviceEventEmitter.removeAllListeners("event.refetchTeamMembers")
+    }
+  }, [])
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -79,53 +85,55 @@ const TeamScreen: React.FC<Props> = ({ navigation }) => {
   
   return (
     <ContainerView>
-      <ScrollView>
-        <VStack>
-          <Center>
-            <AvatarContainer>
-              <Avatar size={'xl'}>{getInitials(user?.team.name ?? '')}</Avatar>
-            </AvatarContainer>
-            <TeamName>{user?.team.name ?? ''}</TeamName>
-          </Center>
-          <ServNumberWrapper>
-            <DetailSection title='Serv Number' value={renderPhoneNumber(servPhone)} color={'#0062FF'} onPress={() => {
-                Clipboard.setStringAsync(renderPhoneNumber(servPhone))                
-                Alert.alert('Copied to clipboard!')
-            }}/>
-          </ServNumberWrapper>
+      <ScrollView refreshControl={
+          <RefreshControl refreshing={useMembers.isFetching} onRefresh={() => useMembers.refetch()}/>
+      }>
+      <VStack>
+        <Center>
+          <AvatarContainer>
+            <Avatar size={'xl'}>{getInitials(user?.team.name ?? '')}</Avatar>
+          </AvatarContainer>
+          <TeamName>{user?.team.name ?? ''}</TeamName>
+        </Center>
+        <ServNumberWrapper>
+          <DetailSection title='Serv Number' value={renderPhoneNumber(servPhone)} color={'#0062FF'} onPress={() => {
+              Clipboard.setStringAsync(renderPhoneNumber(servPhone))                
+              Alert.alert('Copied to clipboard!')
+          }}/>
+        </ServNumberWrapper>
+        <PaddedContainer>
+          <ServNumberSubtitle>
+            Give this number to customers in order to ensure that they can reach you via Serv.
+          </ServNumberSubtitle>
+        </PaddedContainer>
+        {/* Members */}
+        <SectionContainer>
+          <SectionTitle>Members</SectionTitle>
           <PaddedContainer>
-            <ServNumberSubtitle>
-              Give this number to customers in order to ensure that they can reach you via Serv.
-            </ServNumberSubtitle>
-          </PaddedContainer>
-          {/* Members */}
-          <SectionContainer>
-            <SectionTitle>Members</SectionTitle>
-            <PaddedContainer>
-              <VStack space={useMembers.data.result.length > 0 ? 4 : 0}>
-                <FlatList
-                    data={useMembers.data.result}
-                    keyExtractor={(item) => item.id}
-                    ItemSeparatorComponent={() => <DividerWrapper><Divider/></DividerWrapper>}
-                    renderItem={({ item }) => (                      
-                      <TouchableOpacity>
-                        <HStack alignItems={'center'}>
-                          <HStack space={2}>
-                            <Avatar>{getInitials(item?.User.first_name + ' ' + item?.User.last_name)}</Avatar>
-                            <MemberNameText>{item?.User.first_name + ' ' + item?.User.last_name + (item?.isYou ? ' (you)' : '')}</MemberNameText>
-                          </HStack>
-                          <Spacer/>
-                          <MemberDisclosureContainer>
-                              <ChevronRightIcon />
-                          </MemberDisclosureContainer>
+            <VStack space={useMembers.data.result.length > 0 ? 4 : 0}>
+              <FlatList
+                  data={useMembers.data.result}
+                  keyExtractor={(item) => item.id}
+                  ItemSeparatorComponent={() => <DividerWrapper><Divider/></DividerWrapper>}
+                  renderItem={({ item }) => (                      
+                    <TouchableOpacity>
+                      <HStack alignItems={'center'}>
+                        <HStack space={2}>
+                          <Avatar>{getInitials(item?.User.first_name + ' ' + item?.User.last_name)}</Avatar>
+                          <MemberNameText>{item?.User.first_name + ' ' + item?.User.last_name + (item?.isYou ? ' (you)' : '')}</MemberNameText>
                         </HStack>
-                      </TouchableOpacity>                   
-                    )}
-                  />
-                  <Button title='Add Member' onPress={() => {
-                    Alert.alert('Coming soon...')
-                  }}/>
-                </VStack>
+                        <Spacer/>
+                        <MemberDisclosureContainer>
+                            <ChevronRightIcon />
+                        </MemberDisclosureContainer>
+                      </HStack>
+                    </TouchableOpacity>                   
+                  )}
+                />
+                <Button title='Add Member' onPress={() => {
+                  navigation.navigate('AddMemberScreen')
+                }}/>
+              </VStack>
             </PaddedContainer>
           </SectionContainer>
         </VStack>     

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
-import { Platform, Linking, Alert } from 'react-native'
-import { HStack, KeyboardAvoidingView, VStack } from 'native-base'
+import { Alert, DeviceEventEmitter, Platform } from 'react-native'
+import { KeyboardAvoidingView, VStack } from 'native-base'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import PhoneInput from 'react-native-phone-number-input'
@@ -8,8 +8,6 @@ import { useForm, Controller } from "react-hook-form"
 
 import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
-import TextButton from '../components/TextButton'
-import Links from '../utils/links'
 import UseAddMember from '../api/UseAddMember'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'SignInScreen'>
@@ -30,8 +28,9 @@ const AddMemberScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     switch (useAddMember.status) {
       case 'success':
-        
-        
+        Alert.alert('Team member has been invited!', 'They will appear in the Team tab when they complete sign up.')
+        DeviceEventEmitter.emit("event.refetchTeamMembers")
+        navigation.goBack()
         break
       default:
         break
@@ -46,8 +45,8 @@ const AddMemberScreen: React.FC<Props> = ({ navigation }) => {
       <ContainerView>
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
               <VStack space={5} justifyContent={'center'} style={{ height: '100%', marginHorizontal: 10, marginTop: 10 }}>
-                  <TitleText>Please enter your phone number.</TitleText>
-                  <SubtitleText>Enter your phone number.</SubtitleText>
+                  <TitleText>Please enter your team member's phone number.</TitleText>
+                  <SubtitleText>They will be sent an invite link and will show in the Team tab when they complete sign up.</SubtitleText>
                   {errors.phone && <ErrorText>{errors.phone.message ? errors.phone.message : 'This is required.'}</ErrorText>}
                   <Controller
                     control={control}
@@ -72,21 +71,11 @@ const AddMemberScreen: React.FC<Props> = ({ navigation }) => {
                     )}
                     name="phone"
                   />
-                  <HStack>
-                      <TOSTextWrapper>
-                          <TOSText>By tapping next, you agree to our </TOSText>
-                          <TextButton label="Terms & Conditions." onPress={onTOS} color='grey' fontSize={12} underline={true}/>
-                      </TOSTextWrapper>
-                  </HStack>
-                  <DefaultButton label='Continue' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useSignIn.isLoading}/>
+                  <DefaultButton label='Continue' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useAddMember.isLoading}/>
               </VStack>
           </KeyboardAvoidingView>
       </ContainerView>
   )
-}
-
-const onTOS = async () => {
-    await Linking.openURL(Links.terms)
 }
 
 const TitleText = styled.Text`
@@ -120,4 +109,4 @@ const ContainerView = styled.View`
   width: 100%;
 `
 
-export default SignInScreen
+export default AddMemberScreen

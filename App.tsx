@@ -36,6 +36,7 @@ type RootStackParamList = {
   TeamScreen: undefined
   AnalyticsScreen: undefined
   InvoiceScreen: { job: Job, type?: InvoiceEstimateType, invoiceId?: string, estimateId?: string, dueDate?: string, invoiceEstimateItems?: InvoiceEstimateItem[] }
+  AddMemberScreen: undefined
 }
 
 const queryClient = new QueryClient()

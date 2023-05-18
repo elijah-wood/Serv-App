@@ -20,6 +20,7 @@ export default {
     WELCOME: "Welcome",
     ACCOUNT: "Account",
     SIGN_IN: "SignIn",
-    PHONE_VERIFICATION_SCREEN: "PhoneVerificationScreen"
+    PHONE_VERIFICATION_SCREEN: "PhoneVerificationScreen",
+    ADD_MEMBER: "AddMemberScreen"
   }
   

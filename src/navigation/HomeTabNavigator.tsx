@@ -17,6 +17,7 @@ import AnalyticsScreen from '../screens/AnalyticsScreen'
 import TeamScreen from '../screens/TeamScreen'
 import AddJobScreen from '../screens/AddJobScreen'
 import InvoiceScreen from '../screens/InvoiceScreen'
+import AddMemberScreen from '../screens/AddMemberScreen'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'HomeNavigator'>
 
@@ -83,7 +84,7 @@ export const HomeTabs: React.FC<Props> = () => {
                     )
                 }}
             />
-            <Tab.Screen name={Routes.ANALYTICS_TAB} component={AnalyticsStackScreen}
+            {/* <Tab.Screen name={Routes.ANALYTICS_TAB} component={AnalyticsStackScreen}
                 options={{
                     title: 'Analytics',
                     tabBarIcon: ({ color }) => (
@@ -93,7 +94,7 @@ export const HomeTabs: React.FC<Props> = () => {
                         />
                     )
                 }}
-            />
+            /> */}
             <Tab.Screen name={Routes.TEAM_TAB} component={TeamStackScreen}
                 options={{
                     title: 'Team',
@@ -204,6 +205,11 @@ export const TeamStackScreen: React.FC<Props> = () => {
             <Stack.Screen name={Routes.TEAM} component={TeamScreen} 
                 options={{
                     title: 'Team',
+                }}
+            />
+            <Stack.Screen name={Routes.ADD_MEMBER} component={AddMemberScreen} 
+                options={{
+                    title: 'Add Member',
                 }}
             />
         </Stack.Navigator>

@@ -186,7 +186,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                       </TouchableOpacity>                   
                     )}
                   />
-                  <DefaultButton label='Add Member' onPress={() => {
+                  <DefaultButton label='Add Collaborator' onPress={() => {
                     Alert.alert('Coming soon...')
                   }}/>
                 </VStack>
