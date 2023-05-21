@@ -28,7 +28,13 @@ const AddMemberScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     switch (useAddMember.status) {
       case 'success':
-        Alert.alert('Team member has been invited!', 'They will appear in the Team tab when they complete sign up.')
+        if (useAddMember.data.result) {
+            // Member exists
+            Alert.alert('Team member has been added!')
+        } else {
+            // Member invited
+            Alert.alert('Team member has been invited!', 'They will appear in the Team tab when they complete sign up.')
+        }
         DeviceEventEmitter.emit("event.refetchTeamMembers")
         navigation.goBack()
         break

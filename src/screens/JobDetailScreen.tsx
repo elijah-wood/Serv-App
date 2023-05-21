@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
-import { Avatar, Box, ChevronRightIcon, Divider, FlatList, Flex, HStack, Spacer, VStack, View } from 'native-base'
+import { Avatar, Box, ChevronRightIcon, Divider, FlatList, Flex, HStack, Spacer, Text, VStack, View } from 'native-base'
 import { ScrollView } from 'react-native-virtualized-view'
 import { Alert, DeviceEventEmitter, TouchableOpacity } from 'react-native'
 import SelectDropdown from 'react-native-select-dropdown'
+import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList } from '@gorhom/bottom-sheet'
 
 import { RootStackParamList } from '../../App'
 import UseGetJob from '../api/UseGetJob'
-import { Invoice, Job } from '../api/UseJobs'
+import { Job } from '../api/UseJobs'
 import { renderAddress } from '../utils/RenderAddress'
 import { openMap } from '../utils/OpenMap'
 import { DetailSection, SectionContainer, SectionTitle } from '../components/DetailSection'
@@ -19,11 +20,11 @@ import { MapButton } from '../components/MapButton'
 import { getInitials } from '../utils/GetStringInitials'
 import { capitalizeFirstLetter } from '../utils/CapitalizeFirstLetter'
 import { getUserFromToken } from '../api/Session'
-import { Collaborator } from '../api/UseCustomers'
+import { Collaborator, Member } from '../api/UseCustomers'
 import { InvoiceCell } from '../components/InvoiceCell'
 import UseUpdateJob from '../api/UseUpdateJob'
 import { InvoiceEstimateType } from './InvoiceScreen'
-import { InvoiceEstimateItem } from '../api/UseCreateInvoice'
+import UseMembers from '../api/UseMembers'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type JobRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -36,9 +37,12 @@ type Props = {
 const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const useGetJob = UseGetJob(route.params.jobId)
   const useUpdateJob = UseUpdateJob(route.params.jobId)
+  const useMembers = UseMembers()
   const [job, setJob] = useState<Job>()
   const [status, setStatus] = useState('')
   const [collaborators, setCollaborators] = useState<Collaborator[]>([])
+
+  const bottomSheetRef = useRef<BottomSheet>(null)
 
   useEffect(() => {
     DeviceEventEmitter.addListener("event.refetchInvoices", () => useGetJob.refetch())
@@ -79,7 +83,15 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   }, [useUpdateJob.data])
   
-  if (useGetJob.isFetching || useUpdateJob.isLoading) {
+  const data = useMemo(
+    () =>
+      Array(50)
+        .fill(0)
+        .map((_, index) => `index-${index}`),
+    []
+  )
+
+  if (useGetJob.isFetching || useUpdateJob.isLoading || useMembers.isLoading) {
     return (
       <PaddedActivityIndicator/>
     )
@@ -93,23 +105,22 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <DetailSection title='Description' value={job?.description ?? ''} onPress={() => {
             
           }}/>
-           <SelectDropdown
-              data={['Prospect', 'Estimated', 'Scheduled', 'Invoiced', 'Completed']}
-              onSelect={(selectedItem) => {                
-                setStatus(selectedItem.toLowerCase())
-                if (job != undefined) {
-                  useUpdateJob.mutate({ status: selectedItem.toLowerCase() })
-                }                
-              }}
-              renderCustomizedButtonChild={(selectedItem, index) => {
-                return (       
-                  <DetailSection title='Status' value={capitalizeFirstLetter(status ?? '')} showDisclosure={true} disabled={true}/>                    
-                )
-              }}
-              // Height shouldn't be a fixed value here, but this is the only way it will fill right now
-              buttonStyle={{ width: '100%', paddingHorizontal: 0, height: 85 }}
-              />
-
+          <SelectDropdown
+            data={['Prospect', 'Estimated', 'Scheduled', 'Invoiced', 'Completed']}
+            onSelect={(selectedItem) => {                
+              setStatus(selectedItem.toLowerCase())
+              if (job != undefined) {
+                useUpdateJob.mutate({ status: selectedItem.toLowerCase() })
+              }                
+            }}
+            renderCustomizedButtonChild={(selectedItem, index) => {
+              return (       
+                <DetailSection title='Status' value={capitalizeFirstLetter(status ?? '')} showDisclosure={true} disabled={true}/>                    
+              )
+            }}
+            // Height shouldn't be a fixed value here, but this is the only way it will fill right now
+            buttonStyle={{ width: '100%', paddingHorizontal: 0, height: 85 }}
+          />
           <DetailSection title='Customer' value={renderCustomerFullName(job?.Customer)} color={'#0062FF'} onPress={() => {
             navigation.navigate('CustomerDetailScreen', { customerId: job?.customer_id })
           }}/>
@@ -186,8 +197,10 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                       </TouchableOpacity>                   
                     )}
                   />
+                  
                   <DefaultButton label='Add Collaborator' onPress={() => {
-                    Alert.alert('Coming soon...')
+                    Alert.alert('You have no team members added to your account', 'Go to the Team tab and invite a member first.')
+                    //bottomSheetRef.current.expand()
                   }}/>
                 </VStack>
             </InlineListContainer>
@@ -195,6 +208,24 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <Spacer/>
         </VStack>
       </ScrollView>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        onChange={() => {
+          console.log('on change')
+        }} 
+        snapPoints={['50%']}        
+        >
+          <BottomSheetFlatList
+          data={data}
+          keyExtractor={(i) => i}
+          renderItem={({ item }) => (
+            <View>
+              <Text>{item}</Text>
+            </View>
+          )}
+        />
+        </BottomSheet>
     </ContainerView>
   )
 }

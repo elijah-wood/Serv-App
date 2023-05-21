@@ -1,5 +1,6 @@
 import { UseMutationResult, useMutation } from 'react-query'
 import { API } from './API'
+import { Member } from './UseCustomers'
 
 type AddMemberInput = {
     phone: string
@@ -7,6 +8,7 @@ type AddMemberInput = {
 
 type AddMemberResponse = {
     ok: boolean
+    result?: Member[]
 }
 
 const UseAddMember = (): UseMutationResult<AddMemberResponse, Error, AddMemberInput> => {

@@ -98,23 +98,6 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
               )}
               name="name"
             />
-            {/* <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange, value, onBlur } }) => (
-                <TextInputWrapper>
-                  <TextInput
-                      onChangeText={onChange}
-                      value={value}
-                      onBlur={onBlur}
-                      placeholder="Customer"
-                  />
-                </TextInputWrapper>
-              )}
-              name="customer_id"
-            /> */}
             <Controller
               control={control}
               rules={{
@@ -123,13 +106,13 @@ const AddJobScreen: React.FC<Props> = ({ navigation, route }) => {
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInputWrapper>
                   <SelectDropdown
-                  data={['Prospect', 'Estimated', 'Scheduled', 'Invoiced', 'Completed']}
-                  onSelect={(selectedItem) => {
-                    onChange(selectedItem)
-                  }}
-                  buttonStyle={{ backgroundColor: 'white', width: '100%' }}
-                  buttonTextStyle={{ textAlign: 'left', fontSize: 16, marginLeft: 3 }}
-                  defaultValue={'Prospect'}
+                    data={['Prospect', 'Estimated', 'Scheduled', 'Invoiced', 'Completed']}
+                    onSelect={(selectedItem) => {
+                      onChange(selectedItem)
+                    }}
+                    buttonStyle={{ backgroundColor: 'white', width: '100%' }}
+                    buttonTextStyle={{ textAlign: 'left', fontSize: 16, marginLeft: 3 }}
+                    defaultValue={'Prospect'}
                   />
                 </TextInputWrapper>
               )}

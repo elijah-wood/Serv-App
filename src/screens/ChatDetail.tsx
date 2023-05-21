@@ -43,7 +43,9 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
       let participants = await conversation.getParticipants()
       let participantSid: string = null
       participants.forEach(participant => {
+        console.log(`type: ${ participant.attributes['type']}`)
         if (participant.attributes['type'] == 'user') {
+          console.log('is us')
           // Find out which user is us
           let id = participant.attributes['user_id']
           if (id == user.id) {
@@ -51,6 +53,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
           }
         }
       })
+      console.log(`our id: ${participantSid}`)
       setChannelEvents(client, participants)
       setParticipantID(participantSid)
       setParticipants(participants)
@@ -67,13 +70,16 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
 
   const addNewMessages =  (participants: Participant[], includePreviousMessages: boolean) => {
     let newMessages = chatMessagesPaginator.current.items.map(item => {
+      // console.log(participants)
+      
       let participant = participants.find(participant => participant.sid === item.participantSid )
+      console.log(item.participantSid)
       return {
         id: item.sid,
         text: item.body,
         createdAt: item.dateCreated.getTime(),
         author: {
-          id: item.participantSid,
+          id: item.participantSid ?? '0',
           firstName: participant?.attributes['first_name'],
           lastName: participant?.attributes['last_name']
         },
@@ -98,7 +104,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
           text: message.body,
           createdAt: message.dateCreated.getTime(),
           author: {
-            id: message.participantSid,
+            id: message.participantSid ?? '0',
             firstName: participant?.attributes['first_name'],
             lastName: participant?.attributes['last_name'],
           },

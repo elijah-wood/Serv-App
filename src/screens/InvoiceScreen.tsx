@@ -131,6 +131,10 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
         setGrandTotal(itemTotals.current.reduce((accumulator, a) => accumulator + a, 0))
     }
 
+    const isExistingEstimateOrInvoice = (): boolean => {
+        return estimateId != undefined || invoiceId != undefined
+    }
+
     const verifyItems = (): Item[] => {
         let items: Item[] = []
         let isError = false
@@ -283,7 +287,8 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                                         onUpdate={(total) => { 
                                             itemTotals.current[index] = total
                                             updateTotal()
-                                        }}     
+                                        }}   
+                                        canDelete={!isExistingEstimateOrInvoice()}  
                                         onDelete={() => {
                                             let updatedItems: Item[] = []                                        
                                             itemRefs.current.forEach((ref, i) => { 
@@ -297,10 +302,12 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                                             updateTotal()
                                         }}                                      
                                     />
-                                ))}       
+                                ))}   
+                                {!isExistingEstimateOrInvoice() && (
                                 <Box alignItems={'left'} marginLeft={-2}>                                    
                                     <Button title="Add Item" onPress={addItem} />                                    
-                                </Box>                    
+                                </Box>  
+                                )}                                                     
                             </VStack>
                             <TotalContainer>
                                 <HStack>
@@ -314,11 +321,13 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                     <VStack>
                         {type == InvoiceEstimateType.Estimate && (
                         <Flex direction='row' justifyContent={'space-between'} style={{ padding: 12, gap: 12 }}>                                                        
+                            {!isExistingEstimateOrInvoice() && (
                             <Box flex={1}>
                                 <DefaultButton loading={createIsLoading} label='Create Estimate' onPress={() => {
                                     onCreateEstimate()
                                 }}/>
-                            </Box>                                                    
+                            </Box>    
+                            )}                                                
                             <Box flex={1}>
                                 <DefaultButton loading={sendIsLoading} label='Send Estimate' onPress={() => {
                                     onSendEstimate(estimateId)
@@ -327,12 +336,14 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                         </Flex>   
                         )}                     
                         {type == InvoiceEstimateType.Invoice && (
-                        <Flex direction='row' justifyContent={'space-between'} style={{ padding: 12, gap: 12 }}>                                                        
+                        <Flex direction='row' justifyContent={'space-between'} style={{ padding: 12, gap: 12 }}>                                                                                    
+                            {!isExistingEstimateOrInvoice() && (
                             <Box flex={1}>
                                 <DefaultButton loading={createIsLoading} label='Create Invoice' onPress={() => {
                                     onCreateInvoice()
                                 }}/>
-                            </Box>
+                            </Box>        
+                            )}                    
                             <Box flex={1}>
                                 <DefaultButton loading={sendIsLoading} label='Send Invoice' onPress={() => {
                                     onSendInvoice()
@@ -369,6 +380,7 @@ type InvoiceItemHandle = {
 
 type InvoiceItemProps = {
     item: Item
+    canDelete: boolean
     onUpdate: (total: number) => void
     onDelete: () => void
     ref: React.ForwardedRef<InvoiceItemHandle>
@@ -407,11 +419,13 @@ const InvoiceItem: React.FC<InvoiceItemProps> = forwardRef((props, ref) => {
                     placeholder={'Enter item name here'}
                 />  
                 <Spacer/>
-                <Pressable onPress={() => {
-                    props.onDelete()
-                }}> 
-                    <DeleteText>Delete</DeleteText>
-                </Pressable>                                    
+                {props.canDelete && (
+                    <Pressable onPress={() => {
+                        props.onDelete()
+                    }}> 
+                        <DeleteText>Delete</DeleteText>
+                    </Pressable>   
+                )}                                 
             </HStack>          
             <Flex direction='row'>
                 <Box width={'33.3%'} alignSelf={'flex-left'}>
