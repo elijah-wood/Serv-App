@@ -116,7 +116,9 @@ const TeamScreen: React.FC<Props> = ({ navigation }) => {
                   keyExtractor={(item) => item.id}
                   ItemSeparatorComponent={() => <DividerWrapper><Divider/></DividerWrapper>}
                   renderItem={({ item }) => (                      
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => {
+                      Alert.alert('Coming soon...')
+                    }}>
                       <HStack alignItems={'center'}>
                         <HStack space={2}>
                           <Avatar>{getInitials(item?.User.first_name + ' ' + item?.User.last_name)}</Avatar>

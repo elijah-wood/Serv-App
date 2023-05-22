@@ -7,6 +7,7 @@ import { AppRegistry, Platform } from 'react-native'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import * as Sentry from '@sentry/react-native'
 import { useEffect, useRef } from 'react'
+import { ActionSheetProvider } from '@expo/react-native-action-sheet'
 
 import { RootNavigator } from './src/navigation/RootNavigator'
 import TokenIntercepter from './src/api/TokenIntercepter'
@@ -67,7 +68,9 @@ const App: React.FC<Props> = () => {
         <QueryClientProvider client={queryClient} contextSharing={true}>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
-              <RootNavigator />   
+              <ActionSheetProvider>
+                <RootNavigator />   
+              </ActionSheetProvider>
             </SafeAreaProvider>
           </GestureHandlerRootView>
         </QueryClientProvider>

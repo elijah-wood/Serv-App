@@ -6,7 +6,6 @@ import { Avatar, Box, ChevronRightIcon, Divider, FlatList, Flex, HStack, Spacer,
 import { ScrollView } from 'react-native-virtualized-view'
 import { Alert, DeviceEventEmitter, TouchableOpacity } from 'react-native'
 import SelectDropdown from 'react-native-select-dropdown'
-import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList } from '@gorhom/bottom-sheet'
 
 import { RootStackParamList } from '../../App'
 import UseGetJob from '../api/UseGetJob'
@@ -25,6 +24,8 @@ import { InvoiceCell } from '../components/InvoiceCell'
 import UseUpdateJob from '../api/UseUpdateJob'
 import { InvoiceEstimateType } from './InvoiceScreen'
 import UseMembers from '../api/UseMembers'
+import { useActionSheet } from '@expo/react-native-action-sheet'
+import UseAddCollaborator from '../api/UseAddCollaborator'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type JobRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -38,11 +39,12 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const useGetJob = UseGetJob(route.params.jobId)
   const useUpdateJob = UseUpdateJob(route.params.jobId)
   const useMembers = UseMembers()
+  const useAddCollaborator = UseAddCollaborator()
   const [job, setJob] = useState<Job>()
   const [status, setStatus] = useState('')
   const [collaborators, setCollaborators] = useState<Collaborator[]>([])
 
-  const bottomSheetRef = useRef<BottomSheet>(null)
+  const { showActionSheetWithOptions } = useActionSheet()
 
   useEffect(() => {
     DeviceEventEmitter.addListener("event.refetchInvoices", () => useGetJob.refetch())
@@ -82,6 +84,19 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
         break
     }
   }, [useUpdateJob.data])
+
+  useEffect(() => {
+    switch (useAddCollaborator.status) {
+      case 'success':
+        if (useAddCollaborator.data.ok) {
+          useGetJob.refetch()
+          DeviceEventEmitter.emit("event.refetchJobs")
+        }
+        break
+      default:
+        break
+    }
+  }, [useAddCollaborator.data])
   
   const data = useMemo(
     () =>
@@ -198,9 +213,24 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                     )}
                   />
                   
-                  <DefaultButton label='Add Collaborator' onPress={() => {
-                    Alert.alert('You have no team members added to your account', 'Go to the Team tab and invite a member first.')
-                    //bottomSheetRef.current.expand()
+                  <DefaultButton label='Add Collaborator' loading={useAddCollaborator.isLoading} onPress={async () => {
+                    if (useMembers.data.result.length == 1) {
+                      Alert.alert('You have no team members added to your account', 'Go to the Team tab and invite a member first.')
+                      return
+                    }
+                    let user = await getUserFromToken()
+                    let options = [...useMembers.data.result.filter(item => item.User.id != user.id).map(item => item.User.first_name + ' ' + item.User.last_name), 'Cancel']
+                    let cancelButtonIndex = options.length-1
+
+                    showActionSheetWithOptions({
+                      options,
+                      cancelButtonIndex
+                    }, (selectedIndex: number) => {
+                      if (selectedIndex != cancelButtonIndex) {
+                        Alert.alert('Coming soon...')
+                        //useAddCollaborator.mutate({ member_id: useMembers.data.result[selectedIndex].id, customer_id: job.customer_id})
+                      }
+                    })              
                   }}/>
                 </VStack>
             </InlineListContainer>
@@ -208,24 +238,6 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <Spacer/>
         </VStack>
       </ScrollView>
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        onChange={() => {
-          console.log('on change')
-        }} 
-        snapPoints={['50%']}        
-        >
-          <BottomSheetFlatList
-          data={data}
-          keyExtractor={(i) => i}
-          renderItem={({ item }) => (
-            <View>
-              <Text>{item}</Text>
-            </View>
-          )}
-        />
-        </BottomSheet>
     </ContainerView>
   )
 }

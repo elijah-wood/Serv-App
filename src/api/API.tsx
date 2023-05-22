@@ -1,5 +1,6 @@
 import APIClient from "./APIClient"
 import { AuthenticatedHeaders } from "./AuthenticatedHeaders"
+import { AddCollaboratorInput } from "./UseAddCollaborator"
 import { AddMemberInput } from "./UseAddMember"
 import { CompleteSignInInput } from "./UseCompleteSignIn"
 import { CreateCustomerInput } from "./UseCreateCustomer"
@@ -108,6 +109,12 @@ export const API = {
             headers: await AuthenticatedHeaders(),
         })
         return response.data
-    },
+    },   
+    addCollaborator: async (values: AddCollaboratorInput) => {
+        const response = await APIClient.post('/collaborators', values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },    
   }
   
