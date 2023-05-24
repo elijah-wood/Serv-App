@@ -43,7 +43,9 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
       let participants = await conversation.getParticipants()
       let participantSid: string = null
       participants.forEach(participant => {
+        console.log(`type: ${ participant.attributes['type']}`)
         if (participant.attributes['type'] == 'user') {
+          console.log('is us')
           // Find out which user is us
           let id = participant.attributes['user_id']
           if (id == user.id) {
@@ -51,6 +53,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
           }
         }
       })
+      console.log(`our id: ${participantSid}`)
       setChannelEvents(client, participants)
       setParticipantID(participantSid)
       setParticipants(participants)
@@ -66,17 +69,17 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
   }, [])
 
   const addNewMessages =  (participants: Participant[], includePreviousMessages: boolean) => {
-    let newMessages = chatMessagesPaginator.current.items.map(item => {
-      
+    let newMessages = chatMessagesPaginator.current.items.map(item => {      
       let participant = participants.find(participant => participant.sid === item.participantSid )
+      console.log(`participant id: ${item.participantSid}`)
       return {
         id: item.sid,
         text: item.body,
         createdAt: item.dateCreated.getTime(),
         author: {
-          id: item.participantSid,
-          firstName: participant?.attributes['first_name'],
-          lastName: participant?.attributes['last_name']
+          id: item.participantSid ?? 'autoReply',
+          firstName: participant?.attributes['first_name'] ?? 'Auto',
+          lastName: participant?.attributes['last_name'] ?? 'Reply'
         },
         type: 'text'
       } as MessageType.Any
@@ -99,9 +102,9 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
           text: message.body,
           createdAt: message.dateCreated.getTime(),
           author: {
-            id: message.participantSid,
-            firstName: participant?.attributes['first_name'],
-            lastName: participant?.attributes['last_name'],
+            id: message.participantSid ?? 'autoReply',
+            firstName: participant?.attributes['first_name'] ?? "Auto",
+            lastName: participant?.attributes['last_name'] ?? "Reply",
           },
           type: 'text'
         }  as MessageType.Any, ...prevMessages])
@@ -128,7 +131,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
         showUserNames
         textInputProps={{ placeholder: 'Type message here' }}
         messages={messages}
-        onSendPress={messages => onSend(messages)}
+        onSendPress={message => onSend(message)}
         theme={{
           ...defaultTheme,
           colors: { ...defaultTheme.colors, inputBackground: '#0062FF', primary: '#0062FF', userAvatarNameColors: ['#363636'] },
