@@ -50,7 +50,13 @@ export const HomeTabs: React.FC<Props> = () => {
     const Tab = createBottomTabNavigator()
 
     return (
-        <Tab.Navigator screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true}} >
+        <Tab.Navigator screenOptions={{
+            headerShown: false,
+            tabBarHideOnKeyboard: true,
+            tabBarActiveTintColor: '#1B45F5',
+            tabBarInactiveTintColor: '#999999',
+            tabBarStyle: { backgroundColor: 'black'}}}
+        >
             <Tab.Screen name={Routes.INBOX} component={InboxScreen}
                 options={({
                     title: 'Messages',
