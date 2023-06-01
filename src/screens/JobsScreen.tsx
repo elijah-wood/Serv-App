@@ -126,8 +126,8 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
           contentContainerStyle={{flex: 1}}
           ListEmptyComponent={
             <EmptyStateView
-              title='Add you first job'
-              subtitle='First, go to the Customers tab, add a customer, and then you can add a job in the customer detail screen'
+              title='Add your first job'
+              subtitle='You can add a job directly from the Customers tab.'
             />
           }
         />

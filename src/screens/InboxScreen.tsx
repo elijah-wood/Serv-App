@@ -171,8 +171,8 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
         contentContainerStyle={{flex: 1}}
         ListEmptyComponent={
           <EmptyStateView
-            title='Add your first customer'
-            subtitle='First, go to the Customers tab and add your first customer. Once done, you will be able to message them here.'
+            title='Send your first message'
+            subtitle='Go to the Customers tab to add your first customer. Once done, you will be able to message them here.'
           />
         }
       />
