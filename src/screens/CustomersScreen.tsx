@@ -9,6 +9,7 @@ import { RefreshControl, DeviceEventEmitter } from 'react-native'
 
 import { RootStackParamList } from '../../App'
 import UseCustomers from '../api/UseCustomers'
+import { EmptyStateView } from '../components/EmptyStateView'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomersScreen'>
 
@@ -47,38 +48,47 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <ContainerView>
-      <SearchBar
-        platform="ios"
-        placeholder="Search"
-        onChangeText={setSearch}
-        value={search}
-      />
-      <AlphabetList
-      style={{height: '100%'}}
-      refreshing={useCustomers.isFetching}
-      refreshControl={
-        <RefreshControl refreshing={useCustomers.isFetching} onRefresh={() => {
-          useCustomers.refetch()
-        }}/>
+      {(!useCustomers.data || !useCustomers.data.result || useCustomers.data?.result.length === 0) ?
+        <EmptyStateView
+          title='Add your first customer'
+          actionTitle='+ Add customer'
+          onPressAction={() => navigation.navigate('AddCustomerScreen')}
+          /> :
+        <>
+          <SearchBar
+            platform="ios"
+            placeholder="Search"
+            onChangeText={setSearch}
+            value={search}
+          />
+          <AlphabetList
+          style={{height: '100%'}}
+          refreshing={useCustomers.isFetching}
+          refreshControl={
+            <RefreshControl refreshing={useCustomers.isFetching} onRefresh={() => {
+              useCustomers.refetch()
+            }}/>
+          }
+          data={useCustomers.data != undefined ? useCustomers.data?.result.map(customer => {
+            return {
+              key: customer.id.toString(),
+              value: `${customer.first_name} ${customer.last_name}`
+            }
+          }).filter(customer => customer.value.toUpperCase().includes(search.toUpperCase())) : []}
+          indexLetterStyle={{ 
+            color: 'black',
+          }}
+          renderCustomItem={(item) => (
+            <Item onPress={() => {
+              navigation.navigate("CustomerDetailScreen", { customerId: item.key })
+            }}><ItemTitle>{item.value}</ItemTitle></Item>
+          )}
+          renderCustomSectionHeader={(section) => (
+            <SectionTitle>{section.title}</SectionTitle>
+          )}
+        />
+        </>
       }
-      data={useCustomers.data != undefined ? useCustomers.data?.result.map(customer => {
-        return {
-          key: customer.id.toString(),
-          value: `${customer.first_name} ${customer.last_name}`
-        }
-      }).filter(customer => customer.value.toUpperCase().includes(search.toUpperCase())) : []}
-      indexLetterStyle={{ 
-        color: 'black',
-      }}
-      renderCustomItem={(item) => (
-        <Item onPress={() => {
-          navigation.navigate("CustomerDetailScreen", { customerId: item.key })
-        }}><ItemTitle>{item.value}</ItemTitle></Item>
-      )}
-      renderCustomSectionHeader={(section) => (
-        <SectionTitle>{section.title}</SectionTitle>
-      )}
-    />
     </ContainerView>
   )
 }
