@@ -12,6 +12,7 @@ import { TwilioService } from '../twilio/TwilioService'
 import { API } from '../api/API'
 import { Thread } from '../components/ConversationThread'
 import { registerForPushNotificationsAsync } from '../utils/PushNotifications'
+import { EmptyStateView } from '../components/EmptyStateView'
 
 type OnboardingSlideGoalsNavigationProp = StackNavigationProp<RootStackParamList, 'InboxScreen'>
 
@@ -167,6 +168,13 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
             navigation.navigate('ChatDetail', { conversationSid: item.sid, name: name})
           }}/>
         )}
+        contentContainerStyle={{flex: 1}}
+        ListEmptyComponent={
+          <EmptyStateView
+            title='Add your first customer'
+            subtitle='First, go to the Customers tab and add your first customer. Once done, you will be able to message them here.'
+          />
+        }
       />
     </ContainerView>
   )
