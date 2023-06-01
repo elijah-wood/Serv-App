@@ -145,6 +145,11 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
             addNewMessages(participants, true)
           }
         }}
+        emptyState={() => (
+            <EmptyChatMessageText>
+              {`This is the start of your message history with ${name}. If you need any assistance, please reach out to @serv and a team member will reply as soon as possible.`}
+            </EmptyChatMessageText>  
+          )}
         />
     </Container>
   )
@@ -159,5 +164,12 @@ const Container = styled.View`
   height: 100%;
   background-color: white;
 `
+
+const EmptyChatMessageText = styled.Text`
+  font-size: 15px;
+  line-height: 18px;
+  opacity: 0.3;
+  letter-spacing: -0.24px;
+`;
 
 export default ChatDetail
