@@ -9,6 +9,7 @@ import { RootStackParamList } from '../../App'
 import UseJobs, { Job } from '../api/UseJobs'
 import { JobRow } from '../components/JobRow'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { EmptyStateView } from '../components/EmptyStateView'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobsScreen'>
 
@@ -122,6 +123,13 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
           renderItem={renderItem}
           renderSectionHeader={renderSectionHeader}
           stickySectionHeadersEnabled={true}
+          contentContainerStyle={{flex: 1}}
+          ListEmptyComponent={
+            <EmptyStateView
+              title='Add you first job'
+              subtitle='First, go to the Customers tab, add a customer, and then you can add a job in the customer detail screen'
+            />
+          }
         />
     </ContainerView>
   )
