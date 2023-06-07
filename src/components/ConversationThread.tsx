@@ -21,7 +21,10 @@ export const Thread: React.FC<ThreadProps> = ({
   
     const getMostRecentMessage = async (): Promise<string> => {
       let messagesPaginator = await props.conversation.getMessages(1)
-      let mostRecentMessage = messagesPaginator.items[0]?.body 
+      const lastMessage = messagesPaginator.items[0];
+      let mostRecentMessage = lastMessage?.attachedMedia.length > 0 ?
+        'Photo' :
+        lastMessage?.body
       if (mostRecentMessage) {
         setLastMessage(mostRecentMessage)
       }
