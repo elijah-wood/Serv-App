@@ -82,8 +82,9 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
         },
       };
       
-      if (item.media) {
-        const uri = await item.media.getContentTemporaryUrl();
+      if (item.attachedMedia.length > 0) {
+        const mediaUrls = await item.getTemporaryContentUrlsForAttachedMedia();
+        const uri = mediaUrls.get(item.attachedMedia[0].sid);
         return {
           ...message,
           uri,
