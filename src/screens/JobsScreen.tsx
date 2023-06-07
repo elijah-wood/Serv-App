@@ -123,7 +123,7 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
           renderItem={renderItem}
           renderSectionHeader={renderSectionHeader}
           stickySectionHeadersEnabled={true}
-          contentContainerStyle={{flex: 1}}
+          contentContainerStyle={{flexGrow: 1}}
           ListEmptyComponent={
             <EmptyStateView
               title='Add your first job'
