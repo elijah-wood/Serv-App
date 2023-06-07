@@ -168,7 +168,7 @@ const InboxScreen: React.FC<Props> = ({ navigation }) => {
             navigation.navigate('ChatDetail', { conversationSid: item.sid, name: name})
           }}/>
         )}
-        contentContainerStyle={{flex: 1}}
+        contentContainerStyle={{flexGrow: 1}}
         ListEmptyComponent={
           <EmptyStateView
             title='Send your first message'
