@@ -23,7 +23,7 @@ export const Thread: React.FC<ThreadProps> = ({
       let messagesPaginator = await props.conversation.getMessages(1)
       const lastMessage = messagesPaginator.items[0];
       let mostRecentMessage = lastMessage?.attachedMedia.length > 0 ?
-        'Photo' :
+        'Attachment: Image' :
         lastMessage?.body
       if (mostRecentMessage) {
         setLastMessage(mostRecentMessage)
