@@ -60,7 +60,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
 
       let messages = await conversation.getMessages()
       chatMessagesPaginator.current = messages
-      addNewMessages(participants, false)
+      await addNewMessages(participants, false)
 
       setIsLoading(false)
     }
@@ -68,22 +68,36 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
     fetchMessages()
   }, [])
 
-  const addNewMessages =  (participants: Participant[], includePreviousMessages: boolean) => {
-    let newMessages = chatMessagesPaginator.current.items.map(item => {      
+  const addNewMessages = async (participants: Participant[], includePreviousMessages: boolean) => {
+    let newMessages = await Promise.all(chatMessagesPaginator.current.items.map(async item => {      
       let participant = participants.find(participant => participant.sid === item.participantSid )
       console.log(`participant id: ${item.participantSid}`)
-      return {
+      const message = {
         id: item.sid,
-        text: item.body,
         createdAt: item.dateCreated.getTime(),
         author: {
           id: item.participantSid ?? 'autoReply',
           firstName: participant?.attributes['first_name'] ?? 'Auto',
           lastName: participant?.attributes['last_name'] ?? 'Reply'
         },
+      };
+      
+      if (item.attachedMedia.length > 0) {
+        const mediaUrls = await item.getTemporaryContentUrlsForAttachedMedia();
+        const uri = mediaUrls.get(item.attachedMedia[0].sid);
+        return {
+          ...message,
+          uri,
+          type: 'image'
+        } as MessageType.Image
+      }
+      
+      return {
+        ...message,
+        text: item.body,
         type: 'text'
-      } as MessageType.Any
-    })
+      } as MessageType.Text
+    }));
     if (includePreviousMessages) {
       setMessages([...messages, ...newMessages.reverse()])
     } else {
