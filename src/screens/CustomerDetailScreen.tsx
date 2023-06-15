@@ -39,8 +39,10 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const [jobs, setJobs] = useState<Job[]>([])
 
   useEffect(() => {
+    const customerListener = DeviceEventEmitter.addListener("event.refetchSelectedCustomer", () => useGetCustomer.refetch())
     DeviceEventEmitter.addListener("event.refetchJobs", () => useGetCustomer.refetch())
     return () => {
+      customerListener.remove();
       DeviceEventEmitter.removeAllListeners("event.refetchJobs")
     }
   }, [])

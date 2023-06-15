@@ -9,6 +9,7 @@ import { CreateInvoiceInput } from "./UseCreateInvoice"
 import { CreateJobInput } from "./UseCreateJob"
 import { SendEstimateInput } from "./UseSendEstimate"
 import { SignInInput } from "./UseSignIn"
+import { UpdateCustomerInput } from "./UseUpdateCustomer"
 import { UpdateJobInput } from "./UseUpdateJob"
 
 export const API = {
@@ -43,6 +44,12 @@ export const API = {
             headers: await AuthenticatedHeaders(),
         })
         return response.data
+    },
+    updateCustomer: async (id: string, values: UpdateCustomerInput) => {
+        const response = await APIClient.patch(`/customers/${id}`, values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data;
     },
     getJobs: async () => {
         const response = await APIClient.get('/jobs', {

@@ -14,6 +14,7 @@ import UseCreateCustomer from '../api/UseCreateCustomer'
 import { Address, Customer } from '../api/UseCustomers'
 import { RouteProp } from '@react-navigation/native'
 import { Item } from 'react-navigation-header-buttons'
+import UseUpdateCustomer from '../api/UseUpdateCustomer'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'AddCustomerScreen'>
 type AddCustomerRouteProp = RouteProp<RootStackParamList, 'AddCustomerScreen'>
@@ -37,6 +38,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [navigation, isEditMode]);
 
   const useCreateCustomer = UseCreateCustomer()
+  const useUpdateCustomer = UseUpdateCustomer(customer?.id);
   
   const { control, handleSubmit, formState: { errors }, getValues, setFocus } = useForm({
     defaultValues: {
@@ -63,8 +65,22 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   }, [useCreateCustomer.status])
 
-  const onSubmit = () => { 
-    useCreateCustomer.mutate({
+  useEffect(() => {
+    switch (useUpdateCustomer.status) {
+      case 'success':
+        if (useUpdateCustomer.data.ok) {
+          DeviceEventEmitter.emit("event.refetchSelectedCustomer");
+          DeviceEventEmitter.emit("event.refetchCustomers")
+          navigation.goBack()
+        }
+        break
+      default:
+        break  
+    }
+  }, [useUpdateCustomer.data])
+
+  const onSubmit = () => {
+    const customer =  {
       phone: getValues('phone'),
       email: getValues('email'),
       first_name: getValues('firstName'),
@@ -77,10 +93,15 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation, route }) => {
         state: getValues('state'),
         postal_code: getValues('zip'),
       } as Address
-    })
+    };
+    if (isEditMode) {
+      useUpdateCustomer.mutate(customer);
+    } else {
+      useCreateCustomer.mutate(customer)
+    }
   }
 
-  const isLoading = useCreateCustomer.isLoading;
+  const isLoading = isEditMode ? useUpdateCustomer.isLoading : useCreateCustomer.isLoading;
 
   return (
     <ContainerView>
