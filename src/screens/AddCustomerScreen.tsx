@@ -11,28 +11,44 @@ import { DeviceEventEmitter } from 'react-native'
 import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
 import UseCreateCustomer from '../api/UseCreateCustomer'
-import { Address } from '../api/UseCustomers'
+import { Address, Customer } from '../api/UseCustomers'
+import { RouteProp } from '@react-navigation/native'
+import { Item } from 'react-navigation-header-buttons'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'AddCustomerScreen'>
+type AddCustomerRouteProp = RouteProp<RootStackParamList, 'AddCustomerScreen'>
 
 type Props = {
-  navigation: NavigationProp
+  navigation: NavigationProp,
+  route: AddCustomerRouteProp
 }
 
-const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
+const AddCustomerScreen: React.FC<Props> = ({ navigation, route }) => {
+  const customer: Customer = route?.params?.customer ?? null;
+  const isEditMode = customer !== null;
+
+  useEffect(() => {
+    if (isEditMode) {
+      navigation.setOptions({
+        headerLeft: () => <Item title='Cancel' onPress={() => navigation.goBack()} />,
+        headerTitle: 'Edit Customer'
+      });
+    }
+  }, [navigation, isEditMode]);
+
   const useCreateCustomer = UseCreateCustomer()
   
   const { control, handleSubmit, formState: { errors }, getValues, setFocus } = useForm({
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      phone: '',
-      email: '',
-      address1: '',
-      address2: '',
-      city: '',
-      state: '',
-      zip: ''
+      firstName: customer?.first_name ?? '',
+      lastName: customer?.last_name ?? '',
+      phone: customer?.phone ?? '',
+      email: customer?.email ?? '',
+      address1: customer?.address?.line1 ?? '',
+      address2: customer?.address?.line2 ?? '',
+      city: customer?.address?.city ?? '',
+      state: customer?.address?.state ?? '',
+      zip: customer?.address?.postal_code ?? ''
     }
   })
 
@@ -63,6 +79,8 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
       } as Address
     })
   }
+
+  const isLoading = useCreateCustomer.isLoading;
 
   return (
     <ContainerView>
@@ -260,7 +278,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
             />
           </VStack>
           <AddButtonWrapper>
-          <DefaultButton label='Add new customer' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useCreateCustomer.isLoading}/>
+          <DefaultButton label={isEditMode ? 'Save' : 'Add new customer'} disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={isLoading}/>
           </AddButtonWrapper>
           
         </VStack>

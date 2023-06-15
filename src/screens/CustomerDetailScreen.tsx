@@ -4,6 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack'
 import { RouteProp } from '@react-navigation/native'
 import { Avatar, Center, HStack, Spacer, VStack, View } from 'native-base'
 import { ScrollView } from 'react-native-virtualized-view'
+// import { } from 'react-navigation-header-buttons';
 
 import { RootStackParamList } from '../../App'
 import { CTAButton } from '../components/CTAButton'
@@ -22,6 +23,7 @@ import { MapButton } from '../components/MapButton'
 import DefaultButton from '../components/DefaultButton'
 import { Job } from '../api/UseJobs'
 import { renderPhoneNumber } from '../utils/RenderPhoneNumber'
+import { Item } from 'react-navigation-header-buttons'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
 type CustomerRouteProp = RouteProp<RootStackParamList, 'CustomerDetailScreen'>
@@ -42,6 +44,15 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       DeviceEventEmitter.removeAllListeners("event.refetchJobs")
     }
   }, [])
+
+  useEffect(() => {
+    if (!customer) {
+      return;
+    }
+    navigation.setOptions({
+      headerRight: () => <Item title='Edit' onPress={() => navigation.navigate('AddCustomerScreen', { customer })} />
+    })
+  }, [navigation, customer]);
   
   useEffect(() => {
     switch (useGetCustomer.status) {
