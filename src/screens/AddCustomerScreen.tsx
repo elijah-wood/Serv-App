@@ -6,33 +6,51 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { VStack } from 'native-base'
 import { Controller, useForm } from 'react-hook-form'
 import PhoneInput from 'react-native-phone-number-input'
-import { DeviceEventEmitter } from 'react-native'
+import { DeviceEventEmitter, Platform } from 'react-native'
 
 import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
 import UseCreateCustomer from '../api/UseCreateCustomer'
-import { Address } from '../api/UseCustomers'
+import { Address, Customer } from '../api/UseCustomers'
+import { RouteProp } from '@react-navigation/native'
+import { Item } from 'react-navigation-header-buttons'
+import UseUpdateCustomer from '../api/UseUpdateCustomer'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'AddCustomerScreen'>
+type AddCustomerRouteProp = RouteProp<RootStackParamList, 'AddCustomerScreen'>
 
 type Props = {
-  navigation: NavigationProp
+  navigation: NavigationProp,
+  route: AddCustomerRouteProp
 }
 
-const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
+const AddCustomerScreen: React.FC<Props> = ({ navigation, route }) => {
+  const customer: Customer = route?.params?.customer ?? null;
+  const isEditMode = customer !== null;
+
+  useEffect(() => {
+    if (isEditMode) {
+      navigation.setOptions({
+        headerLeft: Platform.OS === 'ios' ? () => <Item title='Cancel' onPress={() => navigation.goBack()} /> : null,
+        headerTitle: 'Edit Customer'
+      });
+    }
+  }, [navigation, isEditMode]);
+
   const useCreateCustomer = UseCreateCustomer()
+  const useUpdateCustomer = UseUpdateCustomer(customer?.id);
   
   const { control, handleSubmit, formState: { errors }, getValues, setFocus } = useForm({
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      phone: '',
-      email: '',
-      address1: '',
-      address2: '',
-      city: '',
-      state: '',
-      zip: ''
+      firstName: customer?.first_name ?? '',
+      lastName: customer?.last_name ?? '',
+      phone: customer?.phone ?? '',
+      email: customer?.email ?? '',
+      address1: customer?.address?.line1 ?? '',
+      address2: customer?.address?.line2 ?? '',
+      city: customer?.address?.city ?? '',
+      state: customer?.address?.state ?? '',
+      zip: customer?.address?.postal_code ?? ''
     }
   })
 
@@ -47,8 +65,22 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
     }
   }, [useCreateCustomer.status])
 
-  const onSubmit = () => { 
-    useCreateCustomer.mutate({
+  useEffect(() => {
+    switch (useUpdateCustomer.status) {
+      case 'success':
+        if (useUpdateCustomer.data.ok) {
+          DeviceEventEmitter.emit("event.refetchSelectedCustomer");
+          DeviceEventEmitter.emit("event.refetchCustomers")
+          navigation.goBack()
+        }
+        break
+      default:
+        break  
+    }
+  }, [useUpdateCustomer.data])
+
+  const onSubmit = () => {
+    const customer =  {
       phone: getValues('phone'),
       email: getValues('email'),
       first_name: getValues('firstName'),
@@ -61,8 +93,15 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
         state: getValues('state'),
         postal_code: getValues('zip'),
       } as Address
-    })
+    };
+    if (isEditMode) {
+      useUpdateCustomer.mutate(customer);
+    } else {
+      useCreateCustomer.mutate(customer)
+    }
   }
+
+  const isLoading = isEditMode ? useUpdateCustomer.isLoading : useCreateCustomer.isLoading;
 
   return (
     <ContainerView>
@@ -260,7 +299,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation }) => {
             />
           </VStack>
           <AddButtonWrapper>
-          <DefaultButton label='Add new customer' disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={useCreateCustomer.isLoading}/>
+          <DefaultButton label={isEditMode ? 'Save' : 'Add new customer'} disabled={Object.keys(errors).length === 0 ? false : true} onPress={handleSubmit(onSubmit)} loading={isLoading}/>
           </AddButtonWrapper>
           
         </VStack>

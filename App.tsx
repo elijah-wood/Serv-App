@@ -8,12 +8,14 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import * as Sentry from '@sentry/react-native'
 import { useEffect, useRef } from 'react'
 import { ActionSheetProvider } from '@expo/react-native-action-sheet'
+import { HeaderButtonsProvider } from 'react-navigation-header-buttons';
 
 import { RootNavigator } from './src/navigation/RootNavigator'
 import TokenIntercepter from './src/api/TokenIntercepter'
 import { Job } from './src/api/UseJobs'
 import { InvoiceEstimateItem } from './src/api/UseCreateInvoice'
 import { InvoiceEstimateType } from './src/screens/InvoiceScreen'
+import { Customer } from './src/api/UseCustomers'
 
 AppRegistry.registerComponent(expo.name, () => App)
 
@@ -28,7 +30,7 @@ type RootStackParamList = {
   HomeNavigator: undefined
   CustomersScreen: undefined
   CustomerDetailScreen: { customerId: string }
-  AddCustomerScreen: undefined
+  AddCustomerScreen: { customer?: Customer }
   JobsScreen: undefined
   JobDetailScreen: { jobId: string }
   AddJobScreen: { customerId: string }
@@ -74,7 +76,7 @@ const App: React.FC<Props> = () => {
             </SafeAreaProvider>
           </GestureHandlerRootView>
         </QueryClientProvider>
-      </NativeBaseProvider>  
+      </NativeBaseProvider>
     </>
   )
 }
