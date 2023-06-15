@@ -44,7 +44,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation, route }) => {
     defaultValues: {
       firstName: customer?.first_name ?? '',
       lastName: customer?.last_name ?? '',
-      phone: customer?.phone ?? '',
+      phone: customer?.phone.replace('+1', '') ?? '',
       email: customer?.email ?? '',
       address1: customer?.address?.line1 ?? '',
       address2: customer?.address?.line2 ?? '',
