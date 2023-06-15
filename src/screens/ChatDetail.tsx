@@ -9,6 +9,7 @@ import { RootStackParamList } from '../../App'
 import { TwilioService } from '../twilio/TwilioService'
 import { getUserFromToken } from '../api/Session'
 import { UserResponse } from '../api/UserResponse'
+import { Image } from 'react-native'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'ChatDetail'>
 type ChatDetailRouteProp = RouteProp<RootStackParamList, 'ChatDetail'>
@@ -16,6 +17,18 @@ type ChatDetailRouteProp = RouteProp<RootStackParamList, 'ChatDetail'>
 type Props = {
   navigation: NavigationProp
   route: ChatDetailRouteProp
+}
+
+function renderImageMessage(message: MessageType.Image) {
+  const height = message.height ?? 200;
+  const width = message.width ?? 200;
+
+  return <Image
+      accessibilityRole='image'
+      resizeMode="cover"
+      source={{ uri: message.uri }}
+      style={{ width, height }}
+    />;
 }
 
 const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
@@ -146,6 +159,7 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
         textInputProps={{ placeholder: 'Type message here' }}
         messages={messages}
         onSendPress={message => onSend(message)}
+        renderImageMessage={renderImageMessage}
         theme={{
           ...defaultTheme,
           colors: { ...defaultTheme.colors, inputBackground: '#0062FF', primary: '#0062FF', userAvatarNameColors: ['#363636'] },
