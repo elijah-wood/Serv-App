@@ -6,7 +6,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { VStack } from 'native-base'
 import { Controller, useForm } from 'react-hook-form'
 import PhoneInput from 'react-native-phone-number-input'
-import { DeviceEventEmitter } from 'react-native'
+import { DeviceEventEmitter, Platform } from 'react-native'
 
 import { RootStackParamList } from '../../App'
 import DefaultButton from '../components/DefaultButton'
@@ -31,7 +31,7 @@ const AddCustomerScreen: React.FC<Props> = ({ navigation, route }) => {
   useEffect(() => {
     if (isEditMode) {
       navigation.setOptions({
-        headerLeft: () => <Item title='Cancel' onPress={() => navigation.goBack()} />,
+        headerLeft: Platform.OS === 'ios' ? () => <Item title='Cancel' onPress={() => navigation.goBack()} /> : null,
         headerTitle: 'Edit Customer'
       });
     }
