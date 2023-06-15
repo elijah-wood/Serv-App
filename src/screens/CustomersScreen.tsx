@@ -52,7 +52,9 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
         <EmptyStateView
           title='Add your first customer'
           actionTitle='+ Add customer'
+          secondaryActionTitle="Sync contacts"
           onPressAction={() => navigation.navigate('AddCustomerScreen')}
+          onPressSecondaryAction={() => {}}
           /> :
         <>
           <SearchBar
