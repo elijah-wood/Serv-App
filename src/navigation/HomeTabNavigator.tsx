@@ -151,6 +151,12 @@ export const CustomersStackScreen: React.FC<Props> = () => {
                     title: 'Create Job',
                 }}
              />
+             <Stack.Screen name={Routes.CREATE_INVOICE} component={InvoiceScreen}
+                 options={{
+                    title: 'Invoice',
+                 }}
+             />
+             
         </Stack.Navigator>
     )
 }
