@@ -12,7 +12,7 @@ import UseGetCustomer from '../api/UseGetCustomer'
 import { Customer } from '../api/UseCustomers'
 import { openMap } from '../utils/OpenMap'
 import { renderAddress } from '../utils/RenderAddress'
-import { DeviceEventEmitter, FlatList } from 'react-native'
+import { DeviceEventEmitter, FlatList, Platform } from 'react-native'
 import { makeCall } from '../utils/MakeCall'
 import { composeEmail } from '../utils/ComposeEmail'
 import { JobRow } from '../components/JobRow'
@@ -24,6 +24,7 @@ import DefaultButton from '../components/DefaultButton'
 import { Job } from '../api/UseJobs'
 import { renderPhoneNumber } from '../utils/RenderPhoneNumber'
 import { Item } from 'react-navigation-header-buttons'
+import { copyText } from '../utils/CopyText'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CustomerDetailScreen'>
 type CustomerRouteProp = RouteProp<RootStackParamList, 'CustomerDetailScreen'>
@@ -83,7 +84,9 @@ const CustomerDetailScreen: React.FC<Props> = ({ navigation, route }) => {
             <AvatarContainer>
               <Avatar size={'xl'}>{getInitials(renderCustomerFullName(customer))}</Avatar>
             </AvatarContainer>
-            <CustomerName>{renderCustomerFullName(customer)}</CustomerName>
+            <CustomerName onLongPress={Platform.OS === 'android' ? () => copyText(renderCustomerFullName(customer)) : null} selectable={Platform.OS === 'ios'}>
+              {renderCustomerFullName(customer)}
+            </CustomerName>
           </Center>
           <HStack space={4} justifyContent={'center'} style={{ marginTop: 16, marginHorizontal: 16}}>
               <CTAButton label='call' icon='phone' onPress={() => {

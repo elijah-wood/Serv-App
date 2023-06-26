@@ -1,7 +1,8 @@
 import { ChevronRightIcon, HStack, Spacer, VStack } from 'native-base'
 import React from 'react'
-import { ColorValue, TouchableOpacity, TouchableOpacityProps } from 'react-native'
+import { ColorValue, Platform, ToastAndroid, TouchableOpacity, TouchableOpacityProps } from 'react-native'
 import styled from 'styled-components/native'
+import { copyText } from '../utils/CopyText';
 
 type Props = TouchableOpacityProps & {
     title: string
@@ -15,13 +16,16 @@ export const DetailSection: React.FC<Props> = ({
     onPress,
     ...props
   }) => {
+    const handleLongPress = async () => {
+        copyText(props.value);
+    };
     return (
         <SectionContainer>
-            <TouchableOpacity onPress={onPress} disabled={props.disabled}>
+            <TouchableOpacity onPress={onPress} onLongPress={Platform.OS === 'android' ? handleLongPress: null} disabled={props.disabled}>
                 <HStack alignItems={'center'}>
                     <VStack>
                         <SectionTitle>{props.title}</SectionTitle>
-                        <SectionValue color={props.color} >{props.value}</SectionValue>
+                        <SectionValue selectable={Platform.OS === 'ios'} color={props.color} >{props.value}</SectionValue>
                     </VStack>
                     {(props.showDisclosure == true) && 
                     <>
