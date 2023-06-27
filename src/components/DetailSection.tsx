@@ -2,7 +2,7 @@ import { ChevronRightIcon, HStack, Spacer, VStack } from 'native-base'
 import React from 'react'
 import { ColorValue, Platform, ToastAndroid, TouchableOpacity, TouchableOpacityProps } from 'react-native'
 import styled from 'styled-components/native'
-import { setStringAsync } from 'expo-clipboard';
+import { copyText } from '../utils/CopyText';
 
 type Props = TouchableOpacityProps & {
     title: string
@@ -17,10 +17,7 @@ export const DetailSection: React.FC<Props> = ({
     ...props
   }) => {
     const handleLongPress = async () => {
-        await setStringAsync(props.value)
-        if (Platform.Version <= 32) {
-            ToastAndroid.show("Copied", ToastAndroid.SHORT)
-        }
+        copyText(props.value);
     };
     return (
         <SectionContainer>
