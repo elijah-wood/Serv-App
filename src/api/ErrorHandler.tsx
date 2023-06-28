@@ -25,7 +25,7 @@ export const errorResponseHandler = (error: AxiosError): Promise<never> => {
     let message = "Unknown error."
     if (response) {
         message = response.error
-        if (message.includes("Please visit")) {
+        if (message.includes("account is not yet setup")) {
           handleStripeSetup(message)
           return
         }
