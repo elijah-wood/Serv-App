@@ -25,10 +25,14 @@ export const errorResponseHandler = (error: AxiosError): Promise<never> => {
     let message = "Unknown error."
     if (response) {
         message = response.error
-        if (message.includes("account is not yet setup")) {
+
+        // If there is a message + 420 status, then handle stripe setup
+        if (error?.response?.status == 420) {
           handleStripeSetup(message)
-          return
+          return Promise.reject(error)
         }
+
+        // Fallback to all other messages
         Alert.alert('Error', message)
     }
     console.log(response)  
