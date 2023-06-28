@@ -50,7 +50,7 @@ const handleStripeSetup = (message: string): void => {
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Set up Stripe',
+          text: 'Set Up Stripe',
           onPress: () => {
             Linking.openURL(url)
           },
