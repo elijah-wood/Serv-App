@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios'
-import { Alert } from 'react-native'
+import { Alert, Linking } from 'react-native'
 
 import { logOut } from '../navigation/RootNavigator'
 
@@ -25,9 +25,38 @@ export const errorResponseHandler = (error: AxiosError): Promise<never> => {
     let message = "Unknown error."
     if (response) {
         message = response.error
+        if (message.includes("Please visit")) {
+          handleStripeSetup(message)
+          return
+        }
         Alert.alert('Error', message)
     }
     console.log(response)  
 
     return Promise.reject(error)
+}
+
+const handleStripeSetup = (message: string): void => {
+  const urlRegex = /(https?:\/\/[^\s]+)/
+  const urlMatch = message.match(urlRegex)
+
+  if (urlMatch) {
+    const url = urlMatch[0]
+    const updatedMessage = message.replace(url, '')
+
+    Alert.alert(
+      'Continue Setup',
+      updatedMessage,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Set up Stripe',
+          onPress: () => {
+            Linking.openURL(url)
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  }
 }
