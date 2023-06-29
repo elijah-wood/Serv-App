@@ -51,8 +51,8 @@ const ContactCell = (props: ContactCellProps) => {
           <Spacer />
           
           {selected ?
-          	<Icon name='checkmark-circle' color={'#0046FF'} size={30} /> :
-          	null
+          	<Icon name='checkmark-circle' color={'#0046FF'} size={25} /> :
+          	<EmptySelectedIcon />
           }
 				</HStack>
 				<Divider />
@@ -81,6 +81,15 @@ const ContactTitleText = styled.Text`
 const ContactFieldText = styled.Text`
 	font-size: 15px;
 	line-height: 18px;
+`
+
+const EmptySelectedIcon = styled.View`
+	width: 20px;
+	height: 20px;
+	border-width: 1px;
+	border-radius: 11px;
+	border-color: #C7C7CC;
+	margin-right: 3px;
 `
 
 export default ContactCell
