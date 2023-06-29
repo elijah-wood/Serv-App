@@ -2,41 +2,22 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { SearchBar } from '@rneui/themed'
 import { requestPermissionsAsync, getContactsAsync, PermissionStatus } from 'expo-contacts'
-import { FlatList } from 'react-native'
-import UseCustomers from '../api/UseCustomers'
+import { DeviceEventEmitter, FlatList } from 'react-native'
+import UseCustomers, { Customer } from '../api/UseCustomers'
 import ContactCell, { SelectableContact } from '../components/ContactCell'
 import DefaultButton from '../components/DefaultButton'
-
-const searchContacts = (contacts: SelectableContact[], search: string): SelectableContact[] => {
-	return contacts.filter(contact => {
-  	const searchString = search.trim().toLowerCase();
-  	
-  	if (contact.name.toLowerCase().includes(searchString)) {
-  		return true;
-  	}
-  	
-  	if (contact.phoneNumbers) {
-  		const phoneNumbers = contact.phoneNumbers.map(p => p.digits).join(',')
-  		if (phoneNumbers.includes(searchString)) {
-  			return true;
-  		}
-  	}
-
-  	if (contact.emails) {
-			const emails = contact.emails.map(p => p.email).join(',')
-  		if (emails.includes(searchString)) {
-  			return true;
-  		}
-  	}
-
-  	return false;
-  })
-}
+import { searchContacts } from '../utils/SearchContacts'
+import UseUploadCustomers from '../api/UseUploadCustomers'
+import { useNavigation } from '@react-navigation/native'
 
 const ImportCustomersScreen = () => {
 	const useCustomers = UseCustomers()
-	const [search, setSearch] = useState('');
-	const [contacts, setContacts] = useState<SelectableContact[] | null>(null);
+	const useUploadCustomers = UseUploadCustomers()
+	const navigation = useNavigation()
+
+	const [search, setSearch] = useState('')
+	const [contacts, setContacts] = useState<SelectableContact[] | null>(null)
+	const [isUploading, setUploading] = useState(false);
 
 	const syncContacts = async () => {
 		if (!useCustomers.data) {
@@ -49,7 +30,44 @@ const ImportCustomersScreen = () => {
       return;
     }
     const { data } = await getContactsAsync({});
-    setContacts(data.map(contact => ({ ...contact, selected: false })));
+    setContacts(
+    	data
+    		.sort((a, b) => a.name.localeCompare(b.name))
+    		.map(contact => ({ ...contact, selected: false }))
+		);
+	}
+
+	useEffect(() => {
+		console.log(JSON.stringify(useUploadCustomers.data));
+		switch (useUploadCustomers.status) {
+		case 'success':
+			setUploading(false);
+			DeviceEventEmitter.emit("event.refetchCustomers")
+      navigation.goBack()
+    case 'error':
+    	setUploading(false);
+		default:
+			break
+		}
+	}, [useUploadCustomers.status])
+
+	const importContacts = async () => {
+		setUploading(true);
+		const selectedContacts = contacts.filter(contact => contact.selected)
+		const customers = selectedContacts.map(contact => {
+			let customer = {
+				first_name: contact.firstName,
+				last_name: contact.lastName,
+				email: contact?.emails?.[0].email,
+				phone: '+15416923156'
+			} as Customer
+
+			console.log(JSON.stringify(contact.phoneNumbers))
+
+			return customer
+		});
+		console.log(customers);
+		useUploadCustomers.mutate(customers)
 	}
 
 	const toggleContact = (selectedContact: SelectableContact) => {
@@ -59,11 +77,15 @@ const ImportCustomersScreen = () => {
 			}
 			return contact
 		}))
-	};
+	}
+
+	const handlePressAddContactsButton = () => {
+		importContacts()
+	}
 
 	useEffect(() => {
 		syncContacts()
-	}, []);
+	}, [])
 
  	if (useCustomers.isLoading || !contacts) {
     return (
@@ -74,7 +96,7 @@ const ImportCustomersScreen = () => {
   }
 
   const filteredContactsBySearch = search.trim().length > 0 ?
-  	searchContacts(contacts, search) :
+  	searchContacts<SelectableContact>(contacts, search) :
   	contacts
   const selectedContacts = contacts.filter(contact => contact.selected)
 
@@ -96,6 +118,8 @@ const ImportCustomersScreen = () => {
     	<DefaultButton
     		label={selectedContacts.length > 0 ? `Add ${selectedContacts.length} contacts` : `Add contacts`}
     		disabled={selectedContacts.length === 0}
+    		onPress={handlePressAddContactsButton}
+    		loading={isUploading}
   		/>
     </ButtonContainerView>
 	</ContainerView>
