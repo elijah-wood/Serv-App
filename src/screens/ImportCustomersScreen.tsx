@@ -7,6 +7,32 @@ import UseCustomers from '../api/UseCustomers'
 import ContactCell, { SelectableContact } from '../components/ContactCell'
 import DefaultButton from '../components/DefaultButton'
 
+const searchContacts = (contacts: SelectableContact[], search: string): SelectableContact[] => {
+	return contacts.filter(contact => {
+  	const searchString = search.trim().toLowerCase();
+  	
+  	if (contact.name.toLowerCase().includes(searchString)) {
+  		return true;
+  	}
+  	
+  	if (contact.phoneNumbers) {
+  		const phoneNumbers = contact.phoneNumbers.map(p => p.digits).join(',')
+  		if (phoneNumbers.includes(searchString)) {
+  			return true;
+  		}
+  	}
+
+  	if (contact.emails) {
+			const emails = contact.emails.map(p => p.email).join(',')
+  		if (emails.includes(searchString)) {
+  			return true;
+  		}
+  	}
+
+  	return false;
+  })
+}
+
 const ImportCustomersScreen = () => {
 	const useCustomers = UseCustomers()
 	const [search, setSearch] = useState('');
@@ -22,7 +48,7 @@ const ImportCustomersScreen = () => {
       // TODO show message about contacts permissions
       return;
     }
-    const { data } = await getContactsAsync();
+    const { data } = await getContactsAsync({});
     setContacts(data.map(contact => ({ ...contact, selected: false })));
 	}
 
@@ -47,7 +73,10 @@ const ImportCustomersScreen = () => {
     )
   }
 
-  const selectedContacts = contacts.filter(contact => contact.selected);
+  const filteredContactsBySearch = search.trim().length > 0 ?
+  	searchContacts(contacts, search) :
+  	contacts
+  const selectedContacts = contacts.filter(contact => contact.selected)
 
 	return <ContainerView>
 		<SearchBar
@@ -57,7 +86,7 @@ const ImportCustomersScreen = () => {
       value={search}
     />
     <FlatList
-    	data={contacts}
+    	data={filteredContactsBySearch}
     	keyExtractor={item => item.id}
     	renderItem={({ item }) => <ContactCell contact={item} onPress={() => toggleContact(item)} />}
     	contentContainerStyle={{flexGrow: 1}}
