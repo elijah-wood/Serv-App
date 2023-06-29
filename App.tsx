@@ -31,6 +31,7 @@ type RootStackParamList = {
   CustomersScreen: undefined
   CustomerDetailScreen: { customerId: string }
   AddCustomerScreen: { customer?: Customer }
+  ImportCustomersScreen: undefined
   JobsScreen: undefined
   JobDetailScreen: { jobId: string }
   AddJobScreen: { customerId: string }

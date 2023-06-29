@@ -5,6 +5,7 @@ export default {
     CUSTOMERS: 'CustomersScreen',
     CUSTOMER_DETAIL: 'CustomerDetailScreen',
     ADD_CUSTOMER: 'AddCustomerScreen',
+    IMPORT_CUSTOMERS: 'ImportCustomersScreen',
     JOBS_TAB: 'JobsTab',
     JOBS: 'JobsScreen',
     JOB_DETAIL: 'JobDetailScreen',

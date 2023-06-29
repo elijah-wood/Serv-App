@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { AlphabetList, IData } from 'react-native-section-alphabet-list'
 import { SearchBar } from '@rneui/themed'
 import Icon from 'react-native-vector-icons/Entypo'
+import IconOcticons from 'react-native-vector-icons/Octicons';
 import { IconButton } from 'native-base'
-import { RefreshControl, DeviceEventEmitter, Alert } from 'react-native'
-import { requestPermissionsAsync, getContactsAsync, PermissionStatus } from 'expo-contacts';
+import { RefreshControl, DeviceEventEmitter } from 'react-native'
 
 import { RootStackParamList } from '../../App'
 import UseCustomers from '../api/UseCustomers'
@@ -32,23 +32,17 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
+        <>
+        <IconButton icon={<IconOcticons name='people' color={'#0062FF'} size={25} />} onPress={() => {
+          navigation.navigate('ImportCustomersScreen')
+        }} />
         <IconButton icon={<Icon name='plus' color={'#0062FF'} size={25}/>} onPress={() => {
           navigation.navigate('AddCustomerScreen')
         }}/>
+        </>
       ),
     })
   }, [navigation])
-
-  const syncContacts = async () => {
-    const { status } = await requestPermissionsAsync();
-    if (status !== PermissionStatus.GRANTED) {
-      Alert.alert('Please allow contact access in Settings');
-      return;
-    }
-    const { data } = await getContactsAsync();
-    // TODO: remove alert and save contacts
-    Alert.alert(`${data.length} contacts imported`);
-  };
 
   if (useCustomers.isLoading) {
     return (
@@ -66,7 +60,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
           actionTitle='+ Add customer'
           secondaryActionTitle="Sync Contacts"
           onPressAction={() => navigation.navigate('AddCustomerScreen')}
-          onPressSecondaryAction={() => syncContacts()}
+          onPressSecondaryAction={() => navigation.navigate('ImportCustomersScreen')}
           /> :
         <>
           <SearchBar
