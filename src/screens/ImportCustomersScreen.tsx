@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { SearchBar } from '@rneui/themed'
 import { requestPermissionsAsync, getContactsAsync, PermissionStatus, Contact } from 'expo-contacts'
-import { DeviceEventEmitter, FlatList } from 'react-native'
+import { DeviceEventEmitter, FlatList, Linking } from 'react-native'
 import UseCustomers, { Customer } from '../api/UseCustomers'
 import ContactCell, { SelectableContact } from '../components/ContactCell'
 import DefaultButton from '../components/DefaultButton'
@@ -62,7 +62,7 @@ const ImportCustomersScreen = () => {
     setContacts(
     	data
     		.filter((contact) => filterContact(contact, existingCustomerPhoneNumbers))
-    		.sort((a, b) => a.name.localeCompare(b.name))
+    		.sort((a, b) => a.name?.localeCompare(b.name))
     		.map(contact => ({ ...contact, selected: false }))
 		)
 	}
@@ -114,7 +114,12 @@ const ImportCustomersScreen = () => {
 	}, [])
 
 	if (permissionStatus === PermissionStatus.DENIED) {
-		return <EmptyStateView title='Permissions Denied' />
+		return <EmptyStateView 
+			title='You must allow access to your contacts.'
+			subtitle='In order to do so, go to device settings.'
+			actionTitle='Open Settings'
+			onPressAction={() => Linking.openSettings()}
+		/>
 	}
 
  	if (useCustomers.isLoading || contacts === null) {
@@ -126,7 +131,7 @@ const ImportCustomersScreen = () => {
   }
 
   if (contacts?.length === 0) {
-  	return <EmptyStateView title="No contacts" />
+  	return <EmptyStateView title="All contacts have imported" />
   }
 
   const filteredContactsBySearch = search.trim().length > 0 ?

@@ -66,6 +66,7 @@ const TitleText = styled.Text`
 	font-size: 21px;
 	line-height: 26px;
 	font-weight: bold;
+	text-align: center;
 `;
 
 const SubtitleText = styled.Text`
