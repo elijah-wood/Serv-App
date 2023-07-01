@@ -11,6 +11,7 @@ import { SendEstimateInput } from "./UseSendEstimate"
 import { SignInInput } from "./UseSignIn"
 import { UpdateCustomerInput } from "./UseUpdateCustomer"
 import { UpdateJobInput } from "./UseUpdateJob"
+import { UploadCustomersInput } from "./UseUploadCustomers"
 
 export const API = {
     login: async (values: SignInInput) => {
@@ -50,6 +51,12 @@ export const API = {
             headers: await AuthenticatedHeaders(),
         })
         return response.data;
+    },
+    uploadCustomers: async (values: UploadCustomersInput) => {
+        const response = await APIClient.post(`/customers/upload`, values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
     },
     getJobs: async () => {
         const response = await APIClient.get('/jobs', {

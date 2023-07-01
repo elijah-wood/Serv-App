@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { AlphabetList, IData } from 'react-native-section-alphabet-list'
 import { SearchBar } from '@rneui/themed'
 import Icon from 'react-native-vector-icons/Entypo'
+import IconOcticons from 'react-native-vector-icons/Octicons';
 import { IconButton } from 'native-base'
 import { RefreshControl, DeviceEventEmitter } from 'react-native'
 
@@ -31,9 +32,14 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
+        <>
+        <IconButton icon={<IconOcticons name='people' color={'#0062FF'} size={25} />} onPress={() => {
+          navigation.navigate('ImportCustomersScreen')
+        }} />
         <IconButton icon={<Icon name='plus' color={'#0062FF'} size={25}/>} onPress={() => {
           navigation.navigate('AddCustomerScreen')
         }}/>
+        </>
       ),
     })
   }, [navigation])
@@ -52,7 +58,9 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
         <EmptyStateView
           title='Add your first customer'
           actionTitle='+ Add customer'
+          secondaryActionTitle="Sync Contacts"
           onPressAction={() => navigation.navigate('AddCustomerScreen')}
+          onPressSecondaryAction={() => navigation.navigate('ImportCustomersScreen')}
           /> :
         <>
           <SearchBar

@@ -7,9 +7,19 @@ type Props = {
 	subtitle?: string;
 	actionTitle?: string;
 	onPressAction?: (e: GestureResponderEvent) => void;
+	secondaryActionTitle?: string;
+	onPressSecondaryAction?: (e: GestureResponderEvent) => void;
 };
 
-export const EmptyStateView: React.FC<Props> = ({title, subtitle, actionTitle, onPressAction}) => {
+export const EmptyStateView: React.FC<Props> = (props) => {
+	const {
+		title,
+		subtitle,
+		actionTitle,
+		onPressAction,
+		secondaryActionTitle,
+		onPressSecondaryAction
+	} = props;
 	return <EmptyStateContainerView>
 		<TitleText>
 			{title}
@@ -30,6 +40,18 @@ export const EmptyStateView: React.FC<Props> = ({title, subtitle, actionTitle, o
 			</TouchableOpacity>:
 			null
 		}
+
+		{typeof secondaryActionTitle !== 'undefined' ?
+			<TouchableOpacity onPress={onPressSecondaryAction}>
+				<ButtonContainerWithoutBorders>
+					<ButtonText>
+						{secondaryActionTitle}
+					</ButtonText>
+				</ButtonContainerWithoutBorders>
+			</TouchableOpacity> :
+			null
+		}
+
 	</EmptyStateContainerView>;
 };
 
@@ -44,6 +66,7 @@ const TitleText = styled.Text`
 	font-size: 21px;
 	line-height: 26px;
 	font-weight: bold;
+	text-align: center;
 `;
 
 const SubtitleText = styled.Text`
@@ -54,12 +77,18 @@ const SubtitleText = styled.Text`
 `;
 
 const ButtonContainerView = styled.View`
-	margin-vertical: 30px;
+	margin-top: 30px;
+	margin-bottom: 9px;
 	padding-vertical: 12px;
 	padding-horizontal: 22px;
 	border-width: 1px;
 	border-color: #0046FF;
 	border-radius: 8px;
+`;
+
+const ButtonContainerWithoutBorders = styled.View`
+	padding-vertical: 9px;
+	padding-horizontal: 22px;
 `;
 
 const ButtonText = styled.Text`
