@@ -27,7 +27,7 @@ const ContactCell = (props: ContactCellProps) => {
 			<VStack space={5}>
 				<HStack style={{alignItems: 'center'}}>
 					<Avatar>
-            {getInitials(contact.name)}
+            {getInitials(contact.name ?? '')}
           </Avatar>
           <ContactCellContentView>
           	<ContactTitleText>

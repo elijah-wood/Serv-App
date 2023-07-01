@@ -4,7 +4,7 @@ export function searchContacts<T extends Contact>(contacts: T[], search: string)
 	return contacts.filter(contact => {
   	const searchString = search.trim().toLowerCase();
   	
-  	if (contact.name.toLowerCase().includes(searchString)) {
+  	if (contact.name?.toLowerCase().includes(searchString)) {
   		return true;
   	}
   	
