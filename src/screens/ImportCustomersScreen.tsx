@@ -12,8 +12,16 @@ import { useNavigation } from '@react-navigation/native'
 import { EmptyStateView } from '../components/EmptyStateView'
 import { formatPhoneNumber } from '../utils/FormatPhoneNumber'
 
-const filterContact = (contact: Contact): boolean => {
-	return contact.phoneNumbers?.length > 0;
+const filterContact = (contact: Contact, existingPhoneNumbers: string[]): boolean => {
+	if (!contact.phoneNumbers || contact.phoneNumbers?.length === 0) {
+		return false
+	}
+
+	if (existingPhoneNumbers.indexOf(formatPhoneNumber(contact.phoneNumbers?.[0].number)) !== -1) {
+		return false
+	}
+
+	return true
 }
 
 const getImportButtonLabel = (contacts: SelectableContact[]): string => {
@@ -40,17 +48,20 @@ const ImportCustomersScreen = () => {
 		const { status } = await requestPermissionsAsync()
 		setPermissionStatus(status)
     if (status !== PermissionStatus.GRANTED) {
-      // TODO show message about contacts permissions
       return;
     }
-		if (!useCustomers.data) {
-			await useCustomers.refetch()
+
+    let existingCustomers = useCustomers.data?.result
+		if (!existingCustomers) {
+			existingCustomers = (await useCustomers.refetch()).data.result
 		}
-		// const existingCustomers = useCustomers.data;
+
+		const existingCustomerPhoneNumbers = existingCustomers?.map(customer => customer.phone)
+
     const { data } = await getContactsAsync({})
     setContacts(
     	data
-    		.filter(filterContact)
+    		.filter((contact) => filterContact(contact, existingCustomerPhoneNumbers))
     		.sort((a, b) => a.name.localeCompare(b.name))
     		.map(contact => ({ ...contact, selected: false }))
 		)
