@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { SearchBar } from '@rneui/themed'
 import { requestPermissionsAsync, getContactsAsync, PermissionStatus, Contact } from 'expo-contacts'
-import { DeviceEventEmitter, FlatList, Linking } from 'react-native'
+import { DeviceEventEmitter, Linking } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
 import UseCustomers, { Customer } from '../api/UseCustomers'
 import ContactCell, { SelectableContact } from '../components/ContactCell'
 import DefaultButton from '../components/DefaultButton'
@@ -146,11 +147,11 @@ const ImportCustomersScreen = () => {
       onChangeText={setSearch}
       value={search}
     />
-    <FlatList
+    <FlashList
+    	estimatedItemSize={85}
     	data={filteredContactsBySearch}
     	keyExtractor={item => item.id}
     	renderItem={({ item }) => <ContactCell contact={item} onPress={() => toggleContact(item)} />}
-    	contentContainerStyle={{flexGrow: 1}}
     	keyboardDismissMode="interactive"
     />
     <ButtonContainerView>
