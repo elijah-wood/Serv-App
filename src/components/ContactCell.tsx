@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { GestureResponderEvent, TouchableOpacity } from 'react-native'
 import { getInitials } from '../utils/GetStringInitials'
 import { Contact } from 'expo-contacts'
+import { renderPhoneNumber } from '../utils/RenderPhoneNumber';
 
 export interface SelectableContact extends Contact {
 	selected: boolean
@@ -35,7 +36,7 @@ const ContactCell = (props: ContactCellProps) => {
           	
           	{phoneNumber ?
 	          	<ContactFieldText>
-	          		{phoneNumber}
+	          		{renderPhoneNumber(phoneNumber)}
 	          	</ContactFieldText> :
 	          	null
 	          }

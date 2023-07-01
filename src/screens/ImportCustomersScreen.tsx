@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components/native'
 import { SearchBar } from '@rneui/themed'
-import { requestPermissionsAsync, getContactsAsync, PermissionStatus } from 'expo-contacts'
+import { requestPermissionsAsync, getContactsAsync, PermissionStatus, Contact } from 'expo-contacts'
 import { DeviceEventEmitter, FlatList } from 'react-native'
 import UseCustomers, { Customer } from '../api/UseCustomers'
 import ContactCell, { SelectableContact } from '../components/ContactCell'
@@ -9,6 +9,22 @@ import DefaultButton from '../components/DefaultButton'
 import { searchContacts } from '../utils/SearchContacts'
 import UseUploadCustomers from '../api/UseUploadCustomers'
 import { useNavigation } from '@react-navigation/native'
+import { EmptyStateView } from '../components/EmptyStateView'
+import { formatPhoneNumber } from '../utils/FormatPhoneNumber'
+
+const filterContact = (contact: Contact): boolean => {
+	return contact.phoneNumbers?.length > 0;
+}
+
+const getImportButtonLabel = (contacts: SelectableContact[]): string => {
+	if (contacts.length === 1) {
+		return `Add ${contacts.length} Customer`
+	}
+	if (contacts.length > 1) {
+		return `Add ${contacts.length} Customers`
+	}
+	return 'Add Customers'
+}
 
 const ImportCustomersScreen = () => {
 	const useCustomers = UseCustomers()
@@ -17,35 +33,37 @@ const ImportCustomersScreen = () => {
 
 	const [search, setSearch] = useState('')
 	const [contacts, setContacts] = useState<SelectableContact[] | null>(null)
-	const [isUploading, setUploading] = useState(false);
+	const [isUploading, setUploading] = useState(false)
+	const [permissionStatus, setPermissionStatus] = useState(PermissionStatus.UNDETERMINED)
 
 	const syncContacts = async () => {
-		if (!useCustomers.data) {
-			await useCustomers.refetch();
-		}
-		// const existingCustomers = useCustomers.data;
-		const { status } = await requestPermissionsAsync();
+		const { status } = await requestPermissionsAsync()
+		setPermissionStatus(status)
     if (status !== PermissionStatus.GRANTED) {
       // TODO show message about contacts permissions
       return;
     }
-    const { data } = await getContactsAsync({});
+		if (!useCustomers.data) {
+			await useCustomers.refetch()
+		}
+		// const existingCustomers = useCustomers.data;
+    const { data } = await getContactsAsync({})
     setContacts(
     	data
+    		.filter(filterContact)
     		.sort((a, b) => a.name.localeCompare(b.name))
     		.map(contact => ({ ...contact, selected: false }))
-		);
+		)
 	}
 
 	useEffect(() => {
-		console.log(JSON.stringify(useUploadCustomers.data));
 		switch (useUploadCustomers.status) {
 		case 'success':
-			setUploading(false);
+			setUploading(false)
 			DeviceEventEmitter.emit("event.refetchCustomers")
       navigation.goBack()
     case 'error':
-    	setUploading(false);
+    	setUploading(false)
 		default:
 			break
 		}
@@ -58,15 +76,12 @@ const ImportCustomersScreen = () => {
 			let customer = {
 				first_name: contact.firstName,
 				last_name: contact.lastName,
-				email: contact?.emails?.[0].email,
-				phone: '+15416923156'
+				email: contact.emails?.[0].email,
+				phone: formatPhoneNumber(contact.phoneNumbers?.[0].number)
 			} as Customer
-
-			console.log(JSON.stringify(contact.phoneNumbers))
 
 			return customer
 		});
-		console.log(customers);
 		useUploadCustomers.mutate(customers)
 	}
 
@@ -87,12 +102,20 @@ const ImportCustomersScreen = () => {
 		syncContacts()
 	}, [])
 
- 	if (useCustomers.isLoading || !contacts) {
+	if (permissionStatus === PermissionStatus.DENIED) {
+		return <EmptyStateView title='Permissions Denied' />
+	}
+
+ 	if (useCustomers.isLoading || contacts === null) {
     return (
       <ContainerView>
           <PaddedActivityIndicator/>
       </ContainerView>
     )
+  }
+
+  if (contacts?.length === 0) {
+  	return <EmptyStateView title="No contacts" />
   }
 
   const filteredContactsBySearch = search.trim().length > 0 ?
@@ -116,7 +139,7 @@ const ImportCustomersScreen = () => {
     />
     <ButtonContainerView>
     	<DefaultButton
-    		label={selectedContacts.length > 0 ? `Add ${selectedContacts.length} contacts` : `Add contacts`}
+    		label={getImportButtonLabel(selectedContacts)}
     		disabled={selectedContacts.length === 0}
     		onPress={handlePressAddContactsButton}
     		loading={isUploading}
