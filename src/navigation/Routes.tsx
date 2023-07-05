@@ -22,6 +22,7 @@ export default {
     ACCOUNT: "Account",
     SIGN_IN: "SignIn",
     PHONE_VERIFICATION_SCREEN: "PhoneVerificationScreen",
-    ADD_MEMBER: "AddMemberScreen"
+    ADD_MEMBER: "AddMemberScreen",
+    IMPORT_TEAM_MEMBERS: 'ImportTeamMembersScreen'
   }
   

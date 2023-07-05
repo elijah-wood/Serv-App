@@ -15,7 +15,7 @@ import TokenIntercepter from './src/api/TokenIntercepter'
 import { Job } from './src/api/UseJobs'
 import { InvoiceEstimateItem } from './src/api/UseCreateInvoice'
 import { InvoiceEstimateType } from './src/screens/InvoiceScreen'
-import { Customer } from './src/api/UseCustomers'
+import { Customer, Member } from './src/api/UseCustomers'
 
 AppRegistry.registerComponent(expo.name, () => App)
 
@@ -31,7 +31,7 @@ type RootStackParamList = {
   CustomersScreen: undefined
   CustomerDetailScreen: { customerId: string }
   AddCustomerScreen: { customer?: Customer }
-  ImportCustomersScreen: undefined
+  ImportCustomersScreen: { customers?: Customer[] }
   JobsScreen: undefined
   JobDetailScreen: { jobId: string }
   AddJobScreen: { customerId: string }
@@ -40,7 +40,8 @@ type RootStackParamList = {
   TeamScreen: undefined
   AnalyticsScreen: undefined
   InvoiceScreen: { job: Job, type?: InvoiceEstimateType, invoiceId?: string, estimateId?: string, dueDate?: string, invoiceEstimateItems?: InvoiceEstimateItem[] }
-  AddMemberScreen: undefined
+  AddMemberScreen: undefined,
+  ImportTeamMembersScreen: { members?: Member[] }
 }
 
 const queryClient = new QueryClient()

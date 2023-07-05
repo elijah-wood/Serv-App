@@ -34,7 +34,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
       headerRight: () => (
         <>
         <IconButton icon={<IconOcticons name='people' color={'#0062FF'} size={25} />} onPress={() => {
-          navigation.navigate('ImportCustomersScreen')
+          navigation.navigate('ImportCustomersScreen', { customers: useCustomers.data?.result })
         }} />
         <IconButton icon={<Icon name='plus' color={'#0062FF'} size={25}/>} onPress={() => {
           navigation.navigate('AddCustomerScreen')
