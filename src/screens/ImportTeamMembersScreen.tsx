@@ -1,7 +1,9 @@
 import { RouteProp } from '@react-navigation/native';
 import { Contact } from 'expo-contacts';
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { RootStackParamList } from '../../App';
+import { Member } from '../api/UseCustomers';
+import UseUploadMembers from '../api/UseUploadMembers';
 import { SelectableContact } from '../components/ContactCell';
 import ImportContactList from '../components/ImportContactList';
 import { formatPhoneNumber } from '../utils/FormatPhoneNumber';
@@ -13,16 +15,37 @@ type ImportTeamMembersScreenProps = {
 }
 
 const ImportTeamMembersScreen = (props: ImportTeamMembersScreenProps) => {
-	const members = props.route?.params?.members ?? [];
+	const useUploadMembers = UseUploadMembers()
+	const members = props.route?.params?.members ?? []
 	const phoneNumbers: string[] = useMemo(() => {
-		return members.map(member => member.User.phone);
-	}, [members]);
+		return members.map(member => member.User.phone)
+	}, [members])
 
 	const [isUploading, setUploading] = useState(false)
 
+	useEffect(() => {
+		switch (useUploadMembers.status) {
+		case 'success':
+			setUploading(false)
+    case 'error':
+    	setUploading(false)
+		default:
+			break
+		}
+	}, [useUploadMembers.status])
+
 	const handleImport = (contacts: SelectableContact[]) => {
 		setUploading(true)
-		
+		const members = contacts.map(contact => {
+			let member = {
+				first_name: contact.firstName,
+				last_name: contact.lastName,
+				email: contact.emails?.[0].email,
+				phone: formatPhoneNumber(contact?.phoneNumbers?.[0].number)
+			}
+			return member
+		});
+		useUploadMembers.mutate(members)
 		setUploading(false)
 	}
 
