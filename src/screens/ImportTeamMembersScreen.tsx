@@ -28,7 +28,6 @@ const ImportTeamMembersScreen = (props: ImportTeamMembersScreenProps) => {
     switch (useUploadMembers.status) {
       case 'success':
         setUploading(false)
-        console.log(useUploadMembers.data);
         Alert.alert(
           'Contacts who don’t already have Serv accounts will be invited.',
           'Once they accept the invitation, you’ll be able to message them here.',
