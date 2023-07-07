@@ -36,6 +36,9 @@
         "projectId": "02ad17dd-170e-49f0-867e-09150465cc72"
       }
     },
-    "owner": "elijahwood"
+    "owner": "elijahwood",
+    "plugins": [
+      "@heap/react-native-heap"
+    ]
   }
 }

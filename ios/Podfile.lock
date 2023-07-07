@@ -76,6 +76,7 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.71.8)
   - fmt (6.2.1)
   - glog (0.3.5)
+  - Heap (9.1.0)
   - hermes-engine (0.71.8):
     - hermes-engine/Pre-built (= 0.71.8)
   - hermes-engine/Pre-built (0.71.8)
@@ -333,6 +334,9 @@ PODS:
     - glog
   - react-native-date-picker (4.2.13):
     - React-Core
+  - react-native-heap (0.22.3):
+    - Heap (~> 9.0)
+    - React
   - react-native-netinfo (9.3.7):
     - React-Core
   - react-native-safe-area-context (4.5.0):
@@ -526,6 +530,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
+  - "react-native-heap (from `../node_modules/@heap/react-native-heap`)"
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -556,6 +561,7 @@ SPEC REPOS:
   trunk:
     - ASN1Decoder
     - fmt
+    - Heap
     - libevent
     - Sentry
     - SentryPrivate
@@ -657,6 +663,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-date-picker:
     :path: "../node_modules/react-native-date-picker"
+  react-native-heap:
+    :path: "../node_modules/@heap/react-native-heap"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-safe-area-context:
@@ -743,6 +751,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 0d9a4f4de7ab614c49e98c00aedfd3bfbda33d59
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
+  Heap: 5cf4e3f4b2fdfdae57a619fad4cafd5a654ccc97
   hermes-engine: 47986d26692ae75ee7a17ab049caee8864f855de
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
@@ -760,6 +769,7 @@ SPEC CHECKSUMS:
   React-jsinspector: c712f9e3bb9ba4122d6b82b4f906448b8a281580
   React-logger: 342f358b8decfbf8f272367f4eacf4b6154061be
   react-native-date-picker: 04e866ba4e7857f83abd504ad42e787f0f02ae00
+  react-native-heap: 23cc725b4a212978c17bbe3c196a6099f37df951
   react-native-netinfo: 2517ad504b3d303e90d7a431b0fcaef76d207983
   react-native-safe-area-context: 39c2d8be3328df5d437ac1700f4f3a4f75716acc
   React-perflogger: d21f182895de9d1b077f8a3cd00011095c8c9100
