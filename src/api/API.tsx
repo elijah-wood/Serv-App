@@ -12,6 +12,7 @@ import { SignInInput } from "./UseSignIn"
 import { UpdateCustomerInput } from "./UseUpdateCustomer"
 import { UpdateJobInput } from "./UseUpdateJob"
 import { UploadCustomersInput } from "./UseUploadCustomers"
+import { UploadMembersInput } from "./UseUploadMembers"
 
 export const API = {
     login: async (values: SignInInput) => {
@@ -124,6 +125,12 @@ export const API = {
         })
         return response.data
     },   
+    uploadMembers: async (values: UploadMembersInput) => {
+         const response = await APIClient.post(`/members/upload`, values, {
+            headers: await AuthenticatedHeaders(),
+        })
+        return response.data
+    },
     addCollaborator: async (values: AddCollaboratorInput) => {
         const response = await APIClient.post('/collaborators', values, {
             headers: await AuthenticatedHeaders(),

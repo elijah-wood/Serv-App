@@ -19,6 +19,7 @@ import AddJobScreen from '../screens/AddJobScreen'
 import InvoiceScreen from '../screens/InvoiceScreen'
 import AddMemberScreen from '../screens/AddMemberScreen'
 import ImportCustomersScreen from '../screens/ImportCustomersScreen'
+import ImportTeamMembersScreen from '../screens/ImportTeamMembersScreen'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'HomeNavigator'>
 
@@ -228,6 +229,11 @@ export const TeamStackScreen: React.FC<Props> = () => {
             <Stack.Screen name={Routes.ADD_MEMBER} component={AddMemberScreen} 
                 options={{
                     title: 'Add Member',
+                }}
+            />
+            <Stack.Screen name={Routes.IMPORT_TEAM_MEMBERS} component={ImportTeamMembersScreen}
+                options={{
+                    title: 'Add Contacts'
                 }}
             />
         </Stack.Navigator>

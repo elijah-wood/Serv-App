@@ -4,6 +4,7 @@ type UserResponse = {
   last_name?: string
   email?: string
   team?: Team
+  phone?: string
 }
   
 type Team = {

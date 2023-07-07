@@ -135,6 +135,9 @@ const TeamScreen: React.FC<Props> = ({ navigation }) => {
                 <Button title='Add Member' onPress={() => {
                   navigation.navigate('AddMemberScreen')
                 }}/>
+                <Button title='Import Contacts' onPress={() => {
+                  navigation.navigate('ImportTeamMembersScreen', { members })
+                }} />
               </VStack>
             </PaddedContainer>
           </SectionContainer>
