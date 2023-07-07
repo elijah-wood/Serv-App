@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { NavigationContainer, DefaultTheme, DarkTheme, NavigationContainerRef, CommonActions } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { ActivityIndicator, useColorScheme, View } from 'react-native'
+import Heap from '@heap/react-native-heap';
 
 import Routes from './Routes'
 import { AccountNavigator } from './AccountNavigator'
@@ -9,6 +10,10 @@ import { HomeNavigator } from './HomeTabNavigator'
 import { getUserSession, removeUserSession } from '../api/Session'
 import { RootStackParamList } from '../../App'
 import { HeaderButtonsProvider } from 'react-navigation-header-buttons'
+
+const HeapNavigationContainer = Heap.withReactNavigationAutotrack(
+  NavigationContainer
+)
 
 function SplashScreen() {
   return (
@@ -54,13 +59,13 @@ export const RootNavigator = () => {
   }
 
   return (
-    <NavigationContainer ref={navigationRef} theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <HeapNavigationContainer ref={navigationRef} theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
       <HeaderButtonsProvider stackType='native'>
         <Stack.Navigator initialRouteName={isLoggedIn ? Routes.HOME : Routes.ACCOUNT} screenOptions={{ headerShown: false }}>
           <Stack.Screen name={Routes.HOME} component={HomeNavigator} options={{ headerShown: false }} />
           <Stack.Screen name={Routes.ACCOUNT} component={AccountNavigator} options={{  headerShown: false }} />
         </Stack.Navigator>
       </HeaderButtonsProvider>
-    </NavigationContainer>
+    </HeapNavigationContainer>
   )
 }
