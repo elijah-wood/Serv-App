@@ -17,10 +17,27 @@ type Props = {
   navigation: NavigationProp
 }
 
+const searchJob = (job: Job, search: string) => {
+  if (search.trim() === '') {
+    return true
+  }
+  const searchString = search.trim().toLowerCase()
+  if (job.name.toLowerCase().includes(searchString)) {
+    return true;
+  }
+  if (job.Customer.first_name?.toLowerCase().includes(searchString)) {
+    return true;
+  }
+  if (job.Customer.last_name?.toLowerCase().includes(searchString)) {
+    return true;
+  }
+  return false;
+}
+
 const JobsScreen: React.FC<Props> = ({ navigation }) => {
   const useJobs = UseJobs()
   const [search, setSearch] = useState("")
-  const [groupedJobs, setGroupedJobs] = useState<{ title: string, data: Job[], hidden: boolean}[]>([{ title: '', data: [], hidden: false}])
+  const [jobs, setJobs] = useState<Job[]>(null);
 
   useEffect(() => {
     DeviceEventEmitter.addListener("event.refetchJobs", () => useJobs.refetch() )
@@ -32,7 +49,7 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     switch (useJobs.status) {
       case 'success':
-        setGroupedJobs(groupByStatus(useJobs.data?.result))
+        setJobs(useJobs.data?.result)
         break
       default:
         break
@@ -105,14 +122,17 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
     )
   }
 
+  const searchedJobs = jobs?.filter((job) => searchJob(job, search))
+  const groupedJobs = groupByStatus(searchedJobs ?? [])
+
   return (
     <ContainerView>
-        {/* <SearchBar
+       {jobs?.length > 0 ? <SearchBar
           platform="ios"
-          placeholder="Search Job Name"
+          placeholder="Search by job name or customer"
           onChangeText={setSearch}
           value={search}
-        /> */}
+        /> : null} 
         <SectionList
           refreshControl={
             <RefreshControl refreshing={useJobs.isFetching} onRefresh={() => useJobs.refetch()}/>
@@ -125,10 +145,10 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
           stickySectionHeadersEnabled={true}
           contentContainerStyle={{flexGrow: 1}}
           ListEmptyComponent={
-            <EmptyStateView
+            search === '' ? <EmptyStateView
               title='Add your first job'
               subtitle='You can add a job directly from the Customers tab.'
-            />
+            />: null
           }
         />
     </ContainerView>
