@@ -129,7 +129,7 @@ const JobsScreen: React.FC<Props> = ({ navigation }) => {
     <ContainerView>
        {jobs?.length > 0 ? <SearchBar
           platform="ios"
-          placeholder="Search by job name or customer"
+          placeholder="Search By Job Name Or Customer"
           onChangeText={setSearch}
           value={search}
         /> : null} 
