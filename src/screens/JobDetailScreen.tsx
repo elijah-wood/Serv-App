@@ -190,7 +190,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           }}/>
           {/* Collaborators */}
           <SectionContainer>
-            <SectionTitle>Collaborators</SectionTitle>
+            <SectionTitle>Team Members</SectionTitle>
             <InlineListContainer>
               <VStack space={collaborators.length > 0 ? 4 : 0}>
                 <FlatList
@@ -213,7 +213,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                     )}
                   />
                   
-                  <DefaultButton label='Add Collaborator' loading={useAddCollaborator.isLoading} onPress={async () => {
+                  <DefaultButton label='Add Team Member' loading={useAddCollaborator.isLoading} onPress={async () => {
                     if (useMembers.data.result.length == 1) {
                       Alert.alert('You have no team members added to your account', 'Go to the Team tab and invite a member first.')
                       return
