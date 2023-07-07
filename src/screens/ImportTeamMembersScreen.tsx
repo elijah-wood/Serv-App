@@ -55,7 +55,6 @@ const ImportTeamMembersScreen = (props: ImportTeamMembersScreenProps) => {
       return member
     });
     useUploadMembers.mutate(members)
-    setUploading(false)
   }
 
   const filterContact = (contact: Contact) => {
