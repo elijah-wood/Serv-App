@@ -2,7 +2,8 @@ import { UseMutationResult, useMutation } from 'react-query'
 import { API } from './API'
 
 type UpdateJobInput = {
-    status: string
+    status?: string
+    notes?: string
 }
 
 type CreateJobResponse = {

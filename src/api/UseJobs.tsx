@@ -7,6 +7,7 @@ type Job = {
     id: string
     name?: string
     description?: string
+    notes?: string
     status?: string
     customer_id: string
     home_size?: string

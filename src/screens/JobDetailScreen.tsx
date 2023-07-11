@@ -48,8 +48,10 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
 
   useEffect(() => {
     DeviceEventEmitter.addListener("event.refetchInvoices", () => useGetJob.refetch())
+    DeviceEventEmitter.addListener("event.refetchSelectedJob", () => useGetJob.refetch())
     return () => {
       DeviceEventEmitter.removeAllListeners("event.refetchInvoices")
+      DeviceEventEmitter.removeAllListeners("event.refetchSelectedJob")
     }
   }, [])
 
@@ -120,6 +122,9 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <DetailSection title='Description' value={job?.description ?? ''} onPress={() => {
             
           }}/>
+          <DetailSection title="Notes" value={job?.notes ?? ''} showDisclosure onPress={() => {
+            navigation.navigate('JobNotesEditScreen', { job })
+          }} />
           <SelectDropdown
             data={['Prospect', 'Estimated', 'Scheduled', 'Invoiced', 'Completed']}
             onSelect={(selectedItem) => {                
@@ -273,8 +278,8 @@ const TitleText = styled.Text`
 
 const ContainerView = styled.View`
   background-color: transparent;
-  height: 100%;
   width: 100%;
+  flexGrow: 1
 `
 
 export default JobDetailScreen

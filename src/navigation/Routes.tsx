@@ -23,6 +23,7 @@ export default {
     SIGN_IN: "SignIn",
     PHONE_VERIFICATION_SCREEN: "PhoneVerificationScreen",
     ADD_MEMBER: "AddMemberScreen",
-    IMPORT_TEAM_MEMBERS: 'ImportTeamMembersScreen'
+    IMPORT_TEAM_MEMBERS: 'ImportTeamMembersScreen',
+    JOB_NOTES_EDIT_SCREEN: 'JobNotesEditScreen'
   }
   
