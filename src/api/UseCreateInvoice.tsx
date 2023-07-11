@@ -8,6 +8,7 @@ type CreateInvoiceInput = {
     price: number
     due_date: number
     items: InvoiceEstimateItem[]
+    notes?: string
 }
 
 type InvoiceEstimateItem = {

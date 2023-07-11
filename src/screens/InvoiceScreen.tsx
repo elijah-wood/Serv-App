@@ -56,6 +56,8 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
     const [date, setDate] = useState(dueDate ? new Date(dueDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
     const [openDatePicker, setOpenDatePicker] = useState(false)
 
+    const [notes, setNotes] = useState<string>('')
+
     useEffect(() => {
         navigation.setOptions({ title: type == undefined ? 'New' : (type == InvoiceEstimateType.Invoice ? 'Invoice' : 'Estimate') })
     }, [])
@@ -165,6 +167,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                 customer_id: job.Customer.id,
                 job_id: job.id,
                 price: grandTotal,
+                notes,
                 items: items.map(item => {                                     
                     return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
                 }
@@ -182,6 +185,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                     customer_id: job.Customer.id,
                     job_id: job.id,
                     price: grandTotal,
+                    notes,
                     items: items.map(item => {                                     
                         return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
                     }
@@ -192,6 +196,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                     send: true,
                     customer_id: job.Customer.id,
                     job_id: job.id,
+                    notes,
                     price: grandTotal,
                     items: items.map(item => {                                     
                         return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
@@ -210,6 +215,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                 customer_id: job.Customer.id,
                 job_id: job.id,
                 price: grandTotal,
+                notes,
                 due_date: Math.floor(date.getTime() / 1000),
                 items: items.map(item => {                                     
                     return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
@@ -228,6 +234,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                     customer_id: job.Customer.id,
                     job_id: job.id,
                     price: grandTotal,
+                    notes,
                     due_date: Math.floor(date.getTime() / 1000),
                     items: items.map(item => {                                     
                         return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
@@ -240,6 +247,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                     customer_id: job.Customer.id,
                     job_id: job.id,
                     price: grandTotal,
+                    notes,
                     due_date: Math.floor(date.getTime() / 1000),
                     items: items.map(item => {                                     
                         return { description: item.name, unit_amount: item.price, quantity: item.quantity } as InvoiceItemAPI 
@@ -270,6 +278,12 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                         <VStack>
                             <Cell title={'Customer'} subtitle={renderCustomerFullName(job.Customer)}/>
                             <Cell title={'Job'} subtitle={job.name}/>
+                            <EditableCell
+                              title='Notes'
+                              value={notes}
+                              onChangeValue={setNotes}
+                              placeholder='Type your notes'
+                            />
                             {type == InvoiceEstimateType.Invoice && (
                                 <TouchableOpacity onPress={() => setOpenDatePicker(true)}>
                                     <Cell title={'Due Date'} subtitle={date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: '2-digit' })}/>
@@ -366,6 +380,25 @@ const Cell = ({title, subtitle}) => (
         <Divider/>
     </VStack>
 )
+
+type EditableCellProps = {
+  title: string,
+  value: string,
+  onChangeValue: (newValue: string) => void,
+  placeholder: string
+}
+
+const EditableCell = ({ title, value, onChangeValue, placeholder }: EditableCellProps) => {
+  return <VStack space={1}>
+    <CellTitle>{title}</CellTitle>
+    <CellTextInput
+      value={value}
+      onChangeText={onChangeValue}
+      placeholder={placeholder}
+    />
+    <Divider />
+  </VStack>
+}
 
 
 interface Item {
@@ -499,6 +532,11 @@ const ContainerView = styled.View`
   background-color: white;
   height: 100%;
   width: 100%;
+`
+
+const CellTextInput = styled.TextInput`
+  font-size: 17px;
+  padding-bottom: 17px;
 `
 
 export default InvoiceScreen

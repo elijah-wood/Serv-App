@@ -6,6 +6,7 @@ type SendEstimateInput = {
     customer_id: string
     job_id: string
     price: number
+    notes?: string
     items: InvoiceEstimateItem[]
 }
 
