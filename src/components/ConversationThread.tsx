@@ -109,9 +109,9 @@ export const Thread: React.FC<ThreadProps> = ({
                 }}>
                 <VStack space={5}>
                     <HStack space={2}>
-                    <Avatar>
-                        {getInitials(name)}
-                    </Avatar>
+                      <Avatar source={name === 'Serv Team' && require('../assets/icon.png')}>
+                          {getInitials(name)}
+                      </Avatar>
                     <ThreadFlexFillWidth>
                         <HStack alignItems={"center"}>
                         <ThreadTitle>{name}</ThreadTitle>

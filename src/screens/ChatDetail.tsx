@@ -1,5 +1,5 @@
 import { StackNavigationProp } from '@react-navigation/stack'
-import { Chat, MessageType, defaultTheme } from '@flyerhq/react-native-chat-ui'
+import { Chat, MessageType, defaultTheme, User } from '@flyerhq/react-native-chat-ui'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import styled from 'styled-components/native'
 import { RouteProp } from '@react-navigation/native'
@@ -91,9 +91,13 @@ const ChatDetail: React.FC<Props> = ({ navigation, route }) => {
         author: {
           id: item.participantSid ?? 'autoReply',
           firstName: participant?.attributes['first_name'] ?? 'Auto',
-          lastName: participant?.attributes['last_name'] ?? 'Reply'
-        },
+          lastName: participant?.attributes['last_name'] ?? 'Reply',
+        } as User,
       };
+
+      if (message.author.firstName === 'Serv' && message.author.lastName === 'Team') {
+        message.author.imageUrl = Image.resolveAssetSource(require('../assets/icon.png')).uri
+      }
       
       if (item.attachedMedia.length > 0) {
         const mediaUrls = await item.getTemporaryContentUrlsForAttachedMedia();
