@@ -20,6 +20,7 @@ import InvoiceScreen from '../screens/InvoiceScreen'
 import AddMemberScreen from '../screens/AddMemberScreen'
 import ImportCustomersScreen from '../screens/ImportCustomersScreen'
 import ImportTeamMembersScreen from '../screens/ImportTeamMembersScreen'
+import JobNotesEditScreen from '../screens/JobNotesEditScreen'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'HomeNavigator'>
 
@@ -198,6 +199,11 @@ export const JobsStackScreen: React.FC<Props> = () => {
                     title: 'Invoice',
                 }}
              />
+             <Stack.Screen name={Routes.JOB_NOTES_EDIT_SCREEN} component={JobNotesEditScreen}
+                options={{
+                    title: 'Edit Notes'
+                }}
+            />
         </Stack.Navigator>
     )
 }
