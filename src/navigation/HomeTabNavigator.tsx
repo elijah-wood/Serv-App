@@ -164,6 +164,11 @@ export const CustomersStackScreen: React.FC<Props> = () => {
                     title: 'Invoice',
                  }}
              />
+             <Stack.Screen name={Routes.JOB_NOTES_EDIT_SCREEN} component={JobNotesEditScreen}
+                options={{
+                    title: 'Edit Notes'
+                }}
+            />
              
         </Stack.Navigator>
     )

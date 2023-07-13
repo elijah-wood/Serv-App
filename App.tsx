@@ -39,7 +39,7 @@ type RootStackParamList = {
   ChatDetail: { conversationSid: string, name: string }
   TeamScreen: undefined
   AnalyticsScreen: undefined
-  InvoiceScreen: { job: Job, type?: InvoiceEstimateType, invoiceId?: string, estimateId?: string, dueDate?: string, invoiceEstimateItems?: InvoiceEstimateItem[] }
+  InvoiceScreen: { job: Job, type?: InvoiceEstimateType, invoiceId?: string, estimateId?: string, dueDate?: string, invoiceEstimateItems?: InvoiceEstimateItem[], notes?: string }
   AddMemberScreen: undefined,
   ImportTeamMembersScreen: { members?: Member[] },
   JobNotesEditScreen: { job: Job }

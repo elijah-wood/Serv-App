@@ -40,7 +40,7 @@ type InvoiceItem = {
 }
 
 const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
-    const { job, type, invoiceId, estimateId, dueDate, invoiceEstimateItems } = route.params
+    const { job, type, invoiceId, estimateId, dueDate, invoiceEstimateItems, notes } = route.params
     const [createIsLoading, setCreateIsLoading] = useState<boolean>(false)
     const [sendIsLoading, setSendIsLoading] = useState<boolean>(false)
     const useCreateInvoice = UseCreateInvoice()
@@ -56,7 +56,7 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
     const [date, setDate] = useState(dueDate ? new Date(dueDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
     const [openDatePicker, setOpenDatePicker] = useState(false)
 
-    const [notes, setNotes] = useState<string>('')
+    const [notesField, setNotesField] = useState<string>(notes ?? '')
 
     useEffect(() => {
         navigation.setOptions({ title: type == undefined ? 'New' : (type == InvoiceEstimateType.Invoice ? 'Invoice' : 'Estimate') })
@@ -280,8 +280,8 @@ const InvoiceScreen: React.FC<Props> = ({ navigation, route }) => {
                             <Cell title={'Job'} subtitle={job.name}/>
                             <EditableCell
                               title='Notes'
-                              value={notes}
-                              onChangeValue={setNotes}
+                              value={notesField}
+                              onChangeValue={setNotesField}
                               placeholder='Type your notes'
                             />
                             {type == InvoiceEstimateType.Invoice && (

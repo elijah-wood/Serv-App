@@ -122,7 +122,7 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           <DetailSection title='Description' value={job?.description ?? ''} onPress={() => {
             
           }}/>
-          <DetailSection title="Notes" value={job?.notes ?? ''} showDisclosure onPress={() => {
+          <DetailSection title="Notes" value={job?.notes ?? 'Tap to add notes'} showDisclosure onPress={() => {
             navigation.navigate('JobNotesEditScreen', { job })
           }} />
           <SelectDropdown
