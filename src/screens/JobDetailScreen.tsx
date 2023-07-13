@@ -6,6 +6,7 @@ import { Avatar, Box, ChevronRightIcon, Divider, FlatList, Flex, HStack, Spacer,
 import { ScrollView } from 'react-native-virtualized-view'
 import { Alert, DeviceEventEmitter, TouchableOpacity } from 'react-native'
 import SelectDropdown from 'react-native-select-dropdown'
+import * as ImagePicker from 'expo-image-picker';
 
 import { RootStackParamList } from '../../App'
 import UseGetJob from '../api/UseGetJob'
@@ -26,6 +27,8 @@ import { InvoiceEstimateType } from './InvoiceScreen'
 import UseMembers from '../api/UseMembers'
 import { useActionSheet } from '@expo/react-native-action-sheet'
 import UseAddCollaborator from '../api/UseAddCollaborator'
+import { Item } from 'react-navigation-header-buttons'
+import UseUploadPhoto from '../api/UseUploadPhoto'
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'JobDetailScreen'>
 type JobRouteProp = RouteProp<RootStackParamList, 'JobDetailScreen'>
@@ -37,6 +40,7 @@ type Props = {
 
 const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const useGetJob = UseGetJob(route.params.jobId)
+  const useUploadPhoto = UseUploadPhoto(route.params.jobId)
   const useUpdateJob = UseUpdateJob(route.params.jobId)
   const useMembers = UseMembers()
   const useAddCollaborator = UseAddCollaborator()
@@ -99,6 +103,10 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
         break
     }
   }, [useAddCollaborator.data])
+
+  useEffect(() => {
+    console.log(useUploadPhoto.status, useUploadPhoto.data)
+  }, [useUploadPhoto.data])
   
   const data = useMemo(
     () =>
@@ -107,6 +115,29 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
         .map((_, index) => `index-${index}`),
     []
   )
+
+  const addPhoto = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      quality: 1
+    })
+    
+    if (result.canceled) {
+      return
+    }
+
+    const { assets } = result
+
+    if (!assets || assets.length === 0) {
+      return
+    }
+
+    console.log(assets)
+
+    useUploadPhoto.mutate({images: ['42']})
+
+  }
 
   if (useGetJob.isFetching || useUpdateJob.isLoading || useMembers.isLoading) {
     return (
@@ -193,6 +224,12 @@ const JobDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           } onPress={() => {
             openMap(job?.address)
           }}/>
+
+          <SectionContainer style={{paddingBottom: 16}}>
+            <SectionTitle>Photos</SectionTitle>
+            <Item title='Add Photo' onPress={() => addPhoto()} style={{position: 'absolute', top: 16, right: 16}} />
+          </SectionContainer>
+
           {/* Collaborators */}
           <SectionContainer>
             <SectionTitle>Team Members</SectionTitle>

@@ -1,3 +1,4 @@
+import { Client } from "@twilio/mcs-client"
 import APIClient from "./APIClient"
 import { AuthenticatedHeaders } from "./AuthenticatedHeaders"
 import { AddCollaboratorInput } from "./UseAddCollaborator"
@@ -13,6 +14,7 @@ import { UpdateCustomerInput } from "./UseUpdateCustomer"
 import { UpdateJobInput } from "./UseUpdateJob"
 import { UploadCustomersInput } from "./UseUploadCustomers"
 import { UploadMembersInput } from "./UseUploadMembers"
+import { UploadPhotoInput } from "./UseUploadPhoto"
 
 export const API = {
     login: async (values: SignInInput) => {
@@ -137,5 +139,11 @@ export const API = {
         })
         return response.data
     },    
+    uploadPhoto: async (jobId: string, values: UploadPhotoInput) => {
+        const response = await APIClient.post(`/photos/upload/${jobId}`, values, {
+          headers: await AuthenticatedHeaders(),  
+        })
+        return response.data
+    }
   }
   
